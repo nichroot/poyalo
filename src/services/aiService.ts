@@ -3,7 +3,7 @@ import { ComicStory, ComicTone, EraLayer } from '../types/comic';
 
 const GEMINI_API_KEY: string = 
   (import.meta as any).env?.VITE_GEMINI_API_KEY ||
-  'AQ.Ab8RN6Iyt_JMmvMg-e0q1KRlB_Vv3eASwDgXn2t1SIYhe_HWbA';
+  'AIzaSyCU2Ua9831saitk0Ifc0877IpTvU3wYaao';
 
 export interface GeneratedPlanResponse {
   city: string;

@@ -3,7 +3,7 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || 'AQ.Ab8RN6Iyt_JMmvMg-e0q1KRlB_Vv3eASwDgXn2t1SIYhe_HWbA';
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || 'AIzaSyCU2Ua9831saitk0Ifc0877IpTvU3wYaao';
   const { prompt } = req.body || {};
 
   if (!prompt || typeof prompt !== 'string') {
