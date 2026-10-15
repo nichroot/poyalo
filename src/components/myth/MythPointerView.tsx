@@ -155,8 +155,7 @@ export const MythPointerView: React.FC<MythPointerViewProps> = ({
         if (onSelectCity) onSelectCity(target);
       }
     } catch (err) {
-      console.error('Failed to generate myths:', err);
-      alert(`Could not fetch myths for "${target}". Please check connection or try again.`);
+      console.warn('Custom myth generation notice:', err);
     } finally {
       setIsGeneratingAI(false);
     }

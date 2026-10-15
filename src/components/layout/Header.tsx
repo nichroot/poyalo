@@ -1,10 +1,11 @@
 import React from 'react';
-import { Compass, Wifi, WifiOff, Sparkles, MapPin, Smartphone } from 'lucide-react';
+import { Compass, Wifi, WifiOff, Sparkles, MapPin, Smartphone, Key } from 'lucide-react';
 
 interface HeaderProps {
   isOffline: boolean;
   onTeleportDemo?: () => void;
   onOpenInstallGuide?: () => void;
+  onOpenApiKeyModal?: () => void;
   activeCity?: string;
 }
 
@@ -12,6 +13,7 @@ export const Header: React.FC<HeaderProps> = ({
   isOffline = false,
   onTeleportDemo,
   onOpenInstallGuide,
+  onOpenApiKeyModal,
   activeCity = 'Worldwide'
 }) => {
   return (
@@ -49,9 +51,22 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </button>
 
-        {/* Right Badges: Install App, Offline & Demo Teleport */}
+        {/* Right Badges: AI Engine, Install App, Offline & Demo Teleport */}
         <div className="flex items-center space-x-1.5 sm:space-x-2">
           
+          {/* AI Engine Settings Button */}
+          {onOpenApiKeyModal && (
+            <button
+              onClick={onOpenApiKeyModal}
+              title="Configure AI Engine / Gemini API Key"
+              className="bg-[#EDE9FE] hover:bg-[#DDD6FE] text-[#111827] px-2 sm:px-2.5 py-1 rounded-full border-2 border-[#111827] text-[10px] sm:text-[11px] font-mono font-bold shadow-[2px_2px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5 flex items-center space-x-1 transition-transform"
+            >
+              <Key className="w-3 h-3 text-[#7C3AED]" />
+              <span className="hidden xs:inline">AI</span>
+              <span>KEY</span>
+            </button>
+          )}
+
           {/* Install / Guide Pill */}
           {onOpenInstallGuide && (
             <button

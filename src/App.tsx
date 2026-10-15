@@ -9,6 +9,7 @@ import { BoardingPass } from './components/pass/BoardingPass';
 import { MythPointerView } from './components/myth/MythPointerView';
 import { WelcomeOnboardingModal } from './components/onboarding/WelcomeOnboardingModal';
 import { AirplaneEasterEgg } from './components/common/AirplaneEasterEgg';
+import { ApiKeyModal } from './components/common/ApiKeyModal';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('planner');
@@ -16,6 +17,7 @@ export const App: React.FC = () => {
   const [pearlsCollected, setPearlsCollected] = useState<number>(0);
   const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
   const [currentCity, setCurrentCity] = useState<string>('');
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
 
   // PWA install prompt & first-time onboarding modal
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any | null>(null);
@@ -91,6 +93,7 @@ export const App: React.FC = () => {
         isOffline={isOffline}
         onTeleportDemo={handleTeleportDemo}
         onOpenInstallGuide={() => setShowWelcome(true)}
+        onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
         activeCity={currentCity}
       />
 
@@ -148,6 +151,12 @@ export const App: React.FC = () => {
 
       {/* Supersonic Comic Airplane Easter Egg (Phone Shake & Header Trigger) */}
       <AirplaneEasterEgg />
+
+      {/* AI Key & Deterministic Mode Configuration Modal */}
+      <ApiKeyModal
+        isOpen={isApiKeyModalOpen}
+        onClose={() => setIsApiKeyModalOpen(false)}
+      />
 
     </div>
   );
