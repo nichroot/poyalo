@@ -155,6 +155,65 @@ const CITY_DATABASE: Record<string, KnownCityData> = {
       { name: 'SM Street (Sweetmeat Street) Halwa Tasting', category: 'food', isOutdoor: true, notes: 'Tasting authentic black wheat halwa and banana chips' },
       { name: 'Kozhikode Beach Sunset & Heritage Pier', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Historic sea bridge ruins with Malabar sea breeze' }
     ]
+  },
+  amsterdam: {
+    name: 'Amsterdam',
+    country: 'Netherlands',
+    lat: 52.3676,
+    lng: 4.9041,
+    themes: ['Canal Ring Heritage & Jordaan', 'Museumplein Dutch Masters & Vondelpark', 'Historic Dam & Maritime Quarter', 'De Pijp Bohemian Markets & Brown Cafes'],
+    landmarks: [
+      { name: 'Anne Frank House & Prinsengracht', category: 'heritage', isOutdoor: false, notes: 'Preserved secret annex and wartime historical museum' },
+      { name: 'Rijksmuseum Dutch Masters Gallery', category: 'museum', isOutdoor: false, notes: 'Rembrandt Night Watch and Vermeer masterpieces' },
+      { name: 'Vondelpark Rose Garden & Historic Pavilions', category: 'heritage', isOutdoor: true, notes: 'Expansive 19th-century public park with cycling avenues' },
+      { name: "A'DAM Lookout 360° Sky Sunset Deck", category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Panoramic rooftop view overlooking the historic port and canals' },
+      { name: 'Van Gogh Museum Gallery', category: 'museum', isOutdoor: false, notes: 'World largest collection of Vincent van Gogh paintings' },
+      { name: 'Albert Cuyp Market Street Food Crawl', category: 'food', isOutdoor: true, notes: 'Fresh warm Dutch stroopwafels, cheeses and pickled herring' },
+      { name: 'Dam Square & Royal Palace Amsterdam', category: 'heritage', isOutdoor: true, notes: 'Historic heart of the city and 17th-century town hall' }
+    ]
+  },
+  london: {
+    name: 'London',
+    country: 'United Kingdom',
+    lat: 51.5074,
+    lng: -0.1278,
+    themes: ['Royal Westminster & Thames Embankment', 'Historic City & Tower Fortress', 'Bloomsbury Intellectuals & British Museum', 'South Bank & Greenwich Maritime'],
+    landmarks: [
+      { name: 'Tower of London & White Tower Armoury', category: 'heritage', isOutdoor: true, notes: 'Nearly 1,000-year-old royal fortress housing the Crown Jewels' },
+      { name: 'Borough Market Artisan Food Halls', category: 'food', isOutdoor: true, notes: 'Oldest food market in London dating back to 1014' },
+      { name: 'British Museum Parthenon Sculptures', category: 'museum', isOutdoor: false, notes: 'World history and antiquity with the Norman Foster glass Great Court' },
+      { name: 'Sky Garden 360° Sunset Panorama', category: 'viewpoint', isOutdoor: false, idealForSunset: true, notes: 'Enclosed public gardens on 35th floor with sunset views over Thames' },
+      { name: 'Westminster Abbey & Big Ben Walk', category: 'heritage', isOutdoor: true, notes: 'Coronation site of British monarchs since 1066' },
+      { name: 'Covent Garden Piazza & Street Theatre', category: 'souk', isOutdoor: true, notes: 'Historic market building with street performers and boutique crafts' }
+    ]
+  },
+  newyork: {
+    name: 'New York',
+    country: 'United States',
+    lat: 40.7128,
+    lng: -74.0060,
+    themes: ['Manhattan Skyline & Central Park', 'Midtown Art & Broadway Lore', 'Lower Manhattan & Harbor Gateway', 'Greenwich Village & High Line'],
+    landmarks: [
+      { name: 'Metropolitan Museum of Art (The Met)', category: 'museum', isOutdoor: false, notes: '5,000 years of global art on Fifth Avenue' },
+      { name: 'Central Park Bow Bridge & Bethesda Terrace', category: 'heritage', isOutdoor: true, notes: 'Olmsted and Vaux historic urban masterpiece' },
+      { name: 'High Line Elevated Rail Park', category: 'viewpoint', isOutdoor: true, notes: 'Repurposed freight rail line through Chelsea art district' },
+      { name: 'Top of the Rock Sunset Observation Deck', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Classic sunset vista with Empire State Building centered' },
+      { name: 'Chelsea Market & Meatpacking Food Crawl', category: 'food', isOutdoor: false, notes: 'Historic Nabisco factory converted into culinary market' }
+    ]
+  },
+  barcelona: {
+    name: 'Barcelona',
+    country: 'Spain',
+    lat: 41.3879,
+    lng: 2.1699,
+    themes: ['Gaudí Modernisme Masterpieces', 'Gothic Quarter & Born Roman Roots', 'Montjuïc Hills & Port Vell', 'Park Güell & Gràcia Bohemian'],
+    landmarks: [
+      { name: 'Basílica de la Sagrada Família', category: 'heritage', isOutdoor: false, notes: 'Gaudí unfinished architectural masterpiece consecrated by Pope Benedict' },
+      { name: 'Mercat de la Boqueria Tapas Crawl', category: 'food', isOutdoor: true, notes: 'Iconic market on La Rambla serving jamón ibérico and seafood' },
+      { name: 'Park Güell Mosaic Serpentine Bench', category: 'viewpoint', isOutdoor: true, notes: 'Panoramic overlook across Barcelona towards the Mediterranean' },
+      { name: 'Bunkers del Carmel Sunset 360°', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Civil war anti-aircraft bunkers with the best panorama in the city' },
+      { name: 'Picasso Museum in El Born Palaces', category: 'museum', isOutdoor: false, notes: 'Formative works of Pablo Picasso in 5 medieval stone palaces' }
+    ]
   }
 };
 
@@ -264,7 +323,7 @@ export async function generateAIPlan(userPrompt: string): Promise<GeneratedPlanR
     const res = await fetch('/api/generate-plan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: userPrompt })
+      body: JSON.stringify({ prompt: userPrompt, apiKey: getGeminiApiKey() })
     });
     if (res.ok) {
       const data = await res.json();
@@ -298,7 +357,8 @@ export async function generateAIPlan(userPrompt: string): Promise<GeneratedPlanR
             ];
 
         return {
-          city: data.city || 'Custom Destination',
+          city: data.city || data.cityName || 'Custom Destination',
+          cityName: data.city || data.cityName || 'Custom Destination',
           country: data.country || 'Worldwide',
           theme: data.theme || 'Curated Exploration Trail',
           totalDays: totalDays,
@@ -311,13 +371,14 @@ export async function generateAIPlan(userPrompt: string): Promise<GeneratedPlanR
     // Fall through to client direct engine
   }
 
-  // 2. Direct Gemini Call (if a custom key is provided)
+  // 2. Direct Gemini Call (if a custom or default key is provided)
   const apiKey = getGeminiApiKey();
   if (apiKey && apiKey.length > 10) {
     try {
-      const systemPrompt = `You are a world-class travel planner for the POYALO app.
-The user wants an itinerary for: "${userPrompt}".
-Detect the destination city, country, and duration requested (e.g. "3 days in Tokyo" -> 3 days, "weekend" -> 2 days, or if unspecified default to 2 to 3 days). Maximum 5 days. For each day, create 3 to 4 distinct logically sequenced stops.
+      const systemPrompt = `You are an elite travel planner for POYALO.
+The traveler requested: "${userPrompt}".
+Identify the destination city, country, and duration requested (e.g. "3 days in Tokyo" -> 3 days, "weekend in Amsterdam" -> 2 days, or if unspecified default to 2 to 3 days). Maximum 5 days.
+CRITICAL INSTRUCTION: You MUST use REAL, SPECIFIC, FAMOUS, and AUTHENTIC places, landmarks, museums, street markets, viewpoints, and neighborhood food spots for this exact destination (e.g. for Amsterdam: Anne Frank House, Rijksmuseum, Vondelpark, Dam Square, Albert Cuyp Market). NEVER use generic placeholder names like "Old Town Gate" or "Central Market". Every place must be a real verified location with accurate coordinates.
 
 Return ONLY a valid JSON object matching this schema:
 {
@@ -331,75 +392,90 @@ Return ONLY a valid JSON object matching this schema:
       "theme": "Day 1 Theme",
       "stops": [
         {
-          "name": "Attraction Name",
+          "name": "Specific Real Landmark Name",
           "category": "heritage" | "souk" | "museum" | "food" | "viewpoint",
-          "startTime": "HH:MM",
-          "endTime": "HH:MM",
-          "durationMinutes": 60,
-          "lat": 35.6895,
-          "lng": 139.6917,
+          "startTime": "09:30",
+          "endTime": "11:00",
+          "durationMinutes": 90,
+          "lat": 52.3600,
+          "lng": 4.8852,
           "isOutdoor": true,
           "idealForSunset": false,
-          "notes": "Short highlight"
+          "notes": "Authentic highlight or local tip"
         }
       ]
     }
   ]
 }`;
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: systemPrompt }] }],
-            generationConfig: {
-              responseMimeType: 'application/json',
-              temperature: 0.7
+      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-flash-latest'];
+      let parsedJson: any = null;
+
+      for (const model of modelsToTry) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: systemPrompt }] }],
+                generationConfig: {
+                  responseMimeType: 'application/json',
+                  temperature: 0.5
+                }
+              })
             }
-          })
-        }
-      );
+          );
 
-      if (response.ok) {
-        const data = await response.json();
-        const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (textContent) {
-          const parsed = JSON.parse(textContent);
-          if (parsed && (parsed.days?.length > 0 || parsed.stops?.length > 0)) {
-            const totalDays = parsed.totalDays || parsed.days?.length || 1;
-            const normalizedDays: ItineraryDay[] = (parsed.days && parsed.days.length > 0)
-              ? parsed.days.map((d: any, dIdx: number) => ({
-                  dayNumber: d.dayNumber || dIdx + 1,
-                  theme: d.theme || `Day ${dIdx + 1} Trail`,
-                  stops: (d.stops || []).map((s: any, idx: number) => ({
-                    id: `ai-stop-${dIdx + 1}-${Date.now()}-${idx}`,
-                    poiId: `poi-${(s.name || '').toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
-                    name: s.name,
-                    category: s.category || 'heritage',
-                    startTime: s.startTime || '10:00',
-                    endTime: s.endTime || '11:30',
-                    durationMinutes: Number(s.durationMinutes) || 75,
-                    lat: Number(s.lat) || 0,
-                    lng: Number(s.lng) || 0,
-                    isOutdoor: Boolean(s.isOutdoor),
-                    idealForSunset: Boolean(s.idealForSunset),
-                    notes: s.notes || undefined
-                  }))
-                }))
-              : [];
-
-            return {
-              city: parsed.city || 'Custom Destination',
-              country: parsed.country || 'Worldwide',
-              theme: parsed.theme || 'Curated Exploration Trail',
-              totalDays: totalDays,
-              days: normalizedDays,
-              stops: normalizedDays[0]?.stops || []
-            };
+          if (response.ok) {
+            const data = await response.json();
+            const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (textContent) {
+              const resJson = JSON.parse(textContent);
+              if (resJson && (resJson.days?.length > 0 || resJson.stops?.length > 0)) {
+                parsedJson = resJson;
+                break;
+              }
+            }
           }
+        } catch {
+          // Try next model
         }
+      }
+
+      if (parsedJson) {
+        const totalDays = parsedJson.totalDays || parsedJson.days?.length || 1;
+        const normalizedDays: ItineraryDay[] = (parsedJson.days && parsedJson.days.length > 0)
+          ? parsedJson.days.map((d: any, dIdx: number) => ({
+              dayNumber: d.dayNumber || dIdx + 1,
+              theme: d.theme || `Day ${dIdx + 1} Trail`,
+              stops: (d.stops || []).map((s: any, idx: number) => ({
+                id: `ai-stop-${dIdx + 1}-${Date.now()}-${idx}`,
+                poiId: `poi-${(s.name || '').toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+                name: s.name,
+                category: s.category || 'heritage',
+                startTime: s.startTime || '10:00',
+                endTime: s.endTime || '11:30',
+                durationMinutes: Number(s.durationMinutes) || 75,
+                lat: Number(s.lat) || 0,
+                lng: Number(s.lng) || 0,
+                isOutdoor: Boolean(s.isOutdoor),
+                idealForSunset: Boolean(s.idealForSunset),
+                notes: s.notes || undefined
+              }))
+            }))
+          : [];
+
+        return {
+          city: parsedJson.city || parsedJson.cityName || 'Custom Destination',
+          cityName: parsedJson.city || parsedJson.cityName || 'Custom Destination',
+          country: parsedJson.country || 'Worldwide',
+          theme: parsedJson.theme || 'Curated Exploration Trail',
+          totalDays: totalDays,
+          days: normalizedDays,
+          stops: normalizedDays[0]?.stops || []
+        };
       }
     } catch {
       // Gracefully fall through
@@ -566,7 +642,7 @@ Return a valid JSON object matching this schema:
   "sources": ["Source 1", "Source 2"]
 }`;
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -711,7 +787,7 @@ Return ONLY a valid JSON array of 4 distinct myth objects matching this schema:
   }
 ]`;
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -24,11 +24,7 @@ const KNOWN_CITIES: Record<string, CityInfo> = {
       { name: 'Meiji Jingu Shrine & Forest Walk', category: 'heritage', isOutdoor: true, notes: 'Sacred evergreen forest in the heart of the metropolis' },
       { name: 'Harajuku Takeshita-dori & Cat Street', category: 'souk', isOutdoor: true, notes: 'Vibrant street fashion, artisan coffee and crepes' },
       { name: 'National Museum of Western Art', category: 'museum', isOutdoor: false, notes: 'Le Corbusier UNESCO-listed architecture in Ueno' },
-      { name: 'Roppongi Hills Mori Tower Sunset', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Breathtaking view of illuminated Tokyo Tower' },
-      { name: 'Imperial Palace East Gardens', category: 'heritage', isOutdoor: true, notes: 'Historic stone castle ruins and Edo moats' },
-      { name: 'Akihabara Electric Town', category: 'souk', isOutdoor: true, notes: 'Vintage electronics and retro gaming culture' },
-      { name: 'TeamLab Planets Immersive Digital Art', category: 'museum', isOutdoor: false, notes: 'Barefoot walk-through digital light installations' },
-      { name: 'Odaiba Seaside Park & Rainbow Bridge', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Tokyo Bay waterfront breeze and golden sunset' }
+      { name: 'Roppongi Hills Mori Tower Sunset', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Breathtaking view of illuminated Tokyo Tower' }
     ]
   },
   paris: {
@@ -46,6 +42,66 @@ const KNOWN_CITIES: Record<string, CityInfo> = {
       { name: 'Saint-Germain-des-Prés Historic Cafés', category: 'food', isOutdoor: true, notes: 'Sartre and Simone de Beauvoir legendary writing haunts' },
       { name: 'Musée Rodin Sculpture Gardens', category: 'museum', isOutdoor: true, notes: 'The Thinker sculpture surrounded by rose gardens' },
       { name: 'Trocadéro Terrace Sunset over Eiffel Tower', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Golden hour vantage point with hourly light sparkles' }
+    ]
+  },
+  amsterdam: {
+    name: 'Amsterdam',
+    country: 'Netherlands',
+    lat: 52.3676,
+    lng: 4.9041,
+    themes: ['Canal Ring Heritage & Jordaan', 'Museumplein Dutch Masters & Vondelpark', 'Historic Dam & Maritime Quarter', 'De Pijp Bohemian Markets & Brown Cafes'],
+    landmarks: [
+      { name: 'Anne Frank House & Prinsengracht', category: 'heritage', isOutdoor: false, notes: 'Preserved secret annex and wartime historical museum' },
+      { name: 'Rijksmuseum Dutch Masters Gallery', category: 'museum', isOutdoor: false, notes: 'Rembrandt Night Watch and Vermeer masterpieces' },
+      { name: 'Vondelpark Rose Garden & Historic Pavilions', category: 'heritage', isOutdoor: true, notes: 'Expansive 19th-century public park with cycling avenues' },
+      { name: "A'DAM Lookout 360° Sky Sunset Deck", category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Panoramic rooftop view overlooking the historic port and canals' },
+      { name: 'Van Gogh Museum Gallery', category: 'museum', isOutdoor: false, notes: 'World largest collection of Vincent van Gogh paintings' },
+      { name: 'Albert Cuyp Market Street Food Crawl', category: 'food', isOutdoor: true, notes: 'Fresh warm Dutch stroopwafels, cheeses and pickled herring' },
+      { name: 'Dam Square & Royal Palace Amsterdam', category: 'heritage', isOutdoor: true, notes: 'Historic heart of the city and 17th-century town hall' },
+      { name: 'Prinsengracht Canal Cruise Golden Hour', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'UNESCO canal belt illuminated at dusk' }
+    ]
+  },
+  london: {
+    name: 'London',
+    country: 'United Kingdom',
+    lat: 51.5074,
+    lng: -0.1278,
+    themes: ['Royal Westminster & Thames Embankment', 'Historic City & Tower Fortress', 'Bloomsbury Intellectuals & British Museum', 'South Bank & Greenwich Maritime'],
+    landmarks: [
+      { name: 'Tower of London & White Tower Armoury', category: 'heritage', isOutdoor: true, notes: 'Nearly 1,000-year-old royal fortress housing the Crown Jewels' },
+      { name: 'Borough Market Artisan Food Halls', category: 'food', isOutdoor: true, notes: 'Oldest food market in London dating back to 1014' },
+      { name: 'British Museum Parthenon Sculptures', category: 'museum', isOutdoor: false, notes: 'World history and antiquity with the Norman Foster glass Great Court' },
+      { name: 'Sky Garden 360° Sunset Panorama', category: 'viewpoint', isOutdoor: false, idealForSunset: true, notes: 'Enclosed public gardens on 35th floor with sunset views over Thames' },
+      { name: 'Westminster Abbey & Big Ben Walk', category: 'heritage', isOutdoor: true, notes: 'Coronation site of British monarchs since 1066' },
+      { name: 'Covent Garden Piazza & Street Theatre', category: 'souk', isOutdoor: true, notes: 'Historic market building with street performers and boutique crafts' }
+    ]
+  },
+  newyork: {
+    name: 'New York',
+    country: 'United States',
+    lat: 40.7128,
+    lng: -74.0060,
+    themes: ['Manhattan Skyline & Central Park', 'Midtown Art & Broadway Lore', 'Lower Manhattan & Harbor Gateway', 'Greenwich Village & High Line'],
+    landmarks: [
+      { name: 'Metropolitan Museum of Art (The Met)', category: 'museum', isOutdoor: false, notes: '5,000 years of global art on Fifth Avenue' },
+      { name: 'Central Park Bow Bridge & Bethesda Terrace', category: 'heritage', isOutdoor: true, notes: 'Olmsted and Vaux historic urban masterpiece' },
+      { name: 'High Line Elevated Rail Park', category: 'viewpoint', isOutdoor: true, notes: 'Repurposed freight rail line through Chelsea art district' },
+      { name: 'Top of the Rock Sunset Observation Deck', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Classic sunset vista with Empire State Building centered' },
+      { name: 'Chelsea Market & Meatpacking Food Crawl', category: 'food', isOutdoor: false, notes: 'Historic Nabisco factory converted into culinary market' }
+    ]
+  },
+  barcelona: {
+    name: 'Barcelona',
+    country: 'Spain',
+    lat: 41.3879,
+    lng: 2.1699,
+    themes: ['Gaudí Modernisme Masterpieces', 'Gothic Quarter & Born Roman Roots', 'Montjuïc Hills & Port Vell', 'Park Güell & Gràcia Bohemian'],
+    landmarks: [
+      { name: 'Basílica de la Sagrada Família', category: 'heritage', isOutdoor: false, notes: 'Gaudí unfinished architectural masterpiece consecrated by Pope Benedict' },
+      { name: 'Mercat de la Boqueria Tapas Crawl', category: 'food', isOutdoor: true, notes: 'Iconic market on La Rambla serving jamón ibérico and seafood' },
+      { name: 'Park Güell Mosaic Serpentine Bench', category: 'viewpoint', isOutdoor: true, notes: 'Panoramic overlook across Barcelona towards the Mediterranean' },
+      { name: 'Bunkers del Carmel Sunset 360°', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Civil war anti-aircraft bunkers with the best panorama in the city' },
+      { name: 'Picasso Museum in El Born Palaces', category: 'museum', isOutdoor: false, notes: 'Formative works of Pablo Picasso in 5 medieval stone palaces' }
     ]
   },
   rome: {
@@ -119,21 +175,21 @@ function generateFallbackPlan(promptText: string) {
       lat: 40.0,
       lng: 10.0,
       themes: [
-        `${guessedName} Historic Core & Heritage Trail`,
-        `${guessedName} Artisan Quarter & Local Flavors`,
+        `${guessedName} Historic Quarter & Landmark Trail`,
+        `${guessedName} Local Flavors & Cultural Discoveries`,
         `${guessedName} Modern Arts & Scenic Heights`,
-        `${guessedName} Coastal Promenade & Garden Walk`,
-        `${guessedName} Hidden Alleys & Farewell Vista`
+        `${guessedName} Waterfront Walk & Garden Sanctuary`,
+        `${guessedName} Historic Hidden Gems & Farewell Vista`
       ],
       landmarks: [
-        { name: `${guessedName} Old Town & Citadel Gate`, category: 'heritage', isOutdoor: true, notes: 'Ancient preserved architecture and cobblestone lanes' },
-        { name: `${guessedName} Central Artisan & Spice Market`, category: 'souk', isOutdoor: true, notes: 'Bustling local vendors, crafts, and street delicacies' },
-        { name: `${guessedName} National Cultural Museum`, category: 'museum', isOutdoor: false, notes: 'Historical masterpieces and archaeological artifacts' },
-        { name: `${guessedName} Panoramic Skyline Lookout`, category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Spectacular golden-hour sunset over the city rooftops' },
-        { name: `${guessedName} Botanical Royal Gardens`, category: 'heritage', isOutdoor: true, notes: 'Historic pavilions and peaceful tree-lined paths' },
-        { name: `${guessedName} Riverside Promenade & Cafés`, category: 'food', isOutdoor: true, notes: 'Authentic regional lunch dishes and local drinks' },
-        { name: `${guessedName} Contemporary Gallery Quarter`, category: 'museum', isOutdoor: false, notes: 'Interactive modern art and design installations' },
-        { name: `${guessedName} Hilltop Sanctuary Sunset`, category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Elevated viewpoint catching the twilight city lights' }
+        { name: `${guessedName} Historic Cathedral & Old Town Square`, category: 'heritage', isOutdoor: true, notes: 'Centuries-old preserved architecture and cobblestone streets' },
+        { name: `${guessedName} Central Food Hall & Artisan Stalls`, category: 'food', isOutdoor: true, notes: 'Authentic local market stalls and fresh specialties' },
+        { name: `${guessedName} National Museum of Fine Arts`, category: 'museum', isOutdoor: false, notes: 'Treasured cultural collections and archaeological exhibits' },
+        { name: `${guessedName} Hilltop Panorama Sunset Lookout`, category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Golden hour vantage point overlooking the entire cityscape' },
+        { name: `${guessedName} Royal Botanical Botanical Walk`, category: 'heritage', isOutdoor: true, notes: 'Historic arboretum and peaceful tree-lined paths' },
+        { name: `${guessedName} Riverside Bistro District`, category: 'food', isOutdoor: true, notes: 'Riverside dining featuring iconic regional cuisine' },
+        { name: `${guessedName} Contemporary Culture Pavilion`, category: 'museum', isOutdoor: false, notes: 'Interactive design exhibitions and creative galleries' },
+        { name: `${guessedName} Skydeck Evening Observation Terrace`, category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Twinkling twilight views across the city skyline' }
       ]
     };
   }
@@ -203,14 +259,15 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: 'Valid prompt is required' });
   }
 
-  const apiKey = (typeof process !== 'undefined' ? (process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY) : '') || '';
+  const apiKey = (typeof process !== 'undefined' ? (process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY) : '') || req.body?.apiKey || '';
 
-  // If apiKey is provided, attempt live Gemini call
+  // If apiKey is provided, attempt live Gemini call with production models
   if (apiKey && apiKey.length > 10) {
     try {
-      const systemPrompt = `You are an expert travel planner for POYALO.
+      const systemPrompt = `You are an elite travel planner for POYALO.
 The traveler requested: "${prompt}".
-Identify the destination city, country, and duration requested (e.g. "3 days in Tokyo" -> 3 days, "weekend" -> 2 days, or if unspecified default to 2 to 3 days). Maximum 5 days.
+Identify the destination city, country, and duration requested (e.g. "3 days in Tokyo" -> 3 days, "weekend in Amsterdam" -> 2 days, or if unspecified default to 2 to 3 days). Maximum 5 days.
+CRITICAL INSTRUCTION: You MUST use REAL, SPECIFIC, FAMOUS, and AUTHENTIC places, landmarks, museums, street markets, viewpoints, and neighborhood food spots for this exact destination (e.g. for Amsterdam: Anne Frank House, Rijksmuseum, Vondelpark, Dam Square, Albert Cuyp Market). NEVER use generic synthesized placeholder names like "Old Town Gate", "Central Market", or "National Museum". Every place must be a real verified location with accurate coordinates.
 
 Return ONLY a valid JSON object matching this schema:
 {
@@ -224,46 +281,60 @@ Return ONLY a valid JSON object matching this schema:
       "theme": "Day 1 Theme",
       "stops": [
         {
-          "name": "Attraction Name",
+          "name": "Specific Real Landmark Name",
           "category": "heritage" | "souk" | "museum" | "food" | "viewpoint",
-          "startTime": "HH:MM",
-          "endTime": "HH:MM",
-          "durationMinutes": 60,
-          "lat": 35.6895,
-          "lng": 139.6917,
+          "startTime": "09:30",
+          "endTime": "11:00",
+          "durationMinutes": 90,
+          "lat": 52.3600,
+          "lng": 4.8852,
           "isOutdoor": true,
           "idealForSunset": false,
-          "notes": "Short highlight"
+          "notes": "Authentic highlight or local tip"
         }
       ]
     }
   ]
 }`;
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: systemPrompt }] }],
-            generationConfig: {
-              responseMimeType: 'application/json',
-              temperature: 0.7
-            }
-          })
-        }
-      );
+      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-flash-latest'];
+      let parsed: any = null;
 
-      if (response.ok) {
-        const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) {
-          const parsed = JSON.parse(text);
-          if (parsed && (parsed.days?.length > 0 || parsed.stops?.length > 0)) {
-            return res.status(200).json(parsed);
+      for (const model of modelsToTry) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: systemPrompt }] }],
+                generationConfig: {
+                  responseMimeType: 'application/json',
+                  temperature: 0.5
+                }
+              })
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              const resJson = JSON.parse(text);
+              if (resJson && (resJson.days?.length > 0 || resJson.stops?.length > 0)) {
+                parsed = resJson;
+                break;
+              }
+            }
           }
+        } catch {
+          // Continue to next model
         }
+      }
+
+      if (parsed) {
+        return res.status(200).json(parsed);
       }
     } catch {
       // Gracefully fall back to deterministic generator
