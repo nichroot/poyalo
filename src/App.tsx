@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Header } from './components/layout/Header';
 import { BottomDock, ActiveTab } from './components/layout/BottomDock';
 import { ItineraryPlanner } from './components/planner/ItineraryPlanner';
@@ -153,6 +154,9 @@ export const App: React.FC = () => {
         isOpen={isApiKeyModalOpen}
         onClose={() => setIsApiKeyModalOpen(false)}
       />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
 
     </div>
   );
