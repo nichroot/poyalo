@@ -170,10 +170,10 @@ export const AirplaneEasterEgg: React.FC = () => {
       triggerFlyby();
     };
 
-    // 3. Desktop Keyboard Shortcut ('S' key for shake demo)
+    // 3. Desktop Keyboard Shortcut (Alt+P for Poyalo Easter Egg, never plain WASD 'S' key!)
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
-        (e.key === 's' || e.key === 'S') && 
+        e.altKey && (e.key === 'p' || e.key === 'P') && 
         document.activeElement?.tagName !== 'INPUT' && 
         document.activeElement?.tagName !== 'TEXTAREA'
       ) {

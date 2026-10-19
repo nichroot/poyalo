@@ -58,10 +58,10 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const handleScoreUpdate = (score: number, pearls: number) => {
+  const handleScoreUpdate = React.useCallback((score: number, pearls: number) => {
     setGameScore(score);
     setPearlsCollected(pearls);
-  };
+  }, []);
 
   const handleOpenMythsForCity = (city: string) => {
     setCurrentCity(city);

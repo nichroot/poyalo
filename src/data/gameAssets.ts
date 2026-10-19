@@ -32,7 +32,7 @@ export const INITIAL_VG_WORLD_COLLECTIBLES: CollectibleItem[] = [
     type: 'date',
     name: 'Golden Medjool Date',
     points: 25,
-    x: 12.0,
+    x: 6.0,
     y: 0.6,
     z: 8.0,
     emoji: '🌴',

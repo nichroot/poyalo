@@ -57,6 +57,16 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 }) => {
   const [showEmotePicker, setShowEmotePicker] = useState(false);
 
+  // Auto-dismiss unlocked item fact notification after 3.2s
+  React.useEffect(() => {
+    if (unlockedItem) {
+      const timer = setTimeout(() => {
+        onDismissUnlock();
+      }, 3200);
+      return () => clearTimeout(timer);
+    }
+  }, [unlockedItem, onDismissUnlock]);
+
   const emotes: TravelEmote[] = [
     'Hello! 👋',
     'Let\'s Go! 🚀',
@@ -255,57 +265,24 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         </button>
       )}
 
-      {/* Cultural Fact Unlock Modal (Triggered on Collectible Hit) */}
+      {/* Non-intrusive Collection Fact Notification (Never blocks controls or freezes gameplay!) */}
       {unlockedItem && (
-        <div className="absolute inset-0 z-40 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 pointer-events-auto">
-          <div className="bg-white border-[2.5px] border-[#111827] rounded-2xl p-4 sm:p-5 max-w-sm w-full shadow-[6px_6px_0px_#111827] space-y-3 animate-scaleUp">
-            
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <span className="bg-[#10B981] text-white text-[10px] font-mono font-black px-2 py-0.5 rounded border border-[#111827]">
-                +{unlockedItem.points} POINTS UNLOCKED!
+        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 max-w-sm w-[92%] bg-white border-2 border-[#111827] rounded-2xl p-2.5 shadow-[4px_4px_0px_#111827] flex items-center space-x-3 pointer-events-none animate-bounce">
+          <div className="w-10 h-10 rounded-xl bg-[#FEF3C7] border-2 border-[#111827] flex items-center justify-center text-xl flex-shrink-0">
+            {unlockedItem.emoji}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-1.5">
+              <span className="bg-[#10B981] text-white text-[9px] font-mono font-black px-1.5 py-0.2 rounded border border-[#111827]">
+                +{unlockedItem.points} PTS
               </span>
-              <button 
-                onClick={onDismissUnlock}
-                className="text-gray-500 hover:text-black font-bold p-1"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <h4 className="font-display font-black text-xs text-[#111827] truncate">
+                {unlockedItem.name}
+              </h4>
             </div>
-
-            {/* Glyph & Item Name */}
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] border-2 border-[#111827] shadow-[2px_2px_0px_#111827] flex items-center justify-center text-2xl">
-                {unlockedItem.emoji}
-              </div>
-              <div>
-                <h3 className="font-display font-black text-base text-[#111827]">
-                  {unlockedItem.name}
-                </h3>
-                <span className="text-[11px] font-mono text-gray-500 font-bold">
-                  Heritage Cultural Lore Card
-                </span>
-              </div>
-            </div>
-
-            {/* Cultural Fact Card */}
-            <div className="p-3 bg-[#FDFBF7] border-2 border-[#111827] rounded-xl text-xs font-mono text-[#111827] leading-relaxed shadow-inner">
-              <p className="font-bold text-[#FF5722] mb-1 flex items-center space-x-1">
-                <BookOpen className="w-3.5 h-3.5 mr-1" />
-                <span>CULTURAL TRIVIA:</span>
-              </p>
-              <p>{unlockedItem.culturalFact}</p>
-            </div>
-
-            {/* Stamp into Passport CTA */}
-            <button
-              onClick={onDismissUnlock}
-              className="w-full py-2.5 bg-[#1B3FFF] hover:bg-[#1532CC] text-white border-2 border-[#111827] rounded-xl font-display font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_#111827] flex items-center justify-center space-x-1.5 active:translate-x-0.5 active:translate-y-0.5"
-            >
-              <Check className="w-4 h-4" />
-              <span>COLLECT FACT & KEEP EXPLORING</span>
-            </button>
-
+            <p className="text-[10px] font-mono text-gray-700 line-clamp-1 mt-0.5">
+              {unlockedItem.culturalFact}
+            </p>
           </div>
         </div>
       )}

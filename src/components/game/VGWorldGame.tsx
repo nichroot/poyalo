@@ -99,6 +99,12 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
   const [waypointDistance, setWaypointDistance] = useState<number>(0);
   const [discoveredLandmarks, setDiscoveredLandmarks] = useState<string[]>([]);
 
+  // Score update callback ref (prevents re-mounting 3D scene on score changes)
+  const onScoreUpdateRef = useRef(onScoreUpdate);
+  useEffect(() => {
+    onScoreUpdateRef.current = onScoreUpdate;
+  }, [onScoreUpdate]);
+
   // Jump and Teleport refs
   const jumpRequestedAtRef = useRef<number>(0);
   const speedBoostExpiresRef = useRef<number>(0);
@@ -1176,10 +1182,11 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       playerGroup.position.x = Math.max(-70, Math.min(75, playerGroup.position.x));
       playerGroup.position.z = Math.max(-95, Math.min(95, playerGroup.position.z));
 
-      // Water channel boundary check
+      // Water channel boundary check (respects Grand Bridge & Burj Al Arab Island)
       const inWaterChannel = playerGroup.position.x > 8.8 && playerGroup.position.x < 43.2;
-      const onBridgeDeck = Math.abs(playerGroup.position.z) <= 4.2;
-      if (inWaterChannel && !onBridgeDeck) {
+      const onBridgeDeck = Math.abs(playerGroup.position.z) <= 4.8;
+      const onBaaIsland = playerGroup.position.x >= 28 && playerGroup.position.z >= 12 && playerGroup.position.z <= 38;
+      if (inWaterChannel && !onBridgeDeck && !onBaaIsland) {
         if (playerGroup.position.x < 26) {
           playerGroup.position.x = 8.6;
         } else {
@@ -1280,9 +1287,9 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
               showBadge(`DISCOVERED: ${lm.name.toUpperCase()} (+150 PTS)!`, lm.emoji || '📍');
               setScore((s) => {
                 const newScore = s + 150;
-                if (onScoreUpdate) {
+                if (onScoreUpdateRef.current) {
                   const pearlCount = collectibles.filter(c => c.type === 'pearl' && c.collected).length;
-                  onScoreUpdate(newScore, pearlCount);
+                  onScoreUpdateRef.current(newScore, pearlCount);
                 }
                 return newScore;
               });
@@ -1325,8 +1332,13 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
               meshEntry.lid.rotation.x = -Math.PI / 3;
             }
             playSoundEffect('chest');
-            setScore(prev => prev + 250);
-            if (onScoreUpdate) onScoreUpdate(score + 250, collectibles.filter(c => c.type === 'pearl' && c.collected).length);
+            setScore(prev => {
+              const updatedScore = prev + 250;
+              if (onScoreUpdateRef.current) {
+                onScoreUpdateRef.current(updatedScore, collectibles.filter(c => c.type === 'pearl' && c.collected).length);
+              }
+              return updatedScore;
+            });
             showBadge('SECRET CHEST +250 PTS!', '🎁');
           }
         }
@@ -1358,7 +1370,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
               const pearlsCount = updated.filter(c => c.type === 'pearl' && c.collected).length;
               setScore(totalScore);
               setUnlockedItem(item);
-              if (onScoreUpdate) onScoreUpdate(totalScore, pearlsCount);
+              if (onScoreUpdateRef.current) onScoreUpdateRef.current(totalScore, pearlsCount);
               return updated;
             });
           }
@@ -1426,7 +1438,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       }
       updateAtmosphereRef.current = null;
     };
-  }, [onScoreUpdate]);
+  }, []);
 
   const pearlsCollected = collectibles.filter(c => c.type === 'pearl' && c.collected).length;
   const totalPearls = collectibles.filter(c => c.type === 'pearl').length;
