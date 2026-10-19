@@ -5,6 +5,7 @@
 ### *Story-First Travel Companion • Comic-Book Lore, Deterministic Trip Validation & 3D WebGL World*
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-poyaloo.vercel.app-1B3FFF?style=for-the-badge&logo=vercel&logoColor=white)](https://poyaloo.vercel.app)
+[![Hackathon](https://img.shields.io/badge/Hackathon-LAYOVER%202026-FF6B00?style=for-the-badge&logo=compass&logoColor=white)](https://tinkerhub.github.io/layover/)
 [![Platform](https://img.shields.io/badge/Platform-Mobile--First%20PWA-10B981?style=for-the-badge&logo=pwa&logoColor=white)](https://poyaloo.vercel.app)
 [![3D Engine](https://img.shields.io/badge/3D%20Engine-Three.js%20WebGL-FF5722?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -20,6 +21,18 @@
 > *"Every place has a comic story. Every plan gets a reality check. Every journey has a 3D world to explore."*
 
 </div>
+
+---
+
+## ✈️ Origin Story: Born at LAYOVER 2026
+
+> *"200 students. One overnight build. Zero fixed problem statements. Build something around travel and demo it by sunrise."*
+
+**POYALO** was built from scratch in a single sleepless, caffeine-fueled night by **two friends** during **[LAYOVER 2026](https://tinkerhub.github.io/layover/)** — an overnight travel hackathon organized by **[TinkerHub](https://tinkerhub.org)** and **[The Visa Guy](https://tinkerhub.github.io/layover/)** at **TinkerSpace Calicut, Kozhikode** (10–11 October 2026).
+
+The challenge was completely open: *"Make something around travel (useful, weird, or gloriously pointless) and demo it by sunrise."* With a flight route theme running from **CCJ (Kozhikode) to DXB (Dubai)**, we teamed up, locked ourselves in from 6:00 PM to 9:30 AM, and asked each other: **"പോയാലോ?" (*"Shall we go for it?"*)**.
+
+We didn't take first place or win the grand prize Dubai tickets — **we weren't first, but at least we gave it everything we had, and it's the heart, sweat, and effort that counts right?** What started as an overnight sprint turned into an app we genuinely love and continue to build with care: pairing interactive comic lore, deterministic travel validation, and an in-browser 3D WebGL world.
 
 ---
 
@@ -220,7 +233,9 @@ GEMINI_API_KEY=your_gemini_api_key_here
 ```
 poyalo/
 ├── api/                     # Vercel Serverless Edge Functions
-│   └── generate-plan.ts     # Secure Gemini AI proxy with verified landmark grounding
+│   ├── generate-plan.ts     # Gemini AI trip planner with verified landmark grounding
+│   ├── generate-comic.ts    # Live Gemini 3.5 comic story generator
+│   └── generate-myths.ts    # Real destination cultural myths & etiquette generator
 ├── docs/                    # Architecture & Design documentation
 │   ├── ARCHITECTURE.md      # Deep architectural patterns and invariants
 │   └── DESIGN_SYSTEM.md     # Neo-brutalist tokens, typography, and comic specs
@@ -268,5 +283,5 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 <br />
 
 <div align="center">
-  <sub>Built with ❤️ for curious travelers worldwide. <strong>POYALO (പോയാലോ?)</strong></sub>
+  <sub>Built with ❤️ by two friends during <strong><a href="https://tinkerhub.github.io/layover/">LAYOVER 2026</a></strong> at TinkerSpace Calicut. <strong>POYALO (പോയാലോ?)</strong></sub>
 </div>
