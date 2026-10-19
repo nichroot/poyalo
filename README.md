@@ -1,82 +1,106 @@
+<div align="center">
+
 # POYALO (പോയാലോ?)
+
+### *Story-First Travel Companion • Comic-Book Lore, Deterministic Trip Validation & 3D WebGL World*
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-poyaloo.vercel.app-1B3FFF?style=for-the-badge&logo=vercel&logoColor=white)](https://poyaloo.vercel.app)
+[![Platform](https://img.shields.io/badge/Platform-Mobile--First%20PWA-10B981?style=for-the-badge&logo=pwa&logoColor=white)](https://poyaloo.vercel.app)
+[![3D Engine](https://img.shields.io/badge/3D%20Engine-Three.js%20WebGL-FF5722?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Styling](https://img.shields.io/badge/UI-Neo--Brutalist%20Comic%20Strips-FBBF24?style=for-the-badge&logoColor=111827)](./docs/DESIGN_SYSTEM.md)
+[![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)](#license)
+
+<br />
+
+<img src="./public/cover.png" alt="POYALO Hero Banner" width="100%" style="border-radius: 16px; border: 2.5px solid #111827; box-shadow: 6px 6px 0px #111827;" />
+
+<br /><br />
 
 > *"Every place has a comic story. Every plan gets a reality check. Every journey has a 3D world to explore."*
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-poyaloo.vercel.app-1B3FFF?style=for-the-badge&logo=vercel)](https://poyaloo.vercel.app)
-[![Platform](https://img.shields.io/badge/Platform-Mobile--First%20PWA-10B981?style=for-the-badge&logo=pwa)](https://poyaloo.vercel.app)
-[![Engine](https://img.shields.io/badge/3D%20Engine-Three.js%20WebGL-FF5722?style=for-the-badge&logo=three.js)](https://threejs.org)
-[![UI Style](https://img.shields.io/badge/UI-Neo--Brutalist%20Comic%20Strips-FBBF24?style=for-the-badge)](./DESIGN_SYSTEM.md)
-[![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)](#license)
-
-**POYALO** (*"Shall we go?"* in Malayalam) is an offline-first, story-driven travel companion Progressive Web Application (PWA). POYALO pairs graphic-novel lore, deterministic client-side itinerary validation, immigration compliance automation, and an interactive 3D WebGL exploration world.
-
-The app starts with a **neutral Worldwide state**—free from pre-selected destinations—ready to plan, debunk myths, and explore any city across the globe.
+</div>
 
 ---
 
-## 🌐 Live Production
+## 🧭 Overview
 
-- **Production URL:** [https://poyaloo.vercel.app](https://poyaloo.vercel.app)
+**POYALO** (*"Shall we go?"* in Malayalam) is an offline-first, story-driven travel Progressive Web Application (PWA). POYALO pairs graphic-novel lore, deterministic client-side itinerary validation, immigration compliance automation, and an interactive 3D WebGL exploration world.
+
+Traditional travel apps fall into two traps: boring spreadsheet itineraries that hallucinate impossible transit times, and dry Wikipedia-style tourism text that travelers skip. 
+
+POYALO flips this paradigm:
+1. **Stories are Comics:** History is told through multi-panel graphic novel strips with 4 personality tone dials (Roast, Professor, Storyteller, Kid) and era time-travel sliders.
+2. **Plans are Reality-Checked:** Code-based deterministic validation checks operating hours, transit physics, solar golden hours, and the strict 180-day passport validity rule locally in under 50ms.
+3. **Destinations are Explorables:** A 320m × 320m in-browser 3D WebGL sandbox lets travelers scout landmarks, discover cultural relics, and parkour across monuments before packing their bags.
+
+---
+
+## 🌐 Live Production & Demo
+
+- **Production App:** [https://poyaloo.vercel.app](https://poyaloo.vercel.app)
 - **GitHub Repository:** [https://github.com/nichroot/poyalo](https://github.com/nichroot/poyalo)
-- **Installable PWA:** Open on iOS Safari ("Add to Home Screen") or Android Chrome ("Install App") for a native, offline-capable experience.
+- **Installable PWA:** Open on iOS Safari (*"Add to Home Screen"*) or Android Chrome (*"Install App"*) for a native 60fps offline experience.
 
 ---
 
-## 🧭 Why POYALO?
-
-| Traditional Travel Apps | The POYALO Advantage |
-| :--- | :--- |
-| **Hallucinating AI Planners:** Spit out schedules that place closed museums on Mondays, ignore traffic bottlenecks, and overlook passport validity rules. | **Deterministic Client Verification:** Code-based rules validate operating hours, transit physics, solar golden hours, and passport rules locally in <200ms. |
-| **Dry Wikipedia Text Walls:** Long, boring tourism text and monotonous audio guides that travelers skip. | **Comic-Book Story Box:** History rendered as multi-panel graphic novel strips with speech bubbles, 4 tone dials, and era time travel. |
-| **Fragmented Visa Anxiety:** Confusing government portals, surprise airline boarding denials, and 6-month passport traps. | **The Visa Guy Suite:** 180-Day Passport Expiry Widget, reactive Boarding Pass with official security seal, Visa Matcher, and 30s Stress Quiz. |
-| **Passive Spreadsheets:** Boring utilitarian apps with zero visual delight or spatial immersion. | **"VG World" 3D WebGL:** In-browser Three.js sandbox with virtual touch joystick, GPS radar landmark search, rotating Ain Dubai, and hidden chests. |
-
----
-
-## ⚡ Core Feature Modules
+## ⚡ The Five Core Pillars
 
 ```
-+---------------------------------------------------------------------------------------------------+
-|                                            POYALO PWA                                             |
-+---------------------------------+---------------------------------+-------------------------------+
-|         PLAN & VERIFY           |         STORY & CULTURE         |        3D WORLD & PLAY        |
-+---------------------------------+---------------------------------+-------------------------------+
-| * POYALO AI Multi-Day Planner   | * Comic-Book Story Box          | * VG World (320m x 320m)      |
-| * SunCalc Golden Hour Physics   | * 4 Tone Dials (Roast/Kid/etc.) | * Mobile Virtual Joystick     |
-| * 180-Day Passport Expiry Widget| * Era Time Machine Slider       | * Place Search & GPS Radar    |
-| * Reactive Boarding Pass Studio | * Web Speech Audio Narration    | * Rotating Ain Dubai Wheel    |
-| * Visa Compatibility Matcher    | * Cultural Myth Pointer         | * Spice Souk & Miracle Oasis  |
-| * 30-Second Visa Stress Quiz    | * "Suggest Myth to Admin" Modal | * Bedouin Camp & Jump Pads    |
-| * Neutral Worldwide State       | * All Worldwide Aggregator      | * Day/Sunset/Night Atmosphere |
-+---------------------------------+---------------------------------+-------------------------------+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                           POYALO PWA                                             │
+├──────────────────────────────────┬────────────────────────────────┬──────────────────────────────┤
+│         PLAN & VERIFY            │        STORY & CULTURE         │       3D WORLD & PLAY        │
+├──────────────────────────────────┼────────────────────────────────┼──────────────────────────────┤
+│ • AI Multi-Day Trip Planner      │ • Graphic-Novel Comic Box      │ • 320m x 320m 3D WebGL World │
+│ • Deterministic Reality Check    │ • 4 Tone Dials (Roast/Kid/...) │ • Multi-Touch Touch Joystick │
+│ • SunCalc Golden Hour Physics    │ • Era Time Machine (1800s/Now) │ • Responsive Jump Buffer     │
+│ • 180-Day Passport Widget        │ • Web Speech & Audio Synth     │ • Turbo Dash Sprint (3.5s)   │
+│ • Reactive Boarding Pass Studio  │ • Cultural Myth Pointer        │ • Landmark Discovery (+150P) │
+│ • Visa Compatibility Matcher     │ • "Suggest Myth to Admin" Form │ • Procedural 3D Monuments    │
+│ • 30-Second Visa Stress Quiz     │ • Worldwide City Databases     │ • Day / Sunset / Night Light │
+└──────────────────────────────────┴────────────────────────────────┴──────────────────────────────┘
 ```
 
-### 1. 🤖 POYALO AI Multi-Day Itinerary Planner
-- **Global Destination Support:** Prompts for any destination worldwide (e.g., *"3 days in Tokyo"*, *"Weekend in Paris"*, *"4 days in Rome"*, *"Dubai Heritage Trail"*).
-- **Multi-Day Sequencing:** Dynamically structures trips across Day 1, 2, 3, 4, 5 tabs with morning, afternoon, sunset, and night stops.
-- **Deterministic Transit & Golden Hour Physics:** Computes estimated travel times between consecutive stops and aligns scenic spots with solar golden hour windows via SunCalc.
-- **Embedded Comic Lore:** Direct launcher box linking any generated day into the Comic-Book Story Box.
+### 1. 🤖 AI Multi-Day Planner & Deterministic Reality Check
+- **Global Destination Support:** Prompts for any destination worldwide (*"3 days in Tokyo"*, *"Weekend in Paris"*, *"4 days in Rome"*, *"Dubai Heritage Trail"*).
+- **Zero API Key Leakage:** Client code runs completely key-free with zero bundling of API secrets. Connects to serverless edge functions or falls back seamlessly to the built-in deterministic engine.
+- **SunCalc Solar Physics:** Automatically calculates local sunset golden-hour times and highlights scenic sunset spots in the daily timeline.
+- **1-Click Entry Verification:** Direct link into immigration validation for the destination country.
 
-### 2. 🎨 Comic-Book Story Box
-- **Graphic Novel Visuals:** Hard black borders (`2.5px solid #111827`), offset brutalist drop shadows (`4px 4px 0px #111827`), speech bubbles with directional tail pointers, narrative captions, and comic sound decals (`"SWOOSH!"`, `"YALLA!"`, `"KAPOW!"`).
+### 2. 🎨 Graphic-Novel Comic Story Box
+- **Graphic Novel Visuals:** Hard black borders (`2.5px solid #111827`), neo-brutalist offset drop shadows (`4px 4px 0px #111827`), speech bubbles with directional tails, narrative caption boxes, and sound decals (`"SWOOSH!"`, `"YALLA!"`, `"KAPOW!"`).
 - **4-Way Tone Dial:**
   - 🎓 **Professor:** Archival schematics, trade history, and rigorous chronological facts.
   - 🎬 **Storyteller:** Cinematic prose, dramatic noir lighting, and character-driven drama.
   - 🔥 **Roast:** Witty satire exposing tourist traps, overhyped queues, and cultural ironies.
   - 🧒 **Kid:** Fun Saturday-morning cartoon strips with adventurous mascots.
-- **Era Time Machine:** Shift between Ancient / Heritage, Mid-Century / Golden Era, and Modern / Cyber eras to see how landmarks evolved.
-- **Audio Narration Player:** Web Speech API synthesis coupled with Web Audio effects reads comic panels aloud with character voice modulation.
-- **Multi-Day Continuity:** Supports multi-day story progression so Day 1, 2, and 3 each reveal distinct narrative arcs.
+- **Era Time Machine:** Shift between Ancient/Heritage (1800s), Golden Era (1950s), and Modern Cyber eras to see how landmarks evolved.
+- **Voice Narration & Web Audio Synth:** Real-time speech synthesis reads comic panels aloud with modulated character voice pitch and custom audio effects.
 
-### 3. 💡 Cultural Myth Pointer & Admin Suggestion Modal
-- **Worldwide Myth Debunking:** Unpacks travel myths vs local realities across Dubai, Tokyo, Paris, Rome, Bangkok, New York, and worldwide destinations.
-- **Categorized Insight Chips:** Cultural, Financial, Culinary, Social, and Historical.
-- **Neutral Aggregator:** View all worldwide myths simultaneously or filter by specific cities with a single tap.
-- **"Suggest Myth to Admin" Modal:** Allows travelers to submit new local myths directly to the platform via a 3-field modal (Place Name, Category, Myth Content) with instant local persistence and queued admin review.
+### 3. 💡 Cultural Myth Pointer
+- **Worldwide Myth Debunking:** Unpacks travel myths vs local realities across Tokyo, Paris, Rome, Dubai, Bangkok, New York, and worldwide destinations.
+- **Categorized Insight Chips:** Cultural etiquette, financial norms, culinary customs, and safety tips.
+- **"Suggest Myth to Admin" Modal:** Travelers can submit new local myths directly to the platform with local persistence and queued review.
 
-### 4. 🛡️ The Visa Guy Suite (Immigration & Compliance)
+### 4. 🎮 "VG World" 3D WebGL Metaverse
+- **In-Browser Three.js Engine:** Zero plugins, instant loading on mobile and desktop browsers.
+- **Mobile Multi-Touch Ergonomics:**
+  - **Virtual Touch Joystick:** 128px outer base, 56px thumb target ($\ge 48\text{px}$ invariant), 8px dead zone, active glow scaling, and 4-way directional indicators (▲▼◀▶).
+  - **Independent Jump Buffer:** 240ms jump buffer allows simultaneous running, turning, and jumping on phones with zero dropped inputs.
+  - **Turbo Dash (`⚡ DASH`):** On-screen mobile sprint button (or `Shift` on desktop) providing a 3.5s 1.8x speed surge with cartoon sound effects.
+- **Procedural Architectural Landmarks:**
+  - *Burj Khalifa:* 6 tiered setback towers, cyan glowing LED balcony rings, entrance glass lobby, and a pulsating red aircraft warning beacon.
+  - *Dubai Frame:* Gold lattice diagonal crossbars and translucent cyan skybridge observation floor.
+  - *Burj Al Arab:* Cantilevered circular helipad disk with yellow 'H' markings, exoskeleton truss arches, and causeway pier.
+  - *Museum of the Future:* Landscaped green park mound hill podium and calligraphic window accent slits.
+  - *Ain Dubai:* Rotating giant observation wheel with 12 glowing observation capsules.
+- **Proactive Landmark Discovery:** Approaching any landmark within 9.5m triggers celebration chimes, a comic discovery badge, and awards +150 XP towards your session explorer score.
+- **Zero VRAM Leak Invariant:** Clean scene traversal with `.dispose()` calls on all geometries and materials during unmount.
+
+### 5. 🛂 POYALO Visa Concierge & Boarding Pass Studio
 - **180-Day Passport Expiry Home Screen Widget:**
-  - Glanceable mobile card evaluating the strict international 6-month passport validity invariant.
+  - Evaluates the strict international 6-month passport validity invariant.
   - Visual color-coded validity meter, live days countdown, and copyable advisory text.
   - One-tap sync with the Boarding Pass.
 - **Interactive Boarding Pass Studio:**
@@ -84,112 +108,165 @@ The app starts with a **neutral Worldwide state**—free from pre-selected desti
   - Real-time editable passenger name, origin, destination, seat, flight number, and date.
   - **Official 180-Day Immigration Security Seal:** Dynamically stamps `PASSPORT COMPLIANT (180+ DAYS)` with verified green badge.
 - **Visa Compatibility Matcher:**
-  - Cross-selling travel matcher: enter UAE residency and passport nationality to categorize global destinations into:
-    - 🟢 *Visa-Free*
-    - 🟡 *Visa on Arrival*
-    - 🔵 *eVisa Support Available*
-    - 🔴 *Pre-Arranged Visa Required*
-  - Instant one-tap WhatsApp concierge routing for expedited document processing.
+  - Cross-matches passport nationality and residency status into Visa-Free, Visa on Arrival, eVisa, or Embassy Required.
 - **30-Second Visa Stress Quiz:**
-  - Playful 5-step quiz measuring deadline pressure, past rejections, missing documents, appointment availability, and itinerary complexity.
-  - Computes a **Visa Stress Score (0–100)** with actionable triage recommendations (from *Chill Cruiser* to *Code Red Emergency*).
-
-### 5. 🕹️ "VG World" 3D WebGL Exploration
-- **In-Browser Three.js Engine:** Zero plugin or installation requirements; loads instantly on mobile and desktop browsers.
-- **Smartphone Touch Ergonomics:**
-  - **Virtual Touch Joystick:** 128px outer base, 56px thumb target ($\ge 48\text{px}$ invariant), 8px dead zone, active glow scaling, and 4-way directional indicators (▲▼◀▶).
-  - Dedicated touch-look drag area for seamless 360° camera orbit.
-- **Vast $320\text{m} \times 320\text{m}$ World Map:**
-  - 🎡 **Ain Dubai Observation Wheel:** Giant rotating steel wheel with revolving passenger capsules.
-  - 🏮 **Spice & Gold Souk:** Bustling marketplace with colorful awnings, vendor stalls, and illuminated hanging lanterns.
-  - 🌴 **Miracle Oasis:** Shaded desert oasis with palm groves and an animated water fountain.
-  - ⛺ **Bedouin Desert Camp:** Authentic majlis carpets, patterned bedouin tents, and a glowing campfire.
-  - 🏛️ **Heritage District & Wind Towers:** Al Fahidi coral stone architecture and Barajeel ventilation towers.
-  - 🏙️ **Modern Skyscraper Plaza:** Futuristic high-rise towers.
-  - ⚡ **Bounce / Jump Pads:** High-velocity spring pads that launch players into the air for panoramic aerial views.
-  - 🎁 **Hidden Treasure Chests:** Interactive chests with spatial audio and collectible cultural artifacts (pearls, dallahs, trade coins).
-  - 🌅 **Atmosphere Controller:** Real-time toggle between Day, Sunset, and Night lighting with dynamic sun/moon positioning and fog.
-- **Place Search & GPS Radar Modal:**
-  - In-game GPS radar listing all landmarks with real-time Euclidean distance.
-  - Instant fuzzy search across world landmarks.
-  - **"Pin Waypoint":** Drops a vertical glowing 3D beacon with pulsing ground rings and HUD distance tracking.
-  - **"Teleport Now":** Instantly warps the player directly to the landmark.
-- **VRAM Memory Integrity:** Scene traversal with recursive `.dispose()` on unmount guarantees zero mobile browser memory leaks.
-
-### 6. ✈️ Interactive Easter Eggs
-- **Airplane Shake Easter Egg:** Shake your phone to trigger a neo-brutalist jumbo jet flying diagonally across the screen with roaring contrails. Calibrated with a multi-shake threshold to prevent accidental triggers.
+  - Playful 5-step quiz measuring deadline pressure, missing documents, appointment availability, and itinerary complexity with actionable recommendations.
 
 ---
 
-## 🎨 Visual Identity & Design Tokens
+## 🛠️ Architecture & Tech Stack
 
-POYALO is designed with a **Retro Neo-Brutalist & Comic-Book** visual language:
+```
+                                  POYALO ARCHITECTURE
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                   React 18 + Vite                                      │
+│  ┌───────────────────────┐  ┌────────────────────────┐  ┌───────────────────────────┐  │
+│  │   Itinerary Planner   │  │   Comic Story Box      │  │      VG World 3D          │  │
+│  │  • AI Multi-Day Gen   │  │  • 4 Tone Dials        │  │  • Three.js WebGL Engine  │  │
+│  │  • Deterministic Rules│  │  • Era Time Machine    │  │  • Mobile Touch Joystick  │  │
+│  │  • SunCalc Physics    │  │  • Web Speech Narration│  │  • Landmark Discovery XP │  │
+│  └───────────┬───────────┘  └───────────┬────────────┘  └─────────────┬─────────────┘  │
+│              │                          │                             │                │
+│              ▼                          ▼                             ▼                │
+│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
+│  │                        State Management & Audio Synthesizer                       │  │
+│  │   • Offline Web Audio API Engine (Jump, Bounce, Boost, Chimes, Doppler Jet)      │  │
+│  │   • LocalStorage Caching (Passport Sync, Itinerary Score, Custom Key)            │  │
+│  └──────────────────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 Backend / Serverless                                   │
+│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
+│  │  /api/generate-plan (Vercel Serverless Function)                                 │  │
+│  │  • Secure process.env.GEMINI_API_KEY isolation (never leaked to client)          │  │
+│  │  • Gemini 1.5 Flash / 2.0 Flash with verified place grounding                    │  │
+│  └──────────────────────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
 
-- **Primary Colors:**
-  - 🔵 **Layover Blue** (`#1B3FFF`): Hero brand color, navigation active states, action buttons.
-  - 🟠 **Jet Orange** (`#FF5722`): Departure badges, alert banners, boarding pass accents.
-  - 🟡 **Comic Gold** (`#FBBF24`): Speech bubbles, collectibles, golden-hour indicators.
-  - ⬛ **Deep Ink Black** (`#111827`): Heavy borders (`2.5px`), high-contrast typography, crisp drop shadows.
-  - 📜 **Canvas Cream** (`#FDFBF7`): Warm paper background for long reading sessions.
-- **Shadow Invariant:** Hard, flat, offset shadows (`4px 4px 0px #111827`) — **strictly zero soft blurry shadows**.
-- **Mobile First:** Designed from 375px screens upward with minimum 48px touch targets.
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technologies |
+| Technology | Role |
 | :--- | :--- |
-| **Frontend Framework** | [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) + [Vite](https://vitejs.dev/) |
-| **Package Manager / Runtime** | [Bun](https://bun.sh/) & [Node.js](https://nodejs.org/) |
-| **Styling** | [Tailwind CSS](https://tailwindcss.com/) (Custom brutalist preset) + [Lucide React](https://lucide.dev/) |
-| **3D WebGL Engine** | [Three.js](https://threejs.org/) (Custom low-poly procedural geometries, shaders & materials) |
-| **Calculations & Algorithms** | [SunCalc](https://github.com/mourner/suncalc) (Golden hour solar geometry), Euclidean distance vectors |
-| **Audio Synthesis** | Web Audio API (Synthesizer sound decals) + Web Speech API (Narration synthesis) |
-| **Persistence & PWA** | LocalStorage + Service Worker PWA Caching |
-| **AI Integration** | POYALO AI Client Architecture |
-| **Deployment** | [Vercel](https://vercel.com/) Edge Network |
+| **React 18 & TypeScript** | Component architecture, strict typing, and memory-safe refs |
+| **Vite 5** | High-speed production bundling and PWA asset optimization |
+| **Three.js** | 3D WebGL rendering, lighting, camera physics, and procedural geometry |
+| **Tailwind CSS** | Neo-brutalist styling, chunky borders, and flat hard drop shadows |
+| **SunCalc** | Offline astronomical solar physics for golden hour calculations |
+| **Web Audio API** | 100% offline synthesizer for sound effects (chimes, jet engines, bounces) |
+| **Web Speech API** | In-browser speech synthesis for audio comic book narration |
+| **Canvas Confetti** | Celebratory particles for quizzes and boarding pass achievements |
+| **Google Gemini API** | AI trip planning, worldwide comic story generation, and myth debunking |
 
 ---
 
-## 🚀 Getting Started
+## 🎨 Design System & Neo-Brutalist Guidelines
+
+POYALO adheres to strict visual rules defined in [`docs/DESIGN_SYSTEM.md`](./docs/DESIGN_SYSTEM.md):
+
+1. **No Blurry Soft Shadows:** Elevation is strictly expressed via hard flat offsets: `shadow-[4px_4px_0px_#111827]`.
+2. **Heavy Outlines:** All borders are chunky and deliberate: `border-2` or `border-[2.5px] #111827`.
+3. **Warm Newsprint Canvas:** High-contrast retro canvas with warm cream paper (`#FDFBF7`) and deep ink black (`#111827`).
+4. **Smartphone-First Ergonomics:** All touch targets are $\ge 48\text{px}$. Boarding passes stack vertically with tear perforations on mobile screens (375px+).
+5. **Comic Decals & Action Decals:** Speech bubbles with directional pointers, narrative captions, and sound decals (`WHOOSH!`, `BOUNCE!`, `ZOOM!`).
+
+---
+
+## 🚀 Local Development Setup
 
 ### Prerequisites
-- [Bun](https://bun.sh/) (recommended) or [Node.js](https://nodejs.org/) (v18+)
+- [Bun](https://bun.sh/) (recommended) or Node.js 18+
 
-### Local Development Setup
+### Quick Start
+
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/nichroot/poyalo.git
-cd dufaii
+cd poyalo
 
-# Install dependencies
+# 2. Install dependencies
 bun install
 
-# Start development server
+# 3. Start development server
 bun run dev
 ```
 
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
 ### Building for Production
+
 ```bash
-# Type check and build Vite bundle
+# Typecheck and build optimized bundle
 bun run build
 
 # Preview production build locally
 bun run preview
 ```
 
+### Environment Variables (Optional)
+
+The app works **100% offline** with built-in verified city databases and deterministic engines. To enable live Google Gemini AI calls:
+
+Create a `.env.local` file:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+> **Security Note:** `GEMINI_API_KEY` is only accessed on the serverless proxy (`api/generate-plan.ts`). It is never exposed in client bundles. Users can also enter their own key in the in-app `ApiKeyModal` (stored exclusively in browser `localStorage`).
+
 ---
 
-## 📱 Progressive Web App (PWA)
+## 📁 Repository Structure
 
-POYALO is configured as a full PWA:
-- **Manifest:** Standalone display mode, high-res neo-brutalist travel icon, landscape/portrait support.
-- **Offline Mode:** Core UI, cached itineraries, myth database, passport evaluation engine, and 3D WebGL engine operate 100% offline.
-- **Install Prompt:** First-time onboarding banner guides users to install to their home screen.
+```
+poyalo/
+├── api/                     # Vercel Serverless Edge Functions
+│   └── generate-plan.ts     # Secure Gemini AI proxy with verified landmark grounding
+├── docs/                    # Architecture & Design documentation
+│   ├── ARCHITECTURE.md      # Deep architectural patterns and invariants
+│   └── DESIGN_SYSTEM.md     # Neo-brutalist tokens, typography, and comic specs
+├── public/                  # Public assets, PWA icons, cover banner, Service Worker
+│   ├── cover.png            # 1280x640 official cover banner
+│   ├── favicon.svg          # Vector favicon
+│   ├── manifest.json        # PWA Web App Manifest
+│   └── sw.js                # Offline caching service worker
+├── src/
+│   ├── components/
+│   │   ├── comic/           # Comic-Book Story Box & panel renderers
+│   │   ├── common/          # ApiKeyModal, AirplaneEasterEgg, InstallModal
+│   │   ├── game/            # VGWorldGame (Three.js), GameHUD, VirtualJoystick
+│   │   ├── layout/          # Header, BottomDock navigation
+│   │   ├── myth/            # MythPointerView, SuggestMythModal
+│   │   ├── pass/            # BoardingPass Studio & immigration stamp
+│   │   ├── passport/        # 180-Day Passport Expiry Widget
+│   │   ├── planner/         # ItineraryPlanner, StopCard, EntryCheckView
+│   │   └── visa/            # VisaCompatibilityMatcher, VisaStressScoreQuiz
+│   ├── data/                # Offline city databases, landmarks, myths, rules
+│   ├── engines/             # Deterministic reality check & rule engines
+│   ├── services/            # AI services & local synthesis engines
+│   ├── types/               # TypeScript interfaces & types
+│   ├── App.tsx              # Root app router & state coordinator
+│   └── main.tsx             # React DOM entry point
+├── AGENTS.md                # AI coding assistant invariants & rules
+├── package.json             # Scripts & dependencies
+└── README.md                # This flagship documentation
+```
 
 ---
 
-## 📄 License
+## 🔒 Privacy & Security Invariants
 
-This project is licensed under the [MIT License](./LICENSE) — see the LICENSE file for details.
+1. **Zero Passport Number Storage:** POYALO never prompts for, transmits, or stores sensitive identification numbers (passport numbers, national IDs). Only nationality and expiry dates are evaluated.
+2. **API Key Isolation:** Server keys are strictly confined to serverless runtime functions. Client builds are verified to contain zero secrets.
+3. **100% Offline Resilience:** The app remains completely operational on airplanes or remote travels using offline Service Worker caching, client-side rule validation, and Web Audio synthesizers.
+
+---
+
+## 📜 License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+<br />
+
+<div align="center">
+  <sub>Built with ❤️ for curious travelers worldwide. <strong>POYALO (പോയാലോ?)</strong></sub>
+</div>
