@@ -69,7 +69,7 @@ export interface RealityCheckResult {
   professorVerdict: string;
   goldenHourTime: string; // e.g. "18:15"
   sunsetViewpointId?: string;
-  isMurphyActive: boolean;
+  isMurphyActive?: boolean;
   activeDisruption?: string;
 }
 

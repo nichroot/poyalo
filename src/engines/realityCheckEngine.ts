@@ -1,9 +1,11 @@
 import SunCalc from 'suncalc';
-import { ItineraryStop, POI, RealityCheckFlag, RealityCheckResult } from '../types/itinerary';
-import { DUBAI_POIS } from '../data/mockPlaces';
+import { ItineraryStop, RealityCheckFlag, RealityCheckResult } from '../types/itinerary';
 
 // Haversine distance in kilometers
 export function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  if (!lat1 || !lon1 || !lat2 || !lon2 || isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
+    return 1.5; // Reasonable default urban distance
+  }
   const R = 6371; // Earth radius in km
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
@@ -17,8 +19,9 @@ export function calculateHaversineDistance(lat1: number, lon1: number, lat2: num
 
 // Convert "HH:MM" to minutes from midnight
 export function timeToMinutes(timeStr: string): number {
+  if (!timeStr || !timeStr.includes(':')) return 600;
   const [h, m] = timeStr.split(':').map(Number);
-  return h * 60 + m;
+  return (isNaN(h) ? 10 : h) * 60 + (isNaN(m) ? 0 : m);
 }
 
 // Convert minutes to "HH:MM"
@@ -31,156 +34,175 @@ export function minutesToTime(minutes: number): string {
 
 export function auditItinerary(
   stops: ItineraryStop[],
-  tripDateStr: string = '2026-10-16', // A Friday to test closed day edge cases
-  isMurphyActive: boolean = false,
-  activeDisruption?: string
+  tripDateStr: string = '2026-10-16'
 ): RealityCheckResult {
   const flags: RealityCheckFlag[] = [];
   const tripDate = new Date(tripDateStr);
-  const dayOfWeek = tripDate.getDay(); // 0=Sun, 5=Fri, 6=Sat
 
   // Dynamic Golden hour calculation via SunCalc for destination's actual GPS coordinates
-  const refLat = stops.find(s => s.lat && !isNaN(s.lat))?.lat ?? 25.2635;
-  const refLng = stops.find(s => s.lng && !isNaN(s.lng))?.lng ?? 55.2972;
-  const sunTimes = SunCalc.getTimes(tripDate, refLat, refLng);
-  const goldenHourMinutes = sunTimes.goldenHour ? sunTimes.goldenHour.getHours() * 60 + sunTimes.goldenHour.getMinutes() : 18 * 60 + 15;
-  const goldenHourStr = minutesToTime(goldenHourMinutes);
+  const refLat = stops.find(s => s.lat && !isNaN(s.lat))?.lat ?? 35.6762;
+  const refLng = stops.find(s => s.lng && !isNaN(s.lng))?.lng ?? 139.6503;
+  
+  let goldenHourStr = '18:15';
+  let goldenHourMinutes = 18 * 60 + 15;
+  try {
+    const sunTimes = SunCalc.getTimes(tripDate, refLat, refLng);
+    if (sunTimes && sunTimes.goldenHour && !isNaN(sunTimes.goldenHour.getTime())) {
+      goldenHourMinutes = sunTimes.goldenHour.getHours() * 60 + sunTimes.goldenHour.getMinutes();
+      goldenHourStr = minutesToTime(goldenHourMinutes);
+    }
+  } catch {
+    // Fall back to default
+  }
 
   let deduction = 0;
 
   stops.forEach((stop, idx) => {
-    const poi = DUBAI_POIS.find(p => p.id === stop.poiId);
     const stopStartMin = timeToMinutes(stop.startTime);
     const stopEndMin = timeToMinutes(stop.endTime);
 
-    // 1. CHECK OPERATING HOURS
-    const openTime = poi?.openTime || (stop.category === 'museum' ? '09:00' : '08:30');
-    const closeTime = poi?.closeTime || (stop.category === 'museum' ? '17:30' : stop.category === 'viewpoint' ? '23:00' : '22:00');
+    // 1. CHECK REASONABLE OPERATING HOURS BY CATEGORY
+    const isMuseum = stop.category === 'museum';
+    const isViewpoint = stop.category === 'viewpoint';
+    const isFood = stop.category === 'food';
+    const isHeritage = stop.category === 'heritage';
+
+    const openTime = isMuseum ? '09:00' : isFood ? '11:00' : '08:30';
+    const closeTime = isMuseum ? '18:00' : isViewpoint ? '23:30' : isFood ? '23:00' : '21:00';
     const openMin = timeToMinutes(openTime);
     const closeMin = timeToMinutes(closeTime);
 
-    if (stopStartMin < openMin || stopStartMin > closeMin) {
-      deduction += 20;
+    if (stopStartMin < openMin - 30) {
+      deduction += 10;
       flags.push({
-        id: `flag-hours-${stop.id}`,
+        id: `flag-early-${stop.id}`,
+        type: 'CLOSED_VENUE',
+        severity: 'warning',
+        stopId: stop.id,
+        stopName: stop.name,
+        title: 'Early Arrival Before Opening Hours',
+        message: `${stop.name} is scheduled at ${stop.startTime}, but typical morning opening is ${openTime}.`,
+        roastComment: 'Showing up before the staff have even unlocked the gates? Pack patience or a coffee cup.',
+        fixSuggestion: `Adjust start time to arrive after ${openTime}.`
+      });
+    } else if (stopEndMin > closeMin + 30) {
+      deduction += 15;
+      flags.push({
+        id: `flag-late-${stop.id}`,
         type: 'CLOSED_VENUE',
         severity: 'error',
         stopId: stop.id,
         stopName: stop.name,
-        title: `Arriving Outside Opening Hours`,
-        message: `${stop.name} is scheduled at ${stop.startTime}, but expected hours are ${openTime} – ${closeTime}.`,
-        roastComment: `Did you plan to break in through the window? You'll be standing outside staring at a padlock.`,
-        fixSuggestion: `Adjust timing to arrive between ${openTime} and ${closeTime}.`
+        title: 'Arrival After Closing Time',
+        message: `${stop.name} is scheduled until ${stop.endTime}, but doors usually close by ${closeTime}.`,
+        roastComment: 'Unless you have night-watchman credentials, you will be locked out.',
+        fixSuggestion: `Schedule this visit between ${openTime} and ${closeTime}.`
       });
     }
 
-    // 2. CHECK WEEKLY CLOSED DAYS
-    if (poi && poi.closedDays.includes(dayOfWeek)) {
-        deduction += 25;
-        flags.push({
-          id: `flag-closed-day-${stop.id}`,
-          type: 'CLOSED_VENUE',
-          severity: 'error',
-          stopId: stop.id,
-          stopName: stop.name,
-          title: `Venue Closed on Fridays`,
-          message: `${stop.name} is strictly shuttered on Friday mornings / audited rest days.`,
-          roastComment: `Rookie mistake! Friday prayers & morning closures in the historic quarter are real.`,
-          fixSuggestion: `Swap with Al Seef Promenade or schedule after 16:30.`
-        });
-      }
-
-    // 3. TRANSIT PHYSICS AUDIT (consecutive stops)
+    // 2. TRANSIT PHYSICS AUDIT (consecutive stops)
     if (idx < stops.length - 1) {
       const nextStop = stops[idx + 1];
       const distKm = calculateHaversineDistance(stop.lat, stop.lng, nextStop.lat, nextStop.lng);
       const nextStartMin = timeToMinutes(nextStop.startTime);
       const availableTransitMinutes = nextStartMin - stopEndMin;
 
-      if (availableTransitMinutes <= 0) {
+      if (availableTransitMinutes < 0) {
         deduction += 20;
         flags.push({
-          id: `flag-teleport-${stop.id}`,
+          id: `flag-overlap-${stop.id}`,
           type: 'TRANSIT_SPEED',
           severity: 'error',
           stopId: stop.id,
           stopName: stop.name,
-          title: `Zero Buffer Transit (Instant Teleportation)`,
-          message: `Scheduled to leave ${stop.name} at ${stop.endTime} and arrive at ${nextStop.name} at ${nextStop.startTime} (0 mins buffer for ${distKm.toFixed(1)} km).`,
-          roastComment: `Unless Elon Musk installed a pneumatic hyperloop tube in your pocket, humans cannot teleport.`,
-          fixSuggestion: `Add at least ${Math.max(15, Math.ceil(distKm * 3))} minutes travel buffer.`
+          title: 'Schedule Overlap Detected',
+          message: `${stop.name} ends at ${stop.endTime}, which overlaps with next stop ${nextStop.name} starting at ${nextStop.startTime}.`,
+          roastComment: 'Humans cannot exist in two places simultaneously — yet.',
+          fixSuggestion: 'Add at least 20 minutes between consecutive stops.'
         });
-      } else {
-        const impliedSpeedKmH = (distKm / (availableTransitMinutes / 60));
-        if (impliedSpeedKmH > 70 && distKm > 2) {
-          deduction += 15;
-          flags.push({
-            id: `flag-speed-${stop.id}`,
-            type: 'TRANSIT_SPEED',
-            severity: 'warning',
-            stopId: stop.id,
-            stopName: stop.name,
-            title: `Unrealistic City Transit Speed (${impliedSpeedKmH.toFixed(0)} km/h)`,
-            message: `Requires covering ${distKm.toFixed(1)} km across dense Dubai Creek traffic in ${availableTransitMinutes} mins.`,
-            roastComment: `Even an Italian supercar with sirens will get stuck on Al Maktoum Bridge at this hour.`,
-            fixSuggestion: `Allocate at least 30 minutes for cross-creek transit.`
-          });
-        }
+      } else if (availableTransitMinutes === 0) {
+        deduction += 12;
+        flags.push({
+          id: `flag-teleport-${stop.id}`,
+          type: 'TRANSIT_SPEED',
+          severity: 'warning',
+          stopId: stop.id,
+          stopName: stop.name,
+          title: 'Zero Transit Buffer',
+          message: `0 minutes buffer between leaving ${stop.name} and starting ${nextStop.name} (${distKm.toFixed(1)} km apart).`,
+          roastComment: 'Instant teleportation is not yet offered by local transit authorities.',
+          fixSuggestion: `Add ${Math.max(15, Math.ceil(distKm * 3))} minutes travel buffer.`
+        });
+      } else if (distKm > 3 && availableTransitMinutes < 15) {
+        deduction += 10;
+        flags.push({
+          id: `flag-rush-${stop.id}`,
+          type: 'TRANSIT_SPEED',
+          severity: 'warning',
+          stopId: stop.id,
+          stopName: stop.name,
+          title: `Tight Transit Window (${distKm.toFixed(1)} km in ${availableTransitMinutes}m)`,
+          message: `Dense city traffic may cause delays between ${stop.name} and ${nextStop.name}.`,
+          roastComment: 'Running through subway corridors with suitcases is nobody’s idea of a holiday.',
+          fixSuggestion: `Increase buffer to ${Math.max(20, Math.ceil(distKm * 2.5))} minutes.`
+        });
       }
     }
 
-    // 4. GOLDEN HOUR / SUNSET ALIGNMENT
-    if (poi?.idealForSunset || stop.idealForSunset) {
+    // 3. SUNSET / GOLDEN HOUR ALIGNMENT
+    if (stop.idealForSunset) {
       const diffFromGoldenHour = Math.abs(stopStartMin - goldenHourMinutes);
-      if (diffFromGoldenHour > 150) {
-        deduction += 12;
+      if (diffFromGoldenHour <= 75) {
+        // Optimal alignment — bonus points
+        deduction = Math.max(0, deduction - 5);
+      } else if (diffFromGoldenHour > 150) {
+        deduction += 8;
         flags.push({
           id: `flag-sunset-${stop.id}`,
           type: 'GOLDEN_HOUR_MISSED',
           severity: 'warning',
           stopId: stop.id,
           stopName: stop.name,
-          title: `Prime Sunset Viewpoint Scheduled at Noon`,
-          message: `${stop.name} is scheduled at ${stop.startTime}, but Golden Hour is at ${goldenHourStr}.`,
-          roastComment: `Enjoying a panoramic scenic viewpoint under blinding 42°C midday sun? Your photos will be 100% glare and squinting.`,
-          fixSuggestion: `Move this stop to ${goldenHourStr} for peak golden-hour reflections over the water.`
+          title: 'Scenic Viewpoint Outside Sunset Window',
+          message: `${stop.name} is scheduled at ${stop.startTime}, while golden sunset is around ${goldenHourStr}.`,
+          roastComment: 'Visiting an iconic panoramic viewpoint at high noon means harsh lighting and maximum squinting.',
+          fixSuggestion: `Move this stop towards ${goldenHourStr} for peak golden-hour photography.`
         });
       }
     }
 
-    // 5. MURPHY MODE DISRUPTIONS
-    if (isMurphyActive && stop.isOutdoor) {
-      deduction += 15;
+    // 4. MIDDAY HEAT / SUN EXPOSURE FOR OUTDOOR STOPS
+    if (stop.isOutdoor && stopStartMin >= 12 * 60 + 30 && stopStartMin <= 15 * 60) {
       flags.push({
-        id: `flag-murphy-${stop.id}`,
+        id: `flag-heat-${stop.id}`,
         type: 'WEATHER_CLASH',
-        severity: 'error',
+        severity: 'warning',
         stopId: stop.id,
         stopName: stop.name,
-        title: `Murphy Alert: ${activeDisruption || 'Sudden Torrential Downpour'}`,
-        message: `Outdoor stop ${stop.name} is impacted by emergency weather disruption!`,
-        roastComment: `Desert flash flood alert! Your open-air walk is now an improvised synchronized swimming event.`,
-        fixSuggestion: `Auto-Repair will replace this outdoor stop with an indoor cultural sanctuary.`
+        title: 'Midday Sun Exposure',
+        message: `${stop.name} is an outdoor activity scheduled during peak UV afternoon hours.`,
+        roastComment: 'Peak midday sun is when locals head for shade, air conditioning, and iced drinks.',
+        fixSuggestion: 'Carry hydration, sunscreen, or shift outdoor walks to morning or late afternoon.'
       });
     }
   });
 
-  const finalScore = Math.max(10, Math.min(100, 100 - deduction));
+  const finalScore = Math.max(20, Math.min(100, 100 - deduction));
   const status: RealityCheckResult['status'] = 
-    finalScore >= 80 ? 'approved' : finalScore >= 55 ? 'caution' : 'critical';
+    finalScore >= 80 ? 'approved' : finalScore >= 60 ? 'caution' : 'critical';
 
   let roastVerdict = '';
   let professorVerdict = '';
 
-  if (finalScore >= 80) {
-    roastVerdict = "Miracle of miracles. Your itinerary actually obeys the laws of physics, opening hours, and human anatomy. You might actually enjoy this trip!";
-    professorVerdict = "Itinerary validated. Temporal spacing, daylight alignment, and geographic proximity parameters conform to optimal transit efficiency.";
-  } else if (finalScore >= 55) {
-    roastVerdict = "You're cutting it dangerously close. A couple of missed closing times and tight connections. You'll survive, but you'll probably yell at your travel companion.";
-    professorVerdict = "Moderate friction detected. Several venue closures and transit bottlenecks warrant structural re-sequencing.";
+  if (finalScore >= 85) {
+    roastVerdict = "Miracle of miracles. Your itinerary obeys the laws of physics, daylight hours, and human legs. You might actually enjoy this trip!";
+    professorVerdict = "Itinerary validated. Temporal spacing, daylight alignment, and transit proximity conform to optimal travel efficiency.";
+  } else if (finalScore >= 65) {
+    roastVerdict = "You are cutting a few connections tight. A brisk walk and a couple of espresso shots should pull you through.";
+    professorVerdict = "Moderate friction detected. Minor transit congestion and venue windows warrant modest buffer adjustments.";
   } else {
-    roastVerdict = "Absolute planning chaos! This itinerary looks like it was generated by a malfunctioning bot that thinks humans don't sleep, venues don't close, and traffic doesn't exist.";
-    professorVerdict = "Critical architectural failure. Multiple deterministic violations detected: closed operating windows and impossible velocity vectors.";
+    roastVerdict = "Time warp alert! This itinerary requires teleportation and ignoring opening doors. Add travel buffers before booking tickets!";
+    professorVerdict = "Multiple deterministic constraints exceeded: overlapping time windows and inadequate transit buffers.";
   }
 
   return {
@@ -190,7 +212,6 @@ export function auditItinerary(
     roastVerdict,
     professorVerdict,
     goldenHourTime: goldenHourStr,
-    isMurphyActive,
-    activeDisruption
+    isMurphyActive: false
   };
 }

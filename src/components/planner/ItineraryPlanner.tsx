@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { 
   Sparkles, 
@@ -12,12 +12,13 @@ import {
   Plus, 
   Clock, 
   Layers, 
-  Check,
-  ShieldCheck,
-  BookOpen
+  Check, 
+  ShieldCheck, 
+  BookOpen 
 } from 'lucide-react';
 import { ItineraryStop, ItineraryDay } from '../../types/itinerary';
-import { generateAIPlan } from '../../services/aiService';
+import { generateAIPlan, generateDeterministicPlan } from '../../services/aiService';
+import { auditItinerary } from '../../engines/realityCheckEngine';
 import { StopCard } from './StopCard';
 import { PassportExpiryWidget } from '../passport/PassportExpiryWidget';
 
@@ -25,6 +26,7 @@ interface ItineraryPlannerProps {
   onOpenMyths?: (city: string) => void;
   onOpenComic?: (city: string) => void;
   onNavigateToPass?: () => void;
+  onScoreUpdate?: (score: number) => void;
   activeCity?: string;
 }
 
@@ -41,6 +43,7 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
   onOpenMyths,
   onOpenComic,
   onNavigateToPass,
+  onScoreUpdate,
   activeCity = ''
 }) => {
   const [days, setDays] = useState<ItineraryDay[]>([]);
@@ -58,6 +61,20 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
   const currentStops = activeDay ? activeDay.stops : [];
   const totalStopsCount = days.reduce((acc, d) => acc + (d.stops?.length || 0), 0);
 
+  // Deterministic Reality Check Audit Engine (Runs locally in client TypeScript)
+  const auditResult = useMemo(() => {
+    return auditItinerary(currentStops);
+  }, [currentStops]);
+
+  useEffect(() => {
+    if (auditResult && typeof auditResult.score === 'number') {
+      try {
+        localStorage.setItem('poyalo_itinerary_score', String(auditResult.score));
+      } catch {}
+      onScoreUpdate?.(auditResult.score);
+    }
+  }, [auditResult.score, onScoreUpdate]);
+
   const handleGenerateFromPrompt = async (e?: React.FormEvent, customPrompt?: string) => {
     if (e && e.preventDefault) e.preventDefault();
     const promptToUse = customPrompt || userPrompt;
@@ -71,7 +88,7 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
       if (plan && plan.days && plan.days.length > 0) {
         setDays(plan.days);
         setActiveDayIndex(0);
-        const cityClean = plan.city || 'Custom Destination';
+        const cityClean = plan.city || plan.cityName || 'Custom Destination';
         setCurrentCity(cityClean);
         setCountryName(plan.country || 'Worldwide');
         setTripTheme(plan.theme || `${cityClean} Exploration Trail`);
@@ -86,184 +103,18 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
         throw new Error('No days returned');
       }
     } catch (err: any) {
-      console.warn('AI generation error, creating multi-day schedule:', err);
-      // Fallback: extract destination name from prompt
-      const words = promptToUse.split(' ');
-      const guessedCity = words.find(w => w.length > 3 && !['trip', 'tour', 'walk', 'with', 'from', 'plan', 'days'].includes(w.toLowerCase())) || 'Destination';
-      
-      const fallbackDays: ItineraryDay[] = [
-        {
-          dayNumber: 1,
-          theme: 'Historic Center & Heritage Sights',
-          stops: [
-            {
-              id: `stop-${Date.now()}-1-1`,
-              poiId: 'poi-1',
-              name: `${guessedCity} Old Town & Heritage Gateway`,
-              category: 'heritage',
-              startTime: '09:30',
-              endTime: '11:00',
-              durationMinutes: 90,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: true,
-              notes: 'Morning walking tour through ancient preserved architecture'
-            },
-            {
-              id: `stop-${Date.now()}-1-2`,
-              poiId: 'poi-2',
-              name: `${guessedCity} Central Artisan Market`,
-              category: 'food',
-              startTime: '11:30',
-              endTime: '13:00',
-              durationMinutes: 90,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: false,
-              notes: 'Sample verified authentic local lunch dishes'
-            },
-            {
-              id: `stop-${Date.now()}-1-3`,
-              poiId: 'poi-3',
-              name: `${guessedCity} National Cultural Museum`,
-              category: 'museum',
-              startTime: '14:00',
-              endTime: '16:00',
-              durationMinutes: 120,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: false,
-              notes: 'Historical masterpieces and archaeological treasures'
-            },
-            {
-              id: `stop-${Date.now()}-1-4`,
-              poiId: 'poi-4',
-              name: `${guessedCity} Panoramic Skyline Viewpoint`,
-              category: 'viewpoint',
-              startTime: '17:30',
-              endTime: '19:00',
-              durationMinutes: 90,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: true,
-              idealForSunset: true,
-              notes: 'Golden hour sunset over the city skyline'
-            }
-          ]
-        },
-        {
-          dayNumber: 2,
-          theme: 'Art Districts, Waterfront & Local Flavors',
-          stops: [
-            {
-              id: `stop-${Date.now()}-2-1`,
-              poiId: 'poi-5',
-              name: `${guessedCity} Botanical Gardens & Royal Pavilions`,
-              category: 'heritage',
-              startTime: '10:00',
-              endTime: '11:45',
-              durationMinutes: 105,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: true,
-              notes: 'Peaceful morning walk through historic flora and pavilions'
-            },
-            {
-              id: `stop-${Date.now()}-2-2`,
-              poiId: 'poi-6',
-              name: `${guessedCity} Riverside Promenade & Cafe Quarter`,
-              category: 'food',
-              startTime: '12:15',
-              endTime: '14:00',
-              durationMinutes: 105,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: true,
-              notes: 'Al fresco riverside lunch and craft coffee'
-            },
-            {
-              id: `stop-${Date.now()}-2-3`,
-              poiId: 'poi-7',
-              name: `${guessedCity} Contemporary Arts Hub`,
-              category: 'museum',
-              startTime: '14:30',
-              endTime: '16:30',
-              durationMinutes: 120,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: false,
-              notes: 'Cutting-edge modern galleries and interactive exhibits'
-            },
-            {
-              id: `stop-${Date.now()}-2-4`,
-              poiId: 'poi-8',
-              name: `${guessedCity} Night Street Food Bazaar`,
-              category: 'food',
-              startTime: '18:00',
-              endTime: '20:00',
-              durationMinutes: 120,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: true,
-              notes: 'Bustling night market with local street delicacies'
-            }
-          ]
-        },
-        {
-          dayNumber: 3,
-          theme: 'Hidden Temples & Scenic Heights',
-          stops: [
-            {
-              id: `stop-${Date.now()}-3-1`,
-              poiId: 'poi-9',
-              name: `${guessedCity} Hilltop Sanctuary & Forest Trail`,
-              category: 'heritage',
-              startTime: '09:00',
-              endTime: '11:00',
-              durationMinutes: 120,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: true,
-              notes: 'Scenic trail leading to secluded historical shrine'
-            },
-            {
-              id: `stop-${Date.now()}-3-2`,
-              poiId: 'poi-10',
-              name: `${guessedCity} Historic Souk & Crafts Workshop`,
-              category: 'souk',
-              startTime: '11:30',
-              endTime: '13:30',
-              durationMinutes: 120,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: false,
-              notes: 'Handmade local ceramics, textiles and spices'
-            },
-            {
-              id: `stop-${Date.now()}-3-3`,
-              poiId: 'poi-11',
-              name: `${guessedCity} Farewell Sunset Lookout`,
-              category: 'viewpoint',
-              startTime: '17:30',
-              endTime: '19:15',
-              durationMinutes: 105,
-              lat: 35.6895,
-              lng: 139.6917,
-              isOutdoor: true,
-              idealForSunset: true,
-              notes: 'Final evening celebration overlooking illuminated monuments'
-            }
-          ]
-        }
-      ];
-
-      setCurrentCity(guessedCity);
-      setCountryName('Worldwide');
-      setTripTheme(`${guessedCity} Grand Discovery Trail`);
-      setDays(fallbackDays);
-      setActiveDayIndex(0);
-      setPlanToast(`✨ Created curated 3-day itinerary for ${guessedCity}!`);
-      setUserPrompt('');
+      console.warn('AI generation notice, using deterministic engine:', err);
+      const fallbackPlan = generateDeterministicPlan(promptToUse);
+      if (fallbackPlan && fallbackPlan.days && fallbackPlan.days.length > 0) {
+        setDays(fallbackPlan.days);
+        setActiveDayIndex(0);
+        const cityClean = fallbackPlan.city || fallbackPlan.cityName || 'Destination';
+        setCurrentCity(cityClean);
+        setCountryName(fallbackPlan.country || 'Worldwide');
+        setTripTheme(fallbackPlan.theme || `${cityClean} Exploration Trail`);
+        setPlanToast(`✨ Created curated ${fallbackPlan.days.length}-day plan for ${cityClean}!`);
+        setUserPrompt('');
+      }
     } finally {
       setIsGenerating(false);
       setTimeout(() => setPlanToast(null), 4000);
@@ -409,12 +260,6 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
         )}
       </div>
 
-      {/* 180-Day Passport Expiry Home Screen Widget */}
-      <PassportExpiryWidget
-        initialDestination={countryName && countryName !== 'Worldwide' ? (countryName.toLowerCase().includes('japan') ? 'JP' : countryName.slice(0, 2).toUpperCase()) : 'AE'}
-        onSavedToPass={onNavigateToPass}
-      />
-
       {/* STATE A: NO TRIPS YET (WELCOME HERO STATE) */}
       {days.length === 0 && !isGenerating && (
         <div className="bg-white border-[2.5px] border-[#111827] rounded-2xl p-8 text-center space-y-4 shadow-[4px_4px_0px_#111827]">
@@ -521,9 +366,9 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
             </div>
           </div>
 
-          {/* Active Day Theme Sub-banner */}
+          {/* Active Day Theme Sub-banner with Reality Check Audit Score */}
           {activeDay && (
-            <div className="bg-[#EFF6FF] border-2 border-[#111827] rounded-xl p-3 shadow-[2px_2px_0px_#111827] flex items-center justify-between">
+            <div className="bg-[#EFF6FF] border-2 border-[#111827] rounded-xl p-3 shadow-[2px_2px_0px_#111827] flex items-center justify-between flex-wrap gap-2">
               <div>
                 <span className="text-[10px] font-mono font-black text-[#1B3FFF] uppercase tracking-wider block">
                   DAY {activeDay.dayNumber} ITINERARY TRAIL
@@ -532,9 +377,20 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
                   {activeDay.theme}
                 </h3>
               </div>
-              <span className="text-xs font-mono font-bold text-gray-700 bg-white px-2.5 py-1 rounded-lg border border-[#111827]">
-                {currentStops.length} STOPS TODAY
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className={`text-[10px] font-mono font-black px-2.5 py-1 rounded-lg border border-[#111827] ${
+                  auditResult.status === 'approved' 
+                    ? 'bg-emerald-100 text-emerald-900' 
+                    : auditResult.status === 'caution'
+                    ? 'bg-amber-100 text-amber-900'
+                    : 'bg-red-100 text-red-900'
+                }`}>
+                  ⚡ {auditResult.score}% REALITY AUDIT
+                </span>
+                <span className="text-xs font-mono font-bold text-gray-700 bg-white px-2.5 py-1 rounded-lg border border-[#111827]">
+                  {currentStops.length} STOPS
+                </span>
+              </div>
             </div>
           )}
 
@@ -619,15 +475,15 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
                   <StopCard
                     stop={stop}
                     index={idx}
-                    flags={[]}
-                    goldenHourTime="18:15"
+                    flags={auditResult.flags}
+                    goldenHourTime={auditResult.goldenHourTime}
                   />
                 </div>
 
                 {/* Transit indicator between stops */}
                 {idx < currentStops.length - 1 && (
                   <div className="flex items-center justify-center my-1.5">
-                    <div className="px-3 py-1 bg-white border border-[#111827] rounded-full text-[10px] font-mono font-bold text-gray-700 shadow-sm flex items-center space-x-1.5">
+                    <div className="px-3 py-1 bg-white border-2 border-[#111827] rounded-full text-[10px] font-mono font-bold text-gray-700 shadow-[1.5px_1.5px_0px_#111827] flex items-center space-x-1.5">
                       <span>🚗 TRANSIT</span>
                       <ArrowRight className="w-3 h-3 text-[#FF5722]" />
                       <span>~20 MINS ESTIMATED TRANSIT</span>

@@ -376,7 +376,7 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
                     stopNarration();
                     setAiCustomStory(null);
                   }}
-                  className="px-2 py-0.5 bg-gray-100 hover:bg-gray-200 border border-[#111827] rounded text-[10px] font-mono font-bold text-gray-700 flex items-center space-x-1 shadow-sm active:translate-x-0.5"
+                  className="px-2 py-0.5 bg-gray-100 hover:bg-gray-200 border border-[#111827] rounded text-[10px] font-mono font-bold text-gray-700 flex items-center space-x-1 shadow-[1.5px_1.5px_0px_#111827] active:translate-x-0.5"
                 >
                   <RotateCcw className="w-2.5 h-2.5" />
                   <span>RESET TO SAMPLE</span>
@@ -614,7 +614,7 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
           {activeStory.sources.map((src, i) => (
             <span 
               key={i} 
-              className="px-2 py-0.5 bg-white border border-[#111827] rounded text-[10px] font-mono font-medium text-gray-700 shadow-sm"
+              className="px-2 py-0.5 bg-white border border-[#111827] rounded text-[10px] font-mono font-medium text-gray-700 shadow-[1.5px_1.5px_0px_#111827]"
             >
               📜 {src}
             </span>

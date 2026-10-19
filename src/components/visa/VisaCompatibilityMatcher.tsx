@@ -47,7 +47,7 @@ export const VisaCompatibilityMatcher: React.FC = () => {
 
   const handleOpenWhatsApp = (country: DestinationVisaRule) => {
     const text = encodeURIComponent(
-      `Hello The Visa Guy! ✈️ I am checking visa compatibility for ${country.countryName}.\n` +
+      `Hello POYALO Visa Concierge! ✈️ I am checking visa compatibility for ${country.countryName}.\n` +
       `• Nationality: ${currentNationalityName} (${nationality})\n` +
       `• Residency: ${currentTierObj?.label}\n` +
       `• Target Destination: ${country.countryName}\n\n` +
@@ -203,7 +203,7 @@ export const VisaCompatibilityMatcher: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search country (e.g. France, Oman)..."
-            className="w-full sm:w-60 pl-8 pr-3 py-1.5 bg-white border-2 border-[#111827] rounded-xl font-mono text-xs text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#1B3FFF] shadow-sm"
+            className="w-full sm:w-60 pl-8 pr-3 py-1.5 bg-white border-2 border-[#111827] rounded-xl font-mono text-xs text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#1B3FFF] shadow-[2px_2px_0px_#111827]"
           />
         </div>
 

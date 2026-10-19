@@ -59,7 +59,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#FDFBF7] border-t-[2.5px] border-[#111827] shadow-[0_-4px_10px_rgba(0,0,0,0.06)] pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#FDFBF7] border-t-[2.5px] border-[#111827] pb-safe">
       <div className="max-w-3xl mx-auto px-1 sm:px-2 py-1.5 flex items-center justify-around gap-1">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;

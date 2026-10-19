@@ -51,6 +51,7 @@ export const MythPointerView: React.FC<MythPointerViewProps> = ({
   const [suggestCategory, setSuggestCategory] = useState<string>('Cultural Etiquette & Society');
   const [suggestContent, setSuggestContent] = useState<string>('');
   const [suggestToast, setSuggestToast] = useState<string | null>(null);
+  const [suggestError, setSuggestError] = useState<string | null>(null);
   const [submittedCount, setSubmittedCount] = useState<number>(() => {
     try {
       const saved = localStorage.getItem('poyalo_user_submitted_myths');
@@ -172,15 +173,17 @@ export const MythPointerView: React.FC<MythPointerViewProps> = ({
 
   const handleOpenSuggestModal = () => {
     setSuggestPlace(selectedCity || '');
+    setSuggestError(null);
     setIsSuggestModalOpen(true);
   };
 
   const handleSubmitSuggestedMyth = (e: React.FormEvent) => {
     e.preventDefault();
     if (!suggestPlace.trim() || !suggestCategory.trim() || !suggestContent.trim()) {
-      alert('Please fill out all 3 boxes (Place name, Category, and Myth content) before submitting.');
+      setSuggestError('Please fill out all 3 boxes (Place name, Category, and Myth content) before submitting.');
       return;
     }
+    setSuggestError(null);
 
     const newSuggestion: UserSuggestedMyth = {
       id: `myth-sub-${Date.now()}`,
@@ -523,6 +526,11 @@ export const MythPointerView: React.FC<MythPointerViewProps> = ({
             </p>
 
             <form onSubmit={handleSubmitSuggestedMyth} className="space-y-4">
+              {suggestError && (
+                <div className="p-3 bg-rose-100 border-2 border-[#111827] rounded-xl text-rose-950 text-xs font-mono font-bold shadow-[2px_2px_0px_#111827]">
+                  ⚠️ {suggestError}
+                </div>
+              )}
               
               {/* BOX 1: PLACE NAME */}
               <div>

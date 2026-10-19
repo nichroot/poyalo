@@ -150,6 +150,115 @@ const KNOWN_CITIES: Record<string, CityInfo> = {
       { name: 'SM Street (Sweetmeat Street) Halwa Tasting', category: 'food', isOutdoor: true, notes: 'Tasting authentic black wheat halwa and banana chips' },
       { name: 'Kozhikode Beach Sunset & Heritage Pier', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Historic sea bridge ruins with Malabar sea breeze' }
     ]
+  },
+  bangkok: {
+    name: 'Bangkok',
+    country: 'Thailand',
+    lat: 13.7563,
+    lng: 100.5018,
+    themes: ['Royal Temples & Chao Phraya River', 'Street Food Capitals & Night Markets', 'Old City Rattanakosin & Canals', 'Modern Skyline & Floating Markets'],
+    landmarks: [
+      { name: 'Grand Palace & Temple of the Emerald Buddha', category: 'heritage', isOutdoor: true, notes: 'Sacred 18th-century royal complex with dazzling golden spires' },
+      { name: 'Wat Pho Giant Reclining Buddha', category: 'heritage', isOutdoor: false, notes: '46-meter gilded Buddha and birthplace of traditional Thai massage' },
+      { name: 'Yaowarat Chinatown Street Food Crawl', category: 'food', isOutdoor: true, notes: 'World-famous stir-fried crab curry, crispy pork, and mango sticky rice' },
+      { name: 'Wat Arun Temple of Dawn Sunset', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Iconic porcelain-encrusted prang glowing over the river at dusk' },
+      { name: 'Chatuchak Weekend Artisan Market', category: 'souk', isOutdoor: true, notes: 'Over 15,000 stalls of vintage textiles, silks, and regional spices' },
+      { name: 'Jim Thompson House & Silk Museum', category: 'museum', isOutdoor: false, notes: 'Traditional teak compound housing historic Southeast Asian antiquities' }
+    ]
+  },
+  singapore: {
+    name: 'Singapore',
+    country: 'Singapore',
+    lat: 1.3521,
+    lng: 103.8198,
+    themes: ['Supertrees & Futuristic Botanical Gardens', 'Chinatown & Kampong Glam Heritage', 'Hawker Culinary Culture & Marina Bay', 'Colonial Civic District & Riverfront'],
+    landmarks: [
+      { name: 'Gardens by the Bay & Flower Dome', category: 'heritage', isOutdoor: false, notes: 'Futuristic conservatories and towering vertical plant gardens' },
+      { name: 'Chinatown Heritage Centre & Buddha Tooth Relic', category: 'heritage', isOutdoor: true, notes: 'Rich Peranakan history and four-story Tang-style temple' },
+      { name: 'Lau Pa Sat Hawker Center & Satay Street', category: 'food', isOutdoor: true, notes: 'Victorian cast-iron pavilion serving Hainanese chicken rice and charcoal satay' },
+      { name: 'Marina Bay Sands SkyPark Observation Deck', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Panoramic sunset view over Marina Bay, Singapore Strait, and city skyline' },
+      { name: 'National Gallery Singapore', category: 'museum', isOutdoor: false, notes: 'Historic City Hall and Supreme Court housing Southeast Asian modern art' }
+    ]
+  },
+  istanbul: {
+    name: 'Istanbul',
+    country: 'Türkiye',
+    lat: 41.0082,
+    lng: 28.9784,
+    themes: ['Byzantine & Ottoman Imperial Wonders', 'Bosphorus Maritime Crossing & Kadıköy', 'Grand Bazaar & Historic Spice Route', 'Galata Bohemian Alleys & Karaköy'],
+    landmarks: [
+      { name: 'Hagia Sophia Grand Mosque', category: 'heritage', isOutdoor: false, notes: 'Sixth-century Byzantine cathedral with soaring dome and golden mosaics' },
+      { name: 'Topkapi Palace & Imperial Harem', category: 'museum', isOutdoor: true, notes: 'Ottoman sultans’ royal residence overlooking the Golden Horn' },
+      { name: 'Grand Bazaar & Egyptian Spice Market', category: 'souk', isOutdoor: false, notes: '4,000 historic vaulted shops with Turkish delights, carpets, and ceramics' },
+      { name: 'Galata Tower 360° Sunset Panorama', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Medieval Genoese stone tower catching golden light over historic peninsula' },
+      { name: 'Basilica Cistern Subterranean Sanctuary', category: 'heritage', isOutdoor: false, notes: 'Ancient underground Roman water reservoir with 336 marble columns' }
+    ]
+  },
+  cairo: {
+    name: 'Cairo',
+    country: 'Egypt',
+    lat: 30.0444,
+    lng: 31.2357,
+    themes: ['Giza Necropolis & Ancient Pharaohs', 'Islamic Cairo & Historic Minarets', 'Grand Egyptian Museum & Nile Breezes', 'Coptic Enclave & Khan el-Khalili'],
+    landmarks: [
+      { name: 'Great Pyramids of Giza & Sphinx', category: 'heritage', isOutdoor: true, notes: 'The only surviving wonder of the ancient world' },
+      { name: 'Grand Egyptian Museum (GEM)', category: 'museum', isOutdoor: false, notes: 'State-of-the-art museum housing the full Tutankhamun collection' },
+      { name: 'Khan el-Khalili Medieval Bazaar', category: 'souk', isOutdoor: true, notes: '14th-century labyrinth of brass lanterns, copper goods, and spice merchants' },
+      { name: 'Mokattam Mountain Sunset Over Cairo', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Panoramic sunset with minarets and pyramids silhouetted in the distance' }
+    ]
+  },
+  kyoto: {
+    name: 'Kyoto',
+    country: 'Japan',
+    lat: 35.0116,
+    lng: 135.7681,
+    themes: ['Zen Temples & Torii Forest Trails', 'Gion Geisha Heritage & Tea Houses', 'Arashiyama Bamboo Grove & Rivers', 'Imperial Palaces & Kaiseki Culture'],
+    landmarks: [
+      { name: 'Fushimi Inari-taisha 10,000 Torii Gates', category: 'heritage', isOutdoor: true, notes: 'Iconic vermilion shrine path winding through sacred Mount Inari forest' },
+      { name: 'Kinkaku-ji (Golden Pavilion)', category: 'heritage', isOutdoor: true, notes: 'Zen Buddhist temple covered in pure gold leaf reflecting over Mirror Pond' },
+      { name: 'Nishiki Market 400-Year Food Street', category: 'food', isOutdoor: false, notes: 'Kyoto kitchen: fresh yuba, grilled octopus skewers, and matcha dango' },
+      { name: 'Kiyomizu-dera Wooden Stage Sunset', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Ancient temple veranda built without nails overlooking Kyoto valley' },
+      { name: 'Arashiyama Bamboo Grove Walk', category: 'heritage', isOutdoor: true, notes: 'Soaring emerald bamboo stems rustling in the mountain breeze' }
+    ]
+  },
+  venice: {
+    name: 'Venice',
+    country: 'Italy',
+    lat: 45.4408,
+    lng: 12.3155,
+    themes: ['Grand Canal & Venetian Palazzi', 'St. Mark Square & Doge Antiquities', 'Rialto Bridges & Cicchetti Taverns', 'Lagoon Islands Murano & Burano'],
+    landmarks: [
+      { name: 'St. Mark’s Basilica & Campanile', category: 'heritage', isOutdoor: false, notes: 'Byzantine domes and dazzling gold-ground mosaics' },
+      { name: 'Doge’s Palace & Bridge of Sighs', category: 'museum', isOutdoor: false, notes: 'Gothic seat of the Venetian Republic and historic prisons' },
+      { name: 'Rialto Market & Traditional Cicchetti Crawl', category: 'food', isOutdoor: true, notes: 'Centuries-old lagoon seafood market and cozy neighborhood bàcari' },
+      { name: 'Grand Canal Accademia Bridge Sunset', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Classic postcard golden-hour vista towards Santa Maria della Salute' }
+    ]
+  },
+  berlin: {
+    name: 'Berlin',
+    country: 'Germany',
+    lat: 52.5200,
+    lng: 13.4050,
+    themes: ['Cold War Lore & Reunified Icons', 'Museum Island Prussian Treasures', 'Kreuzberg Street Art & Food Markets', 'Tiergarten & Spree Riverfront'],
+    landmarks: [
+      { name: 'Brandenburg Gate & Pariser Platz', category: 'heritage', isOutdoor: true, notes: '18th-century neoclassical monument and symbol of German reunification' },
+      { name: 'Museum Island & Pergamon Panorama', category: 'museum', isOutdoor: false, notes: 'UNESCO heritage island complex with Prussian antiquities' },
+      { name: 'Markthalle Neun Street Food Thursday', category: 'food', isOutdoor: false, notes: 'Historic 19th-century market hall in Kreuzberg serving artisan regional bites' },
+      { name: 'Reichstag Glass Dome Sunset Vista', category: 'viewpoint', isOutdoor: false, idealForSunset: true, notes: 'Norman Foster spiraling glass dome overlooking the parliamentary quarter' }
+    ]
+  },
+  sydney: {
+    name: 'Sydney',
+    country: 'Australia',
+    lat: -33.8688,
+    lng: 151.2093,
+    themes: ['Sydney Harbour & Architectural Icons', 'The Rocks Historic Convict Quarters', 'Bondi Coastal Walks & Ocean Beaches', 'Barangaroo & Darling Harbour'],
+    landmarks: [
+      { name: 'Sydney Opera House & Forecourt Walk', category: 'heritage', isOutdoor: true, notes: 'Jørn Utzon UNESCO masterpiece with sail-like roof shells' },
+      { name: 'The Rocks Historic Convict Market', category: 'souk', isOutdoor: true, notes: 'Oldest colonial cobblestone streets, artisan crafts, and historic pubs' },
+      { name: 'Sydney Fish Market Oyster Tasting', category: 'food', isOutdoor: true, notes: 'Third largest fish market in the world with freshly shucked oysters' },
+      { name: 'Sydney Harbour Bridge Pylon Sunset Lookout', category: 'viewpoint', isOutdoor: true, idealForSunset: true, notes: 'Panoramic golden hour sunset over Sydney Harbour and Opera House' }
+    ]
   }
 };
 
@@ -297,7 +406,7 @@ Return ONLY a valid JSON object matching this schema:
   ]
 }`;
 
-      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-flash-latest'];
+      const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro'];
       let parsed: any = null;
 
       for (const model of modelsToTry) {

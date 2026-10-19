@@ -1,9 +1,8 @@
 import React from 'react';
-import { Compass, Wifi, WifiOff, Sparkles, MapPin, Smartphone, Key } from 'lucide-react';
+import { Wifi, WifiOff, MapPin, Smartphone, Key } from 'lucide-react';
 
 interface HeaderProps {
   isOffline: boolean;
-  onTeleportDemo?: () => void;
   onOpenInstallGuide?: () => void;
   onOpenApiKeyModal?: () => void;
   activeCity?: string;
@@ -11,13 +10,12 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   isOffline = false,
-  onTeleportDemo,
   onOpenInstallGuide,
   onOpenApiKeyModal,
   activeCity = 'Worldwide'
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-[#FDFBF7] border-b-[2.5px] border-[#111827] px-3 sm:px-4 py-2.5 shadow-sm">
+    <header className="sticky top-0 z-40 bg-[#FDFBF7] border-b-[2.5px] border-[#111827] px-3 sm:px-4 py-2.5 shadow-[0_2.5px_0px_#111827]">
       <div className="max-w-5xl mx-auto flex items-center justify-between">
         
         {/* Brand & City (Clickable to trigger supersonic easter egg) */}
@@ -51,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </button>
 
-        {/* Right Badges: AI Engine, Install App, Offline & Demo Teleport */}
+        {/* Right Badges: AI Engine, Install App, Offline Status */}
         <div className="flex items-center space-x-1.5 sm:space-x-2">
           
           {/* AI Engine Settings Button */}
@@ -89,17 +87,6 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="md:hidden">{isOffline ? 'OFFLINE' : 'SYNCED'}</span>
           </div>
 
-          {/* Quick Demo Teleport Button */}
-          {onTeleportDemo && (
-            <button
-              onClick={onTeleportDemo}
-              title="Quickly fill chaotic sample itinerary for stage pitch"
-              className="bg-[#FFA07A] hover:bg-[#FF885A] text-[#111827] px-2 sm:px-2.5 py-1 rounded-full border-2 border-[#111827] text-[10px] sm:text-[11px] font-mono font-bold shadow-[2px_2px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5 flex items-center space-x-1 transition-transform"
-            >
-              <Sparkles className="w-3 h-3 text-[#111827]" />
-              <span className="hidden sm:inline">PITCH TELEPORT</span>
-            </button>
-          )}
         </div>
 
       </div>

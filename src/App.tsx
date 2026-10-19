@@ -15,6 +15,14 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('planner');
   const [gameScore, setGameScore] = useState<number>(0);
   const [pearlsCollected, setPearlsCollected] = useState<number>(0);
+  const [itineraryScore, setItineraryScore] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('poyalo_itinerary_score');
+      return saved ? Number(saved) : 94;
+    } catch {
+      return 94;
+    }
+  });
   const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
   const [currentCity, setCurrentCity] = useState<string>('');
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
@@ -55,19 +63,6 @@ export const App: React.FC = () => {
     setPearlsCollected(pearls);
   };
 
-  const handleTeleportDemo = () => {
-    // Quick toggle between planner and game for stage presentations
-    if (activeTab === 'planner') {
-      setActiveTab('game');
-    } else if (activeTab === 'game') {
-      setActiveTab('comic');
-    } else if (activeTab === 'comic') {
-      setActiveTab('myths');
-    } else {
-      setActiveTab('planner');
-    }
-  };
-
   const handleOpenMythsForCity = (city: string) => {
     setCurrentCity(city);
     setActiveTab('myths');
@@ -91,7 +86,6 @@ export const App: React.FC = () => {
       {/* Neo-Brutalist Top Header */}
       <Header
         isOffline={isOffline}
-        onTeleportDemo={handleTeleportDemo}
         onOpenInstallGuide={() => setShowWelcome(true)}
         onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
         activeCity={currentCity}
@@ -105,6 +99,7 @@ export const App: React.FC = () => {
             onOpenMyths={handleOpenMythsForCity} 
             onOpenComic={handleOpenComicForCity}
             onNavigateToPass={() => setActiveTab('pass')}
+            onScoreUpdate={setItineraryScore}
           />
         )}
         {activeTab === 'comic' && (
@@ -130,7 +125,7 @@ export const App: React.FC = () => {
           <BoardingPass 
             gameScore={gameScore} 
             pearlsCollected={pearlsCollected} 
-            itineraryScore={94} 
+            itineraryScore={itineraryScore} 
           />
         )}
       </main>
