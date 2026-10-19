@@ -256,7 +256,7 @@ export const VisaStressScoreQuiz: React.FC = () => {
           }`}>
             <h4 className="font-display font-black text-base text-[#111827] flex items-center space-x-1.5">
               <span>🎯</span>
-              <span>THE VISA GUY DIAGNOSTIC RECOMMENDATION</span>
+              <span>POYALO VISA CONCIERGE RECOMMENDATION</span>
             </h4>
             
             <p className="text-xs font-mono text-gray-800 leading-relaxed">
@@ -277,7 +277,7 @@ export const VisaStressScoreQuiz: React.FC = () => {
                 <span>
                   {stressTier === 'critical' 
                     ? '🚨 ROUTE TO SENIOR CONSULTANT (WHATSAPP SOS)' 
-                    : 'CHAT WITH THE VISA GUY CONCIERGE'}
+                    : 'CHAT WITH POYALO VISA CONCIERGE'}
                 </span>
               </button>
 

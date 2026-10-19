@@ -34,4 +34,4 @@ export interface PlayerStats {
   districtRank: string;
 }
 
-export type TravelEmote = 'Marhaba! 👋' | 'Yalla! 🚀' | 'Karak Tea? ☕' | 'Photo Spot! 📸';
+export type TravelEmote = 'Hello! 👋' | 'Let\'s Go! 🚀' | 'Photo Spot! 📸' | 'Follow Me! 🗺️' | 'Marhaba! 👋' | 'Yalla! 🚀' | 'Karak Tea? ☕';

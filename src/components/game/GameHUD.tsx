@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { Sparkles, Trophy, Users, X, Check, BookOpen, Sun, Sunset, Moon, Zap, ArrowUp, Search, Compass, Navigation } from 'lucide-react';
+import { 
+  Sparkles, 
+  X, 
+  Check, 
+  BookOpen, 
+  Sun, 
+  Sunset, 
+  Moon, 
+  Zap, 
+  ArrowUp, 
+  Search, 
+  Compass, 
+  Smile
+} from 'lucide-react';
 import { CollectibleItem, TravelEmote } from '../../types/game';
 import { WorldLandmark } from '../../data/worldLandmarks';
 
@@ -7,8 +20,7 @@ interface GameHUDProps {
   score: number;
   pearlsCollected: number;
   totalPearls: number;
-  playersOnline: number;
-  nearbyPlayerName?: string;
+  discoveredLandmarksCount?: number;
   onSendEmote: (emote: TravelEmote) => void;
   unlockedItem: CollectibleItem | null;
   onDismissUnlock: () => void;
@@ -16,6 +28,7 @@ interface GameHUDProps {
   onToggleTimeOfDay?: () => void;
   speedBoostActive?: boolean;
   onJump?: () => void;
+  onSprint?: () => void;
   activeBadge?: { text: string; icon: string } | null;
   onOpenPlaceSearch?: () => void;
   activeWaypoint?: WorldLandmark | null;
@@ -27,8 +40,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   score,
   pearlsCollected,
   totalPearls,
-  playersOnline,
-  nearbyPlayerName,
+  discoveredLandmarksCount = 0,
   onSendEmote,
   unlockedItem,
   onDismissUnlock,
@@ -36,6 +48,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   onToggleTimeOfDay,
   speedBoostActive = false,
   onJump,
+  onSprint,
   activeBadge,
   onOpenPlaceSearch,
   activeWaypoint,
@@ -45,105 +58,125 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   const [showEmotePicker, setShowEmotePicker] = useState(false);
 
   const emotes: TravelEmote[] = [
-    'Marhaba! 👋',
-    'Yalla! 🚀',
-    'Karak Tea? ☕',
-    'Photo Spot! 📸'
+    'Hello! 👋',
+    'Let\'s Go! 🚀',
+    'Photo Spot! 📸',
+    'Follow Me! 🗺️'
   ];
 
   return (
     <>
-      {/* Top Left: Score & Collectible Badges */}
-      <div className="absolute top-3 left-3 z-30 flex flex-wrap items-center gap-2 pointer-events-auto">
-        {/* District & Game Title */}
-        <div className="bg-[#111827] text-white px-2.5 py-1 rounded-xl border border-white/20 shadow-[2px_2px_0px_#111827] flex items-center space-x-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span className="font-display font-black text-xs tracking-wide">VG WORLD</span>
-          <span className="text-[10px] font-mono text-amber-300">EXPLORE & EXPANDED</span>
+      {/* Top Left: Clean Consolidated Status Bar (Zero Clutter) */}
+      <div className="absolute top-3 left-3 z-30 flex items-center space-x-1.5 pointer-events-auto">
+        <div className="bg-white border-2 border-[#111827] px-2.5 sm:px-3 py-1.5 rounded-xl shadow-[3px_3px_0px_#111827] flex items-center space-x-2">
+          {/* Score */}
+          <div className="flex items-center space-x-1">
+            <span className="text-xs sm:text-sm">🪙</span>
+            <span className="font-mono font-black text-xs text-[#111827]">{score}</span>
+          </div>
+
+          <div className="w-[1.5px] h-3.5 bg-gray-300" />
+
+          {/* Pearls */}
+          <div className="flex items-center space-x-1">
+            <span className="text-xs sm:text-sm">🦪</span>
+            <span className="font-mono font-black text-xs text-[#1B3FFF]">
+              {pearlsCollected}/{totalPearls}
+            </span>
+          </div>
+
+          {/* Discovered Landmarks */}
+          <div className="w-[1.5px] h-3.5 bg-gray-300" />
+          <div className="flex items-center space-x-1">
+            <span className="text-xs sm:text-sm">📍</span>
+            <span className="font-mono font-black text-xs text-[#10B981]">
+              {discoveredLandmarksCount}/9
+            </span>
+          </div>
         </div>
 
-        {/* Score Pill */}
-        <div className="bg-white border-2 border-[#111827] px-3 py-1 rounded-full shadow-[2px_2px_0px_#111827] flex items-center space-x-1.5">
-          <span className="text-sm">🪙</span>
-          <span className="font-mono font-black text-xs text-[#111827]">{score} PTS</span>
-        </div>
+        {/* Emote Trigger Button */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowEmotePicker(!showEmotePicker)}
+            title="Express Yourself"
+            className="w-8 h-8 bg-white hover:bg-amber-100 border-2 border-[#111827] rounded-xl shadow-[2px_2px_0px_#111827] flex items-center justify-center text-xs active:translate-x-0.5 active:translate-y-0.5 transition-transform"
+          >
+            <Smile className="w-4 h-4 text-[#FF5722]" />
+          </button>
 
-        {/* Pearls Pill */}
-        <div className="bg-[#EBF2FF] border-2 border-[#111827] px-2.5 py-1 rounded-full shadow-[2px_2px_0px_#111827] flex items-center space-x-1">
-          <span className="text-sm">🦪</span>
-          <span className="font-mono font-black text-xs text-[#1B3FFF]">
-            {pearlsCollected}/{totalPearls}
-          </span>
-        </div>
-
-        {/* Real-time Players Badge */}
-        <div className="bg-white border-2 border-[#111827] px-2.5 py-1 rounded-full shadow-[2px_2px_0px_#111827] hidden sm:flex items-center space-x-1">
-          <Users className="w-3 h-3 text-[#1B3FFF]" />
-          <span className="font-mono font-bold text-[10px] text-gray-800">
-            {playersOnline} ONLINE
-          </span>
+          {/* Discrete Emote Popup */}
+          {showEmotePicker && (
+            <div className="absolute top-10 left-0 bg-white border-2 border-[#111827] p-1.5 rounded-xl shadow-[4px_4px_0px_#111827] flex flex-col gap-1 z-40 w-36">
+              {emotes.map((em) => (
+                <button
+                  key={em}
+                  onClick={() => {
+                    onSendEmote(em);
+                    setShowEmotePicker(false);
+                  }}
+                  className="px-2 py-1 text-left bg-[#FDFBF7] hover:bg-[#FBBF24] rounded-lg text-[11px] font-mono font-bold text-[#111827] transition-colors"
+                >
+                  {em}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Top Right: Time of Day Atmosphere Switcher, Search Places & Controls */}
-      <div className="absolute top-3 right-3 z-30 flex items-center space-x-2 pointer-events-auto">
-        
+      {/* Top Right: Places Search & Atmosphere Switcher */}
+      <div className="absolute top-3 right-3 z-30 flex items-center space-x-1.5 pointer-events-auto">
         {/* Search Places Button */}
         {onOpenPlaceSearch && (
           <button
             onClick={onOpenPlaceSearch}
             title="Search Places, Landmarks & GPS Teleports"
-            className="px-3 py-1.5 bg-[#FF5722] hover:bg-[#E64A19] text-white border-2 border-[#111827] rounded-xl font-display font-black text-xs uppercase shadow-[2.5px_2.5px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5 flex items-center space-x-1.5 transition-all"
+            className="px-2.5 sm:px-3 py-1.5 bg-[#FF5722] hover:bg-[#E64A19] text-white border-2 border-[#111827] rounded-xl font-display font-black text-xs uppercase shadow-[2.5px_2.5px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5 flex items-center space-x-1 transition-all"
           >
             <Search className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>PLACES</span>
+            <span className="hidden xs:inline">PLACES</span>
           </button>
         )}
 
-        {/* Time of Day Toggle Button */}
+        {/* Atmosphere Mode Switcher */}
         {onToggleTimeOfDay && (
           <button
             onClick={onToggleTimeOfDay}
-            title="Toggle Day / Sunset / Neon Night Atmosphere"
-            className="px-2.5 py-1.5 bg-white hover:bg-amber-50 border-2 border-[#111827] rounded-xl font-mono font-black text-[10px] shadow-[2px_2px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5 flex items-center space-x-1 transition-all"
+            title="Toggle Day / Sunset / Night"
+            className="px-2.5 py-1.5 bg-white hover:bg-amber-50 border-2 border-[#111827] rounded-xl font-mono font-black text-[11px] shadow-[2px_2px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5 flex items-center space-x-1 transition-all"
           >
             {timeOfDay === 'day' && (
               <>
                 <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
-                <span className="text-gray-900">DAY</span>
+                <span className="text-gray-900 hidden sm:inline">DAY</span>
               </>
             )}
             {timeOfDay === 'sunset' && (
               <>
                 <Sunset className="w-3.5 h-3.5 text-orange-500 fill-orange-400" />
-                <span className="text-orange-950">SUNSET</span>
+                <span className="text-orange-950 hidden sm:inline">SUNSET</span>
               </>
             )}
             {timeOfDay === 'night' && (
               <>
                 <Moon className="w-3.5 h-3.5 text-indigo-500 fill-indigo-400" />
-                <span className="text-indigo-950">NIGHT</span>
+                <span className="text-indigo-950 hidden sm:inline">NIGHT</span>
               </>
             )}
           </button>
         )}
-
-        {/* Desktop Controls Hint */}
-        <div className="hidden lg:flex items-center space-x-1.5 bg-white/90 backdrop-blur-sm border-2 border-[#111827] px-2.5 py-1 rounded-xl shadow-[2px_2px_0px_#111827] text-[10px] font-mono font-bold text-gray-700 pointer-events-none">
-          <span>WASD: MOVE</span>
-          <span>•</span>
-          <span>SPACE: JUMP</span>
-        </div>
       </div>
 
-      {/* Active GPS Waypoint Compass Banner */}
+      {/* Active GPS Waypoint Banner */}
       {activeWaypoint && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1.5 bg-white border-2 border-[#111827] rounded-full shadow-[3px_3px_0px_#111827] font-mono font-black text-xs flex items-center space-x-2 text-[#111827] pointer-events-auto">
-          <Compass className="w-4 h-4 text-[#1B3FFF] animate-spin flex-shrink-0" />
-          <span className="truncate max-w-[160px] sm:max-w-xs">
+        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-white border-2 border-[#111827] rounded-full shadow-[3px_3px_0px_#111827] font-mono font-black text-xs flex items-center space-x-2 text-[#111827] pointer-events-auto">
+          <Compass className="w-3.5 h-3.5 text-[#1B3FFF] animate-spin flex-shrink-0" />
+          <span className="truncate max-w-[140px] sm:max-w-xs text-[11px]">
             {activeWaypoint.emoji} {activeWaypoint.name.toUpperCase()}
           </span>
-          <span className="bg-[#10B981] text-white text-[10px] px-2 py-0.5 rounded-full border border-[#111827]">
+          <span className="bg-[#10B981] text-white text-[10px] px-1.5 py-0.2 rounded-full border border-[#111827]">
             {waypointDistance ?? 0}M
           </span>
           {onClearWaypoint && (
@@ -152,7 +185,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               className="text-gray-400 hover:text-red-600 p-0.5 ml-0.5"
               title="Clear GPS Waypoint"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -160,73 +193,72 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
       {/* Active Boost / Event Alert Banner */}
       {speedBoostActive && (
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-[#FBBF24] text-[#111827] border-2 border-[#111827] rounded-full shadow-[3px_3px_0px_#111827] font-mono font-black text-xs flex items-center space-x-1.5 animate-pulse pointer-events-none">
-          <Zap className="w-4 h-4 text-[#1B3FFF] fill-[#1B3FFF]" />
-          <span>⚡ 1.8X SPEED BOOST ACTIVATED!</span>
+        <div className="absolute top-22 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-[#FBBF24] text-[#111827] border-2 border-[#111827] rounded-full shadow-[3px_3px_0px_#111827] font-mono font-black text-xs flex items-center space-x-1.5 animate-pulse pointer-events-none">
+          <Zap className="w-3.5 h-3.5 text-[#1B3FFF] fill-[#1B3FFF]" />
+          <span>⚡ TURBO SPRINT ACTIVATED!</span>
         </div>
       )}
 
-      {/* Comic Badge Popups (e.g. "SUPER BOUNCE!" or "SECRET CHEST!") */}
+      {/* Comic Badge Popups (e.g. "DISCOVERED: BURJ KHALIFA (+150 PTS)!") */}
       {activeBadge && (
-        <div className="absolute top-28 left-1/2 -translate-x-1/2 z-30 px-4 py-1.5 bg-[#FF5722] text-white border-2 border-[#111827] rounded-2xl shadow-[4px_4px_0px_#111827] font-comic text-lg flex items-center space-x-2 animate-bounce pointer-events-none">
+        <div className="absolute top-26 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-[#FF5722] text-white border-2 border-[#111827] rounded-2xl shadow-[4px_4px_0px_#111827] font-comic text-base flex items-center space-x-2 animate-bounce pointer-events-none whitespace-nowrap">
           <span>{activeBadge.icon}</span>
           <span className="tracking-wide">{activeBadge.text}</span>
         </div>
+      )}
+
+      {/* Mobile Turbo Dash Button (Right Side, Above Jump) */}
+      {onSprint && (
+        <button
+          type="button"
+          onPointerDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onSprint();
+          }}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onSprint();
+          }}
+          title="Turbo Dash / Sprint (Shift)"
+          className={`absolute bottom-24 right-5 z-30 w-12 h-12 rounded-full border-[2.5px] border-[#111827] shadow-[3px_3px_0px_#111827] flex flex-col items-center justify-center font-display font-black text-[9px] uppercase transition-all pointer-events-auto select-none touch-none active:scale-95 ${
+            speedBoostActive 
+              ? 'bg-[#06B6D4] text-white animate-pulse' 
+              : 'bg-white hover:bg-cyan-50 text-[#111827]'
+          }`}
+        >
+          <Zap className="w-4 h-4 fill-current" />
+          <span className="text-[8px] -mt-0.5 font-mono font-black">DASH</span>
+        </button>
       )}
 
       {/* Mobile Jump Button (Bottom Right) */}
       {onJump && (
         <button
           type="button"
-          onClick={onJump}
+          onPointerDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onJump();
+          }}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onJump();
+          }}
           title="Jump / Leap (Spacebar)"
-          className="absolute bottom-6 right-5 z-30 w-16 h-16 bg-[#FBBF24] hover:bg-amber-300 active:bg-amber-400 text-[#111827] rounded-full border-[2.5px] border-[#111827] shadow-[4px_4px_0px_#111827] flex flex-col items-center justify-center font-display font-black text-xs uppercase active:translate-x-1 active:translate-y-1 transition-transform pointer-events-auto select-none touch-none"
+          className="absolute bottom-6 right-5 z-30 w-16 h-16 bg-[#FBBF24] hover:bg-amber-300 active:bg-amber-400 active:scale-95 text-[#111827] rounded-full border-[2.5px] border-[#111827] shadow-[4px_4px_0px_#111827] flex flex-col items-center justify-center font-display font-black text-xs uppercase transition-transform pointer-events-auto select-none touch-none"
         >
           <ArrowUp className="w-6 h-6 stroke-[3]" />
           <span className="text-[9px] -mt-0.5 tracking-tight font-black">JUMP</span>
         </button>
       )}
 
-      {/* Proximity Action Pill (Appears when within 3.5m of remote player) */}
-      {nearbyPlayerName && (
-        <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center pointer-events-auto">
-          {!showEmotePicker ? (
-            <button
-              onClick={() => setShowEmotePicker(true)}
-              className="px-5 py-2.5 bg-[#FF5722] hover:bg-[#E64A19] text-white border-2 border-[#111827] rounded-full shadow-[4px_4px_0px_#111827] font-display font-black text-xs uppercase tracking-wider flex items-center space-x-2 active:translate-x-0.5 active:translate-y-0.5 animate-bounce"
-            >
-              <span>👋</span>
-              <span>SAY MARHABA TO {nearbyPlayerName.toUpperCase()}!</span>
-            </button>
-          ) : (
-            <div className="bg-white border-[2.5px] border-[#111827] p-2 rounded-2xl shadow-[4px_4px_0px_#111827] flex items-center gap-1.5 animate-fadeIn">
-              {emotes.map((em) => (
-                <button
-                  key={em}
-                  onClick={() => {
-                    onSendEmote(em);
-                    setShowEmotePicker(false);
-                  }}
-                  className="px-3 py-1.5 bg-[#FDFBF7] hover:bg-[#FBBF24] border-2 border-[#111827] rounded-xl text-xs font-mono font-black text-[#111827] shadow-[2px_2px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5"
-                >
-                  {em}
-                </button>
-              ))}
-              <button
-                onClick={() => setShowEmotePicker(false)}
-                className="p-1 text-gray-500 hover:text-black"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Cultural Fact Unlock Modal (Triggered on Collectible Hit) */}
       {unlockedItem && (
         <div className="absolute inset-0 z-40 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 pointer-events-auto">
-          <div className="bg-white border-[2.5px] border-[#111827] rounded-2xl p-5 max-w-sm w-full shadow-[6px_6px_0px_#111827] space-y-3 animate-scaleUp">
+          <div className="bg-white border-[2.5px] border-[#111827] rounded-2xl p-4 sm:p-5 max-w-sm w-full shadow-[6px_6px_0px_#111827] space-y-3 animate-scaleUp">
             
             {/* Header */}
             <div className="flex items-center justify-between">
@@ -243,14 +275,14 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
             {/* Glyph & Item Name */}
             <div className="flex items-center space-x-3">
-              <div className="w-14 h-14 rounded-2xl bg-[#FEF3C7] border-2 border-[#111827] shadow-[2px_2px_0px_#111827] flex items-center justify-center text-3xl">
+              <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] border-2 border-[#111827] shadow-[2px_2px_0px_#111827] flex items-center justify-center text-2xl">
                 {unlockedItem.emoji}
               </div>
               <div>
-                <h3 className="font-display font-black text-lg text-[#111827]">
+                <h3 className="font-display font-black text-base text-[#111827]">
                   {unlockedItem.name}
                 </h3>
-                <span className="text-xs font-mono text-gray-500 font-bold">
+                <span className="text-[11px] font-mono text-gray-500 font-bold">
                   Heritage Cultural Lore Card
                 </span>
               </div>

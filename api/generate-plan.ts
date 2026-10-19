@@ -368,7 +368,7 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: 'Valid prompt is required' });
   }
 
-  const apiKey = (typeof process !== 'undefined' ? (process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY) : '') || req.body?.apiKey || '';
+  const apiKey = (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '') || req.body?.apiKey || '';
 
   // If apiKey is provided, attempt live Gemini call with production models
   if (apiKey && apiKey.length > 10) {

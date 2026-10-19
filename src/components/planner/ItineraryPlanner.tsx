@@ -20,12 +20,12 @@ import { ItineraryStop, ItineraryDay } from '../../types/itinerary';
 import { generateAIPlan, generateDeterministicPlan } from '../../services/aiService';
 import { auditItinerary } from '../../engines/realityCheckEngine';
 import { StopCard } from './StopCard';
-import { PassportExpiryWidget } from '../passport/PassportExpiryWidget';
 
 interface ItineraryPlannerProps {
   onOpenMyths?: (city: string) => void;
   onOpenComic?: (city: string) => void;
   onNavigateToPass?: () => void;
+  onNavigateToEntry?: () => void;
   onScoreUpdate?: (score: number) => void;
   activeCity?: string;
 }
@@ -43,6 +43,7 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
   onOpenMyths,
   onOpenComic,
   onNavigateToPass,
+  onNavigateToEntry,
   onScoreUpdate,
   activeCity = ''
 }) => {
@@ -54,7 +55,6 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
   const [currentCity, setCurrentCity] = useState<string>(activeCity || '');
   const [tripTheme, setTripTheme] = useState<string>('');
   const [countryName, setCountryName] = useState<string>('Worldwide');
-  const [showPassportWidget, setShowPassportWidget] = useState<boolean>(false);
 
   // Currently displayed day
   const activeDay = days[activeDayIndex] || days[0] || null;
@@ -440,32 +440,25 @@ export const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({
             </button>
           </div>
 
-          {/* Quick Passport Expiry Sanity Check Widget Toggle */}
-          <div className="flex items-center justify-between bg-white border-2 border-[#111827] rounded-xl p-2.5 shadow-[2px_2px_0px_#111827]">
+          {/* Quick Passport Expiry & Visa Validation Link */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#F0FDF4] border-2 border-[#111827] rounded-xl p-3 shadow-[2.5px_2.5px_0px_#111827]">
             <div className="flex items-center space-x-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
               <span className="font-mono font-bold text-xs text-gray-800">
-                Planning an International Flight? Verify 180-Day Passport Rule
+                180-Day Passport Rule & Visa Eligibility for {countryName}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowPassportWidget(!showPassportWidget)}
-              className="px-3 py-1.5 bg-[#FDFBF7] hover:bg-emerald-50 text-[#111827] border-2 border-[#111827] rounded-xl text-xs font-mono font-black shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5"
-            >
-              <span>{showPassportWidget ? 'HIDE WIDGET ▲' : 'OPEN PASSPORT WIDGET ▼'}</span>
-            </button>
+            {onNavigateToEntry && (
+              <button
+                type="button"
+                onClick={onNavigateToEntry}
+                className="self-start sm:self-center px-3 py-1.5 bg-white hover:bg-emerald-100 text-[#111827] border-2 border-[#111827] rounded-lg text-xs font-mono font-black shadow-[1.5px_1.5px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 transition-colors"
+              >
+                <span>VERIFY ENTRY RULES</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
-
-          {/* Expandable Passport Expiry Widget */}
-          {showPassportWidget && (
-            <div className="animate-in fade-in duration-300">
-              <PassportExpiryWidget 
-                initialDestination={countryName && countryName !== 'Worldwide' ? (countryName.toLowerCase().includes('japan') ? 'JP' : countryName.slice(0, 2).toUpperCase()) : 'AE'} 
-                onSavedToPass={onNavigateToPass}
-              />
-            </div>
-          )}
 
           {/* Timeline Stop Cards for Active Day */}
           <div className="space-y-3 pt-1">

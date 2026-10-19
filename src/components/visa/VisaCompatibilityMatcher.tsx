@@ -63,18 +63,18 @@ export const VisaCompatibilityMatcher: React.FC = () => {
       <div className="bg-[#FFFFFF] border-[2.5px] border-[#111827] rounded-2xl p-4 sm:p-6 shadow-[4px_4px_0px_#111827] relative overflow-hidden">
         <div className="flex items-center space-x-2">
           <span className="bg-[#1B3FFF] text-white px-2.5 py-0.5 rounded font-mono font-black text-xs uppercase border border-[#111827]">
-            THE VISA GUY • SMART TRAVEL MATCHER
+            POYALO • SMART TRAVEL VISA MATCHER
           </span>
           <span className="text-xs font-mono font-bold text-gray-500">
-            UAE Residency + Passport Cross-Match
+            Residency + Passport Cross-Match
           </span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-display font-black text-[#111827] mt-1 tracking-tight">
           Where Can You Travel Right Now?
         </h2>
         <p className="text-xs sm:text-sm font-mono text-gray-700 mt-1 max-w-2xl">
-          Enter your passport nationality and UAE residency status. We match you with instant visa-free getaways, 
-          simple eVisas, and high-demand destinations where <strong>The Visa Guy</strong> handles your appointment locks and filings.
+          Enter your passport nationality and residency status. We match you with instant visa-free getaways, 
+          simple eVisas, and high-demand destinations where <strong>POYALO Concierge</strong> handles your appointment locks and filings.
         </p>
 
         {/* Input Controls Grid */}

@@ -18,7 +18,7 @@ export function getGeminiApiKey(): string {
     const custom = localStorage.getItem('poyalo_custom_gemini_key');
     if (custom && custom.trim().length > 10) return custom.trim();
   } catch {}
-  return (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+  return '';
 }
 
 export function setCustomGeminiApiKey(key: string): void {

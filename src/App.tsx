@@ -99,6 +99,7 @@ export const App: React.FC = () => {
             onOpenMyths={handleOpenMythsForCity} 
             onOpenComic={handleOpenComicForCity}
             onNavigateToPass={() => setActiveTab('pass')}
+            onNavigateToEntry={() => setActiveTab('entry')}
             onScoreUpdate={setItineraryScore}
           />
         )}

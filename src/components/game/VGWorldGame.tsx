@@ -92,14 +92,15 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
   const [speedBoostActive, setSpeedBoostActive] = useState<boolean>(false);
   const [activeBadge, setActiveBadge] = useState<{ text: string; icon: string } | null>(null);
 
-  // Place Search & Waypoint state
+  // Place Search, Discovered Landmarks & Waypoint state
   const [showPlaceSearch, setShowPlaceSearch] = useState<boolean>(false);
   const [activeWaypoint, setActiveWaypoint] = useState<WorldLandmark | null>(null);
   const [playerCoords, setPlayerCoords] = useState<{ x: number; y: number; z: number }>({ x: 0, y: 0, z: 0 });
   const [waypointDistance, setWaypointDistance] = useState<number>(0);
+  const [discoveredLandmarks, setDiscoveredLandmarks] = useState<string[]>([]);
 
   // Jump and Teleport refs
-  const jumpTriggerRef = useRef<boolean>(false);
+  const jumpRequestedAtRef = useRef<number>(0);
   const speedBoostExpiresRef = useRef<number>(0);
   const teleportTargetRef = useRef<{ x: number; y: number; z: number; landmarkName: string } | null>(null);
   const activeWaypointRef = useRef<WorldLandmark | null>(null);
@@ -131,7 +132,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       y: 0.8,
       z: -4.0,
       rotationY: 0.5,
-      currentEmote: 'Marhaba! 👋'
+      currentEmote: 'Hello! 👋'
     },
     {
       id: 'usr_fatima',
@@ -175,7 +176,13 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
   }, []);
 
   const handleJump = useCallback(() => {
-    jumpTriggerRef.current = true;
+    jumpRequestedAtRef.current = Date.now();
+  }, []);
+
+  const handleSprint = useCallback(() => {
+    speedBoostExpiresRef.current = Date.now() + 3500;
+    playSoundEffect('boost');
+    showBadge('TURBO SPRINT!', '⚡');
   }, []);
 
   const handleToggleTimeOfDay = useCallback(() => {
@@ -435,26 +442,50 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     scene.add(abra1, abra2);
 
     // 12. DETAILED LANDMARKS
-    // a) Burj Khalifa
+    // a) Burj Khalifa (Multi-tier Setbacks, Neon Accent Bands & Spire Beacon)
     const bkGroup = new THREE.Group();
-    const bkDark = new THREE.MeshLambertMaterial({ color: '#4B5563' });
-    for (let i = 0; i < 5; i++) {
-      const size = 7 - i * 1.2;
-      const h = 10;
-      const box = new THREE.Mesh(new THREE.BoxGeometry(size, h, size), i === 0 ? bkDark : sharedSilverMat);
+    const bkDark = new THREE.MeshLambertMaterial({ color: '#334155' });
+    const bkCyanBand = new THREE.MeshLambertMaterial({ color: '#38BDF8', emissive: '#0284C7', emissiveIntensity: 0.75 });
+    for (let i = 0; i < 6; i++) {
+      const size = 8 - i * 1.15;
+      const h = 9;
+      const box = new THREE.Mesh(new THREE.BoxGeometry(size, h, size), i % 2 === 0 ? bkDark : sharedSilverMat);
       box.position.y = i * h + h / 2;
       box.castShadow = true;
       box.receiveShadow = true;
       bkGroup.add(box);
+
+      // Cyan Glowing Balcony Ring at each setback
+      const ringGeo = new THREE.BoxGeometry(size + 0.35, 0.3, size + 0.35);
+      const ring = new THREE.Mesh(ringGeo, bkCyanBand);
+      ring.position.y = i * h + h;
+      bkGroup.add(ring);
     }
-    const bkSpire = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.6, 12, 4), sharedSilverMat);
-    bkSpire.position.y = 56;
+    // High Spire & Red Aviation Warning Beacon
+    const bkSpire = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.55, 14, 6), sharedSilverMat);
+    bkSpire.position.y = 61;
     bkSpire.castShadow = true;
     bkGroup.add(bkSpire);
+
+    const bkBeacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.35, 8, 8),
+      new THREE.MeshBasicMaterial({ color: '#EF4444' })
+    );
+    bkBeacon.position.y = 68;
+    bkGroup.add(bkBeacon);
+
+    // Ground-level entrance pavilion
+    const bkLobby = new THREE.Mesh(
+      new THREE.BoxGeometry(12, 2.2, 12),
+      new THREE.MeshLambertMaterial({ color: '#1E293B' })
+    );
+    bkLobby.position.y = 1.1;
+    bkGroup.add(bkLobby);
+
     bkGroup.position.set(30, 0, -50);
     scene.add(bkGroup);
 
-    // b) Dubai Frame
+    // b) Dubai Frame (Gold Towers, Lattice Crossbars & Skybridge Glass)
     const dfGroup = new THREE.Group();
     const pillarGeo = new THREE.BoxGeometry(2.5, 26, 2.5);
     const p1 = new THREE.Mesh(pillarGeo, sharedGoldMat);
@@ -463,36 +494,96 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const p2 = new THREE.Mesh(pillarGeo, sharedGoldMat);
     p2.position.set(7, 13, 0);
     p2.castShadow = true;
+
+    // Cross-truss lattice ornamentation
+    const latticeGeo = new THREE.BoxGeometry(0.2, 24, 0.2);
+    for (let lx of [-7.8, -6.2, 6.2, 7.8]) {
+      const lattice = new THREE.Mesh(latticeGeo, sharedGoldMat);
+      lattice.position.set(lx, 13, 0);
+      dfGroup.add(lattice);
+    }
+
+    // Skybridge Top & Glass Observation Floor
     const dfBridge = new THREE.Mesh(new THREE.BoxGeometry(16.5, 2.5, 2.5), sharedGoldMat);
     dfBridge.position.set(0, 25, 0);
     dfBridge.castShadow = true;
-    dfGroup.add(p1, p2, dfBridge);
+    const dfGlassFloor = new THREE.Mesh(
+      new THREE.BoxGeometry(12, 0.15, 2.0),
+      new THREE.MeshLambertMaterial({ color: '#38BDF8', transparent: true, opacity: 0.65 })
+    );
+    dfGlassFloor.position.set(0, 23.8, 0);
+    dfGroup.add(p1, p2, dfBridge, dfGlassFloor);
     dfGroup.position.set(-25, 0, -35);
     scene.add(dfGroup);
 
-    // c) Burj Al Arab
+    // c) Burj Al Arab (Curved Sail, Cantilevered Helipad & Island Causeway)
     const baaGroup = new THREE.Group();
-    const sail = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 5.5, 22, 3), new THREE.MeshLambertMaterial({ color: '#F8FAFC' }));
+    const sailMat = new THREE.MeshLambertMaterial({ color: '#F8FAFC' });
+    const sail = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 5.5, 22, 3), sailMat);
     sail.position.y = 11;
     sail.rotation.y = -Math.PI / 2;
     sail.castShadow = true;
-    const island = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 0.6, 24), new THREE.MeshLambertMaterial({ color: '#CBD5E1' }));
+
+    // Iconic Cantilevered Helipad Disk (Juts out toward sea)
+    const helipad = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.6, 2.6, 0.35, 18),
+      new THREE.MeshLambertMaterial({ color: '#1E293B' })
+    );
+    helipad.position.set(0, 19.5, 4.2);
+    const helipadH = new THREE.Mesh(
+      new THREE.RingGeometry(1.0, 1.4, 16),
+      new THREE.MeshBasicMaterial({ color: '#FBBF24', side: THREE.DoubleSide })
+    );
+    helipadH.rotation.x = -Math.PI / 2;
+    helipadH.position.set(0, 19.7, 4.2);
+
+    // Island Base with stone rip-rap
+    const island = new THREE.Mesh(
+      new THREE.CylinderGeometry(11, 11, 0.6, 24),
+      new THREE.MeshLambertMaterial({ color: '#CBD5E1' })
+    );
     island.position.y = 0.3;
-    baaGroup.add(sail, island);
+
+    // Access Bridge Pier
+    const baaCauseway = new THREE.Mesh(
+      new THREE.BoxGeometry(5.0, 0.4, 14),
+      sharedWoodMat
+    );
+    baaCauseway.position.set(0, 0.3, -11);
+
+    baaGroup.add(sail, helipad, helipadH, island, baaCauseway);
     baaGroup.position.set(40, 0, 25);
     scene.add(baaGroup);
 
-    // d) Museum of the Future
+    // d) Museum of the Future (Calligraphic Torus on Landscaped Hill)
     const motfGroup = new THREE.Group();
-    const torus = new THREE.Mesh(
-      new THREE.TorusGeometry(4.5, 2.2, 14, 42),
-      new THREE.MeshStandardMaterial({ color: '#CBD5E1', roughness: 0.25, metalness: 0.8 })
+    // Green Landscaped Hill Podium
+    const motfHill = new THREE.Mesh(
+      new THREE.CylinderGeometry(7.5, 11.0, 2.4, 28),
+      sharedFoliageMat
     );
-    torus.position.y = 6.5;
+    motfHill.position.y = 1.2;
+    motfHill.receiveShadow = true;
+    motfGroup.add(motfHill);
+
+    // Torus Ring with Metallic Finish
+    const torus = new THREE.Mesh(
+      new THREE.TorusGeometry(4.8, 2.3, 16, 44),
+      new THREE.MeshStandardMaterial({ color: '#CBD5E1', roughness: 0.22, metalness: 0.85 })
+    );
+    torus.position.y = 7.2;
     torus.castShadow = true;
-    const motfBase = new THREE.Mesh(new THREE.BoxGeometry(7, 1.2, 5), new THREE.MeshLambertMaterial({ color: '#334155' }));
-    motfBase.position.y = 0.6;
-    motfGroup.add(torus, motfBase);
+
+    // Calligraphic Window Accent Slits
+    const slitMat = new THREE.MeshBasicMaterial({ color: '#FDE047' });
+    for (let s = 0; s < 8; s++) {
+      const angle = (s * Math.PI * 2) / 8;
+      const slit = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.2, 0.35), slitMat);
+      slit.position.set(Math.cos(angle) * 4.8, 7.2 + Math.sin(angle) * 2.3, 0);
+      motfGroup.add(slit);
+    }
+
+    motfGroup.add(torus);
     motfGroup.position.set(-35, 0, 15);
     motfGroup.rotation.y = Math.PI / 4;
     scene.add(motfGroup);
@@ -897,52 +988,60 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       collectibleRings[item.id] = ringMat;
     });
 
-    // 21. CAMERA DRAG & ROTATION
+    // 21. CAMERA DRAG & ROTATION VIA CANVAS POINTER EVENTS
     let cameraAngle = Math.PI * 0.75;
     let cameraPitch = 0.45;
-    let isDragging = false;
-    let prevMouseX = 0;
-    let prevMouseY = 0;
+    let activeCameraPointerId: number | null = null;
+    let prevPointerX = 0;
+    let prevPointerY = 0;
 
-    const onPointerDown = (e: MouseEvent | TouchEvent) => {
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      if (clientX < 180 && clientY > height - 180) return;
-      if (clientX > width - 100 && clientY > height - 100) return;
+    const canvasDom = renderer.domElement;
 
-      isDragging = true;
-      prevMouseX = clientX;
-      prevMouseY = clientY;
+    const onCanvasPointerDown = (e: PointerEvent) => {
+      // Only track if no other pointer is currently rotating camera
+      if (activeCameraPointerId !== null) return;
+      activeCameraPointerId = e.pointerId;
+      prevPointerX = e.clientX;
+      prevPointerY = e.clientY;
+      try {
+        canvasDom.setPointerCapture(e.pointerId);
+      } catch {}
     };
 
-    const onPointerMove = (e: MouseEvent | TouchEvent) => {
-      if (!isDragging) return;
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      const deltaX = clientX - prevMouseX;
-      const deltaY = clientY - prevMouseY;
-      prevMouseX = clientX;
-      prevMouseY = clientY;
+    const onCanvasPointerMove = (e: PointerEvent) => {
+      if (e.pointerId !== activeCameraPointerId) return;
+      const deltaX = e.clientX - prevPointerX;
+      const deltaY = e.clientY - prevPointerY;
+      prevPointerX = e.clientX;
+      prevPointerY = e.clientY;
       cameraAngle -= deltaX * 0.007;
       cameraPitch = Math.max(0.18, Math.min(1.25, cameraPitch + deltaY * 0.005));
     };
 
-    const onPointerUp = () => {
-      isDragging = false;
+    const onCanvasPointerUp = (e: PointerEvent) => {
+      if (e.pointerId === activeCameraPointerId) {
+        try {
+          canvasDom.releasePointerCapture(e.pointerId);
+        } catch {}
+        activeCameraPointerId = null;
+      }
     };
 
-    window.addEventListener('mousedown', onPointerDown);
-    window.addEventListener('mousemove', onPointerMove);
-    window.addEventListener('mouseup', onPointerUp);
-    window.addEventListener('touchstart', onPointerDown, { passive: true });
-    window.addEventListener('touchmove', onPointerMove, { passive: true });
-    window.addEventListener('touchend', onPointerUp);
+    canvasDom.addEventListener('pointerdown', onCanvasPointerDown);
+    canvasDom.addEventListener('pointermove', onCanvasPointerMove);
+    canvasDom.addEventListener('pointerup', onCanvasPointerUp);
+    canvasDom.addEventListener('pointercancel', onCanvasPointerUp);
 
     // Keyboard controls
     const onKeyDown = (e: KeyboardEvent) => {
       keysPressed.current[e.key.toLowerCase()] = true;
       if (e.code === 'Space') {
-        jumpTriggerRef.current = true;
+        jumpRequestedAtRef.current = Date.now();
+      }
+      if (e.key === 'Shift') {
+        speedBoostExpiresRef.current = Date.now() + 3500;
+        playSoundEffect('boost');
+        showBadge('TURBO SPRINT!', '⚡');
       }
     };
     const onKeyUp = (e: KeyboardEvent) => {
@@ -1091,13 +1190,13 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       // Vertical gravity & Ground Collision
       const targetGround = getGroundHeight(playerGroup.position.x, playerGroup.position.z);
 
-      if (jumpTriggerRef.current) {
-        jumpTriggerRef.current = false;
-        if (isGrounded) {
-          playerVelY = 12.0;
-          isGrounded = false;
-          playSoundEffect('jump');
-        }
+      // Jump buffer execution: 240ms window (enables seamless jump while moving on mobile)
+      const wantsJump = (now - jumpRequestedAtRef.current) < 240;
+      if (wantsJump && (isGrounded || Math.abs(playerY - targetGround) < 0.55)) {
+        jumpRequestedAtRef.current = 0;
+        playerVelY = 12.8;
+        isGrounded = false;
+        playSoundEffect('jump');
       }
 
       if (!isGrounded) {
@@ -1145,6 +1244,11 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       // Rotate Ain Dubai Giant Wheel
       wheelRotatingGroup.rotation.z += 0.22 * delta;
 
+      // Pulse Burj Khalifa aircraft warning beacon
+      (bkBeacon.material as THREE.MeshBasicMaterial).color.set(
+        Math.sin(time * 5) > 0 ? '#EF4444' : '#1E1B4B'
+      );
+
       // Shimmer Creek Water
       creekMat.opacity = 0.86 + Math.sin(time * 2) * 0.05;
 
@@ -1165,6 +1269,29 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       } else {
         waypointBeaconGroup.visible = false;
       }
+
+      // Proactive Landmark Discovery System (+150 XP per landmark)
+      WORLD_LANDMARKS.forEach((lm) => {
+        const d = Math.hypot(playerGroup.position.x - lm.coords.x, playerGroup.position.z - lm.coords.z);
+        if (d <= 9.5) {
+          setDiscoveredLandmarks((prev) => {
+            if (!prev.includes(lm.id)) {
+              playSoundEffect('chest');
+              showBadge(`DISCOVERED: ${lm.name.toUpperCase()} (+150 PTS)!`, lm.emoji || '📍');
+              setScore((s) => {
+                const newScore = s + 150;
+                if (onScoreUpdate) {
+                  const pearlCount = collectibles.filter(c => c.type === 'pearl' && c.collected).length;
+                  onScoreUpdate(newScore, pearlCount);
+                }
+                return newScore;
+              });
+              return [...prev, lm.id];
+            }
+            return prev;
+          });
+        }
+      });
 
       // Speed Boost Pads proximity
       boostPads.forEach((pad) => {
@@ -1273,12 +1400,10 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     return () => {
       cancelAnimationFrame(animationFrameId);
 
-      window.removeEventListener('mousedown', onPointerDown);
-      window.removeEventListener('mousemove', onPointerMove);
-      window.removeEventListener('mouseup', onPointerUp);
-      window.removeEventListener('touchstart', onPointerDown);
-      window.removeEventListener('touchmove', onPointerMove);
-      window.removeEventListener('touchend', onPointerUp);
+      canvasDom.removeEventListener('pointerdown', onCanvasPointerDown);
+      canvasDom.removeEventListener('pointermove', onCanvasPointerMove);
+      canvasDom.removeEventListener('pointerup', onCanvasPointerUp);
+      canvasDom.removeEventListener('pointercancel', onCanvasPointerUp);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('resize', onWindowResize);
@@ -1319,8 +1444,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         score={score}
         pearlsCollected={pearlsCollected}
         totalPearls={totalPearls}
-        playersOnline={4}
-        nearbyPlayerName={nearbyPlayerName}
+        discoveredLandmarksCount={discoveredLandmarks.length}
         onSendEmote={handleSendEmote}
         unlockedItem={unlockedItem}
         onDismissUnlock={() => setUnlockedItem(null)}
@@ -1328,6 +1452,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         onToggleTimeOfDay={handleToggleTimeOfDay}
         speedBoostActive={speedBoostActive}
         onJump={handleJump}
+        onSprint={handleSprint}
         activeBadge={activeBadge}
         onOpenPlaceSearch={() => setShowPlaceSearch(true)}
         activeWaypoint={activeWaypoint}
