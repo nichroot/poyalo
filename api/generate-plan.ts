@@ -406,7 +406,7 @@ Return ONLY a valid JSON object matching this schema:
   ]
 }`;
 
-      const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro'];
+      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash'];
       let parsed: any = null;
 
       for (const model of modelsToTry) {
@@ -430,23 +430,28 @@ Return ONLY a valid JSON object matching this schema:
             const data = await response.json();
             const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
             if (text) {
-              const resJson = JSON.parse(text);
+              const cleanText = text.replace(/```json\s*|```/g, '').trim();
+              const rawJson = JSON.parse(cleanText);
+              const resJson = Array.isArray(rawJson) ? rawJson[0] : rawJson;
               if (resJson && (resJson.days?.length > 0 || resJson.stops?.length > 0)) {
                 parsed = resJson;
                 break;
               }
             }
+          } else {
+            const err = await response.text();
+            console.warn(`[POYALO API Plan] Model ${model} returned ${response.status}:`, err.slice(0, 200));
           }
-        } catch {
-          // Continue to next model
+        } catch (mErr: any) {
+          console.warn(`[POYALO API Plan] Error calling ${model}:`, mErr?.message);
         }
       }
 
       if (parsed) {
         return res.status(200).json(parsed);
       }
-    } catch {
-      // Gracefully fall back to deterministic generator
+    } catch (err: any) {
+      console.error('[POYALO API Plan] Error in live Gemini generation:', err?.message);
     }
   }
 

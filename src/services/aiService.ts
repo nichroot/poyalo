@@ -517,7 +517,7 @@ Return ONLY a valid JSON object matching this schema:
   ]
 }`;
 
-      const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro'];
+      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash'];
       let parsedJson: any = null;
 
       for (const model of modelsToTry) {
@@ -715,6 +715,35 @@ export async function generateAIComicStory(
 ): Promise<ComicStory> {
   const apiKey = getGeminiApiKey();
 
+  // 1. Try serverless endpoint first (has access to server-side GEMINI_API_KEY)
+  try {
+    const res = await fetch('/api/generate-comic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ placeOrCity, tone, era, apiKey })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.panels && data.panels.length > 0) {
+        return {
+          id: data.id || `ai-comic-${Date.now()}`,
+          placeId: data.placeId || `poi-${placeOrCity.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+          placeName: data.placeName || placeOrCity,
+          cityName: data.cityName || placeOrCity,
+          eraLayer: data.eraLayer || era,
+          tone: data.tone || tone,
+          title: data.title || `${placeOrCity} Story`,
+          tagline: data.tagline || 'An illustrated journey into local history.',
+          panels: data.panels,
+          sources: data.sources || ['Local Historical Archives']
+        };
+      }
+    }
+  } catch {
+    // Continue to direct client engine
+  }
+
+  // 2. Direct client call (if user has custom key)
   if (apiKey && apiKey.length > 10) {
     try {
       const prompt = `Create a 3-panel comic story for "${placeOrCity}" in tone "${tone}" and era layer "${era}".
@@ -751,38 +780,47 @@ Return a valid JSON object matching this schema:
   "sources": ["Source 1", "Source 2"]
 }`;
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.8
-          }
-        })
-      });
+      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+      for (const model of modelsToTry) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                responseMimeType: 'application/json',
+                temperature: 0.8
+              }
+            })
+          });
 
-      if (response.ok) {
-        const data = await response.json();
-        const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (textContent) {
-          const parsed = JSON.parse(textContent);
-          if (parsed && parsed.panels && parsed.panels.length > 0) {
-            return {
-              id: `ai-comic-${Date.now()}`,
-              placeId: `poi-${placeOrCity.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
-              placeName: placeOrCity,
-              cityName: parsed.cityName || placeOrCity,
-              eraLayer: era,
-              tone: tone,
-              title: parsed.title || `${placeOrCity} Story`,
-              tagline: parsed.tagline || 'An illustrated journey into local history.',
-              panels: parsed.panels,
-              sources: parsed.sources || ['Local Historical Archives']
-            };
+          if (response.ok) {
+            const data = await response.json();
+            const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (textContent) {
+              const cleanText = textContent.replace(/```json\s*|```/g, '').trim();
+              const parsed = JSON.parse(cleanText);
+              const comic = Array.isArray(parsed) ? parsed[0] : parsed;
+              if (comic && comic.panels && comic.panels.length > 0) {
+                return {
+                  id: `ai-comic-${Date.now()}`,
+                  placeId: `poi-${placeOrCity.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+                  placeName: placeOrCity,
+                  cityName: comic.cityName || placeOrCity,
+                  eraLayer: era,
+                  tone: tone,
+                  title: comic.title || `${placeOrCity} Story`,
+                  tagline: comic.tagline || 'An illustrated journey into local history.',
+                  panels: comic.panels,
+                  sources: comic.sources || ['Local Historical Archives']
+                };
+              }
+            }
           }
+        } catch {
+          // Try next model
         }
       }
     } catch {
@@ -873,6 +911,35 @@ export function generateDeterministicMyths(destinationName: string): GeneratedMy
 export async function generateAIMyths(destinationName: string): Promise<GeneratedMythItem[]> {
   const apiKey = getGeminiApiKey();
 
+  // 1. Try serverless endpoint first (has access to server-side GEMINI_API_KEY)
+  try {
+    const res = await fetch('/api/generate-myths', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ destinationName, apiKey })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((m: any, idx: number) => ({
+          id: m.id || `ai-myth-${Date.now()}-${idx}`,
+          city: destinationName,
+          country: m.country || 'Destination',
+          category: m.category || 'traditional',
+          categoryLabel: m.categoryLabel || 'Local Lore',
+          emoji: m.emoji || '💡',
+          myth: m.myth || 'Common tourist misconception.',
+          reality: m.reality || 'The local authentic reality.',
+          insiderTip: m.insiderTip || 'Be respectful and ask locals politely.',
+          severity: m.severity || 'fun'
+        }));
+      }
+    }
+  } catch {
+    // Continue to direct client engine
+  }
+
+  // 2. Direct client call (if user has custom key)
   if (apiKey && apiKey.length > 10) {
     try {
       const prompt = `You are a cultural myth-buster and local etiquette expert for POYALO travel app.
@@ -896,39 +963,47 @@ Return ONLY a valid JSON array of 4 distinct myth objects matching this schema:
   }
 ]`;
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.7
-          }
-        })
-      });
+      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+      for (const model of modelsToTry) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                responseMimeType: 'application/json',
+                temperature: 0.7
+              }
+            })
+          });
 
-      if (response.ok) {
-        const data = await response.json();
-        const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (textContent) {
-          const parsed = JSON.parse(textContent);
-          const items = Array.isArray(parsed) ? parsed : parsed.myths || [];
-          if (items.length > 0) {
-            return items.map((m: any, idx: number) => ({
-              id: `ai-myth-${Date.now()}-${idx}`,
-              city: destinationName,
-              country: m.country || 'Destination',
-              category: m.category || 'traditional',
-              categoryLabel: m.categoryLabel || 'Local Lore',
-              emoji: m.emoji || '💡',
-              myth: m.myth || 'Common tourist misconception.',
-              reality: m.reality || 'The local authentic reality.',
-              insiderTip: m.insiderTip || 'Be respectful and ask locals politely.',
-              severity: m.severity || 'fun'
-            }));
+          if (response.ok) {
+            const data = await response.json();
+            const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (textContent) {
+              const cleanText = textContent.replace(/```json\s*|```/g, '').trim();
+              const parsed = JSON.parse(cleanText);
+              const items = Array.isArray(parsed) ? parsed : parsed.myths || [];
+              if (items.length > 0) {
+                return items.map((m: any, idx: number) => ({
+                  id: `ai-myth-${Date.now()}-${idx}`,
+                  city: destinationName,
+                  country: m.country || 'Destination',
+                  category: m.category || 'traditional',
+                  categoryLabel: m.categoryLabel || 'Local Lore',
+                  emoji: m.emoji || '💡',
+                  myth: m.myth || 'Common tourist misconception.',
+                  reality: m.reality || 'The local authentic reality.',
+                  insiderTip: m.insiderTip || 'Be respectful and ask locals politely.',
+                  severity: m.severity || 'fun'
+                }));
+              }
+            }
           }
+        } catch {
+          // Try next model
         }
       }
     } catch {
