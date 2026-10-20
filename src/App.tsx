@@ -132,6 +132,30 @@ export const App: React.FC = () => {
         )}
       </main>
 
+      {/* Creator Attribution Section */}
+      {activeTab !== 'game' && (
+        <footer className="w-full text-center py-3 pb-24 sm:pb-28 text-xs font-mono text-gray-500 select-none">
+          made with <span className="text-red-500 font-bold">♥</span> by{' '}
+          <a
+            href="https://www.instagram.com/nichroot/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-black text-[#111827] hover:text-[#1B3FFF] underline decoration-2 decoration-[#1B3FFF] hover:decoration-amber-400 transition-colors"
+          >
+            nichroot
+          </a>{' '}
+          and{' '}
+          <a
+            href="https://www.instagram.com/m_farshi__"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-black text-[#111827] hover:text-[#1B3FFF] underline decoration-2 decoration-[#1B3FFF] hover:decoration-amber-400 transition-colors"
+          >
+            farshi
+          </a>
+        </footer>
+      )}
+
       {/* Persistent Bottom Mobile Dock */}
       <BottomDock
         activeTab={activeTab}

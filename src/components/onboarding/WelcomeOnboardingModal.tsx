@@ -226,7 +226,24 @@ export const WelcomeOnboardingModal: React.FC<WelcomeOnboardingModalProps> = ({
         {/* Modal Bottom Sticky Dismiss Action */}
         <div className="p-4 bg-white border-t-[2.5px] border-[#111827] flex items-center justify-between gap-3">
           <div className="text-[11px] font-mono text-gray-500 hidden sm:block">
-            Offline First • Zero Sensitive PII Stored
+            made with <span className="text-red-500 font-bold">♥</span> by{' '}
+            <a
+              href="https://www.instagram.com/nichroot/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-[#111827] hover:text-[#1B3FFF] underline"
+            >
+              nichroot
+            </a>{' '}
+            and{' '}
+            <a
+              href="https://www.instagram.com/m_farshi__"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-[#111827] hover:text-[#1B3FFF] underline"
+            >
+              farshi
+            </a>
           </div>
           <button
             onClick={onClose}

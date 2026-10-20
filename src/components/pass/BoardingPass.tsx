@@ -551,6 +551,28 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({
         </button>
       </div>
 
+      {/* Creator Attribution */}
+      <div className="text-center pt-2 text-[11px] font-mono text-gray-500">
+        made with <span className="text-red-500 font-bold">♥</span> by{' '}
+        <a
+          href="https://www.instagram.com/nichroot/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-black text-[#111827] hover:text-[#1B3FFF] underline decoration-1 hover:decoration-[#1B3FFF] transition-colors"
+        >
+          nichroot
+        </a>{' '}
+        and{' '}
+        <a
+          href="https://www.instagram.com/m_farshi__"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-black text-[#111827] hover:text-[#1B3FFF] underline decoration-1 hover:decoration-[#1B3FFF] transition-colors"
+        >
+          farshi
+        </a>
+      </div>
+
     </div>
   );
 };

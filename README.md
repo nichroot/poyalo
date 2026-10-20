@@ -283,5 +283,5 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 <br />
 
 <div align="center">
-  <sub>Built with ❤️ by two friends during <strong><a href="https://tinkerhub.github.io/layover/">LAYOVER 2026</a></strong> at TinkerSpace Calicut. <strong>POYALO (പോയാലോ?)</strong></sub>
+  <sub>Made with ❤️ by <a href="https://www.instagram.com/nichroot/">nichroot</a> and <a href="https://www.instagram.com/m_farshi__">farshi</a> during <strong><a href="https://tinkerhub.github.io/layover/">LAYOVER 2026</a></strong> at TinkerSpace Calicut. <strong>POYALO (പോയാലോ?)</strong></sub>
 </div>
