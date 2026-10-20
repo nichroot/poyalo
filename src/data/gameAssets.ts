@@ -156,5 +156,18 @@ export const INITIAL_VG_WORLD_COLLECTIBLES: CollectibleItem[] = [
     color: '#A855F7',
     culturalFact: 'The Museum of the Future features Arabic calligraphy poetry by Sheikh Mohammed bin Rashid Al Maktoum carved directly into its stainless steel facade.',
     collected: false
+  },
+  {
+    id: 'c-desert-gahwa',
+    type: 'dallah',
+    name: 'Bedouin Majlis Golden Gahwa',
+    points: 150,
+    x: -48.0,
+    y: 0.6,
+    z: -54.0,
+    emoji: '☕',
+    color: '#D97706',
+    culturalFact: 'In Bedouin desert culture, offering cardamom-infused Gahwa and fresh dates to desert travelers is an ancient sacred tradition of honor and hospitality.',
+    collected: false
   }
 ];

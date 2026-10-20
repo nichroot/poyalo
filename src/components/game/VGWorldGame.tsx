@@ -239,7 +239,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const lanternSouk   = new THREE.PointLight('#F59E0B', 0, 22);
     lanternSouk.position.set(-6, 3.5, 28);
     const lanternCamp   = new THREE.PointLight('#EA580C', 0, 22);
-    lanternCamp.position.set(-50, 2.5, -55);
+    lanternCamp.position.set(-48, 2.0, -53);
     scene.add(lanternBridge, lanternBurj, lanternSouk, lanternCamp);
 
     // Star field — only visible at night
@@ -310,18 +310,52 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     (gridHelper.material as THREE.Material).transparent = true;
     scene.add(gridHelper);
 
-    // 7. SAND DUNES (Confined to Western Desert Reserve — Zero congestion around Museum of the Future)
-    const createDune = (x: number, z: number, r: number, h: number) => {
-      const d = new THREE.Mesh(new THREE.ConeGeometry(r, h, 14), sharedDuneMat);
-      d.position.set(x, h / 2, z); d.scale.set(1.4, 0.45, 1.1);
-      d.receiveShadow = true; d.castShadow = true;
-      return d;
+    // 7. MAJESTIC RED SAND DUNES (Western & Northern Horizon Reserve — 100% Grounded, Zero Floating)
+    // Geometry base vertices are translated and anchored subterraneanly at y = -0.2 (impossible to float)
+    const createDune = (
+      cx: number,
+      cz: number,
+      rx: number,
+      rz: number,
+      height: number,
+      rotY = 0
+    ) => {
+      const g = new THREE.Group();
+      // Main deep red desert dune
+      const geo = new THREE.ConeGeometry(1, 1, 18);
+      geo.translate(0, 0.5, 0); // Translate base to y = 0, apex to y = 1.0
+      const mesh = new THREE.Mesh(geo, sharedDuneMat);
+      mesh.scale.set(rx, height, rz);
+      mesh.position.set(0, -0.2, 0); // Sunk 0.2 units below ground plane
+      mesh.receiveShadow = true;
+      mesh.castShadow = true;
+      g.add(mesh);
+
+      // Sunlit windward ridge crest highlight (low-poly stylized desert rim)
+      const crestGeo = new THREE.ConeGeometry(1, 1, 14);
+      crestGeo.translate(0, 0.5, 0);
+      const crestMat = new THREE.MeshLambertMaterial({ color: '#E8A246' });
+      const crestMesh = new THREE.Mesh(crestGeo, crestMat);
+      crestMesh.scale.set(rx * 0.75, height * 0.94, rz * 0.72);
+      crestMesh.position.set(rx * 0.08, -0.19, -rz * 0.06);
+      g.add(crestMesh);
+
+      g.position.set(cx, 0, cz);
+      g.rotation.y = rotY;
+      return g;
     };
+
     scene.add(
-      createDune(-58, -45, 18, 5.0),
-      createDune(-52, -75, 22, 6.5),
-      createDune(-65, -30, 20, 6.0),
-      createDune(-64, -65, 24, 7.0)
+      // Far North-Western Horizon Dune Ridge
+      createDune(-62, -78, 22, 16, 5.5, 0.35),
+      // Far Western Perimeter Dune (framing behind the camp clearing)
+      createDune(-67, -46, 16, 24, 5.0, -0.2),
+      // Deep Northern Desert Dune
+      createDune(-38, -84, 18, 14, 4.6, 0.15),
+      // South-Western Transition Dune
+      createDune(-66, -18, 15, 20, 4.2, 0.3),
+      // Deep Corner Ridge
+      createDune(-72, -88, 20, 20, 6.2, -0.1)
     );
 
     // 8. ROAD NETWORK
@@ -570,84 +604,151 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const archTop = new THREE.Mesh(new THREE.BoxGeometry(8, 0.8, 1.2), sharedWoodMat); archTop.position.set(-7, 3.8, 19); soukGroup.add(archTop);
     scene.add(soukGroup);
 
-    // g) BEDOUIN DESERT CAMP (100% Solid Grounded Dune Plateau & Authentic Majlis)
+    // g) BEDOUIN DESERT CAMP (100% Grounded Authentic Desert Majlis at x: -48, z: -55)
     const campGroup = new THREE.Group();
-    // 1. Solid Dune Plateau Base (elevation y = 2.15)
-    const campPlateau = new THREE.Mesh(
-      new THREE.CylinderGeometry(9.0, 10.5, 0.4, 24),
-      sharedSandMat
+
+    // 1. Campsite Packed-Earth Clearing Base (flush at ground level y = 0.015)
+    const campGround = new THREE.Mesh(
+      new THREE.CircleGeometry(12.5, 28),
+      new THREE.MeshLambertMaterial({ color: '#C27838' })
     );
-    campPlateau.position.set(-52, 2.15, -58);
-    campPlateau.receiveShadow = true;
-    campGroup.add(campPlateau);
+    campGround.rotation.x = -Math.PI / 2;
+    campGround.position.set(-48, 0.015, -55);
+    campGround.receiveShadow = true;
+    campGroup.add(campGround);
 
-    // 2. Traditional Goat-Hair Tent (Beit al-Sha'ar)
-    const tentRoofMat = new THREE.MeshLambertMaterial({ color: '#271B12' }); // Rich woven goat hair
-    const tentRoof = new THREE.Mesh(new THREE.BoxGeometry(7.2, 0.22, 5.6), tentRoofMat);
-    tentRoof.position.set(-52, 4.25, -59.5);
-    tentRoof.castShadow = true;
-    campGroup.add(tentRoof);
+    // 2. Traditional Pitched Goat-Hair Tent (Beit al-Sha'ar)
+    const tentRoofMat = new THREE.MeshLambertMaterial({ color: '#271B12' }); // Rich woven dark goat hair
+    // Rear sloped canopy
+    const rearRoof = new THREE.Mesh(new THREE.BoxGeometry(7.2, 0.14, 3.2), tentRoofMat);
+    rearRoof.position.set(-48, 2.45, -58.0);
+    rearRoof.rotation.x = -0.25;
+    rearRoof.castShadow = true;
+    // Front sloped canopy
+    const frontRoof = new THREE.Mesh(new THREE.BoxGeometry(7.2, 0.14, 2.6), tentRoofMat);
+    frontRoof.position.set(-48, 2.65, -55.4);
+    frontRoof.rotation.x = 0.22;
+    frontRoof.castShadow = true;
+    // Center ridge beam
+    const ridgeBeam = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.16, 0.16), sharedWoodMat);
+    ridgeBeam.position.set(-48, 2.95, -56.7);
+    ridgeBeam.castShadow = true;
+    campGroup.add(rearRoof, frontRoof, ridgeBeam);
 
-    // Four solid timber support poles running from ground up to roof
-    const poleGeo = new THREE.CylinderGeometry(0.12, 0.12, 1.95, 6);
-    const poleCoords = [
-      [-55.2, -62.0], [ -48.8, -62.0],
-      [-55.2, -57.0], [ -48.8, -57.0]
-    ];
-    poleCoords.forEach(([px, pz]) => {
-      const pole = new THREE.Mesh(poleGeo, sharedWoodMat);
-      pole.position.set(px, 3.25, pz);
+    // Tall center support poles (running from ground y = 0 up to ridge beam)
+    const centerPoleGeo = new THREE.CylinderGeometry(0.11, 0.13, 2.95, 8);
+    [-51.0, -45.0].forEach(px => {
+      const pole = new THREE.Mesh(centerPoleGeo, sharedWoodMat);
+      pole.position.set(px, 1.47, -56.7);
       pole.castShadow = true;
       campGroup.add(pole);
     });
 
-    // Rear windbreak woven fabric wall
+    // Four eaves support poles (running from ground y = 0 up to tent eaves)
+    const rearPoleGeo  = new THREE.CylinderGeometry(0.09, 0.11, 2.15, 6);
+    const frontPoleGeo = new THREE.CylinderGeometry(0.09, 0.11, 2.45, 6);
+    [-51.2, -44.8].forEach(px => {
+      const rPole = new THREE.Mesh(rearPoleGeo, sharedWoodMat);
+      rPole.position.set(px, 1.07, -59.3);
+      rPole.castShadow = true;
+      const fPole = new THREE.Mesh(frontPoleGeo, sharedWoodMat);
+      fPole.position.set(px, 1.22, -54.3);
+      fPole.castShadow = true;
+      campGroup.add(rPole, fPole);
+    });
+
+    // Rear and side windbreak woven wool fabric walls
     const tentFabricMat = new THREE.MeshLambertMaterial({ color: '#7F1D1D' }); // Deep Bedouin maroon
-    const rearWall = new THREE.Mesh(new THREE.BoxGeometry(6.6, 1.9, 0.12), tentFabricMat);
-    rearWall.position.set(-52, 3.25, -62.0);
+    const rearWall = new THREE.Mesh(new THREE.BoxGeometry(6.4, 2.0, 0.1), tentFabricMat);
+    rearWall.position.set(-48, 1.0, -59.3);
     rearWall.castShadow = true;
-    const sideWall = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.9, 5.0), tentFabricMat);
-    sideWall.position.set(-55.2, 3.25, -59.5);
+    const sideWall = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.0, 4.8), tentFabricMat);
+    sideWall.position.set(-51.2, 1.0, -56.8);
     sideWall.castShadow = true;
     campGroup.add(rearWall, sideWall);
 
-    // 3. Woven Arabian Floor Carpet & Majlis Cushions
+    // 3. Woven Arabian Floor Carpet & Majlis Seating
     const carpetMat = new THREE.MeshLambertMaterial({ color: '#991B1B' });
-    const carpet = new THREE.Mesh(new THREE.BoxGeometry(6.2, 0.06, 4.6), carpetMat);
-    carpet.position.set(-52, 2.38, -59.5);
+    const carpet = new THREE.Mesh(new THREE.BoxGeometry(6.0, 0.04, 4.4), carpetMat);
+    carpet.position.set(-48, 0.03, -56.8);
     carpet.receiveShadow = true;
-    campGroup.add(carpet);
+    const runnerMat = new THREE.MeshLambertMaterial({ color: '#B45309' });
+    const runner = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.05, 3.8), runnerMat);
+    runner.position.set(-48, 0.04, -56.8);
+    runner.receiveShadow = true;
+    campGroup.add(carpet, runner);
 
-    const cushionGeo = new THREE.BoxGeometry(1.4, 0.35, 0.65);
+    // Plush Sadu embroidered floor cushions (Takia / Masnad)
+    const cushionGeo = new THREE.BoxGeometry(1.4, 0.32, 0.65);
     const cushionMat = new THREE.MeshLambertMaterial({ color: '#DC2626' });
-    const c1 = new THREE.Mesh(cushionGeo, cushionMat); c1.position.set(-54.0, 2.52, -59.5); c1.rotation.y = Math.PI / 2;
-    const c2 = new THREE.Mesh(cushionGeo, cushionMat); c2.position.set(-52.0, 2.52, -61.2);
-    const c3 = new THREE.Mesh(cushionGeo, cushionMat); c3.position.set(-50.0, 2.52, -59.5); c3.rotation.y = Math.PI / 2;
-    campGroup.add(c1, c2, c3);
+    // Rear row
+    [-50.0, -48.0, -46.0].forEach(cx => {
+      const c = new THREE.Mesh(cushionGeo, cushionMat);
+      c.position.set(cx, 0.19, -58.5);
+      campGroup.add(c);
+    });
+    // West & East side rows
+    const sideCushionGeo = new THREE.BoxGeometry(0.65, 0.32, 1.3);
+    [-57.5, -55.8].forEach(cz => {
+      const cW = new THREE.Mesh(sideCushionGeo, cushionMat);
+      cW.position.set(-50.2, 0.19, cz);
+      const cE = new THREE.Mesh(sideCushionGeo, cushionMat);
+      cE.position.set(-45.8, 0.19, cz);
+      campGroup.add(cW, cE);
+    });
 
-    // Brass Dallah coffee table
-    const tableMat = new THREE.MeshLambertMaterial({ color: '#D97706' });
-    const coffeeTable = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 0.25, 12), tableMat);
-    coffeeTable.position.set(-52, 2.48, -59.0);
-    const dallah = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.2, 0.55, 8), sharedGoldMat);
-    dallah.position.set(-52, 2.85, -59.0);
-    campGroup.add(coffeeTable, dallah);
+    // 4. Carved Brass Coffee Table & Golden Dallah Pot
+    const coffeeTable = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.72, 0.24, 14), new THREE.MeshLambertMaterial({ color: '#D97706' }));
+    coffeeTable.position.set(-48, 0.14, -56.6);
+    const dallah = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.2, 0.5, 8), sharedGoldMat);
+    dallah.position.set(-48, 0.49, -56.6);
+    const dallahSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.04, 0.28, 6), sharedGoldMat);
+    dallahSpout.position.set(-48, 0.6, -56.4);
+    dallahSpout.rotation.x = 0.5;
+    const dallahLid = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.18, 6), sharedGoldMat);
+    dallahLid.position.set(-48, 0.82, -56.6);
+    const cupMat = new THREE.MeshLambertMaterial({ color: '#F8FAFC' });
+    const cup1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.09, 8), cupMat);
+    cup1.position.set(-48.25, 0.29, -56.4);
+    const cup2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.09, 8), cupMat);
+    cup2.position.set(-47.75, 0.29, -56.4);
+    campGroup.add(coffeeTable, dallah, dallahSpout, dallahLid, cup1, cup2);
 
-    // 4. Stone Campfire Fire-pit (sitting firmly on the ground)
-    const fireBase = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.22, 8, 14), sharedBuildingMat);
+    // 5. Traditional Stone Campfire Fire-pit (sitting firmly on the desert sand)
+    const fireBase = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.22, 8, 16), sharedBuildingMat);
     fireBase.rotation.x = Math.PI / 2;
-    fireBase.position.set(-52, 2.38, -54.5);
-    const coals = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.1, 8), sharedRoadMat);
-    coals.position.set(-52, 2.38, -54.5);
-    const flameMesh = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.0, 6), new THREE.MeshBasicMaterial({ color: '#F97316' }));
-    flameMesh.position.set(-52, 2.85, -54.5);
+    fireBase.position.set(-48, 0.12, -51.8);
+    const coals = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.8, 0.8, 0.08, 12),
+      new THREE.MeshLambertMaterial({ color: '#1F2937', emissive: '#EA580C', emissiveIntensity: 0.8 })
+    );
+    coals.position.set(-48, 0.06, -51.8);
+    const flameMesh = new THREE.Mesh(new THREE.ConeGeometry(0.44, 1.05, 7), new THREE.MeshBasicMaterial({ color: '#F97316' }));
+    flameMesh.position.set(-48, 0.58, -51.8);
     campGroup.add(fireBase, coals, flameMesh);
 
-    // 5. Wooden Camel Hitching Post
-    const hitchPost1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.6, 6), sharedWoodMat); hitchPost1.position.set(-45, 3.1, -55.5);
-    const hitchPost2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.6, 6), sharedWoodMat); hitchPost2.position.set(-45, 3.1, -58.5);
-    const hitchBeam  = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 3.4), sharedWoodMat); hitchBeam.position.set(-45, 3.7, -57.0);
-    campGroup.add(hitchPost1, hitchPost2, hitchBeam);
+    // 6. Wooden Camel Hitching Station & Feed Sacks
+    const hitchPost1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.5, 6), sharedWoodMat);
+    hitchPost1.position.set(-42, 0.75, -53.5);
+    const hitchPost2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.5, 6), sharedWoodMat);
+    hitchPost2.position.set(-42, 0.75, -56.5);
+    const hitchBeam = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 3.4), sharedWoodMat);
+    hitchBeam.position.set(-42, 1.35, -55.0);
+    const sackMat = new THREE.MeshLambertMaterial({ color: '#CA8A04' });
+    const sack1 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.7), sackMat);
+    sack1.position.set(-42.4, 0.25, -54.2);
+    const sack2 = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.45, 0.65), sackMat);
+    sack2.position.set(-42.4, 0.23, -55.8);
+    campGroup.add(hitchPost1, hitchPost2, hitchBeam, sack1, sack2);
+
+    // 7. Terracotta Water Amphoras (Al-Jahla)
+    const amphoraMat = new THREE.MeshLambertMaterial({ color: '#B45309' });
+    const jar1 = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.32, 0.65, 8), amphoraMat);
+    jar1.position.set(-45.0, 0.33, -53.6);
+    const jar2 = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.28, 0.55, 8), amphoraMat);
+    jar2.position.set(-44.4, 0.28, -53.2);
+    campGroup.add(jar1, jar2);
+
     scene.add(campGroup);
 
     // h) MIRACLE OASIS & FOUNTAIN
@@ -1015,13 +1116,23 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         const prog = (-9 - px) / 7.0;
         return Math.max(0, Math.min(5.65, prog * 5.65));
       }
-      // Bedouin Desert Camp Dune Plateau (zero floating)
-      if (Math.hypot(px - (-52), pz - (-58)) <= 9.2) {
-        return 2.3;
-      }
-      // Western sand dunes reserve
-      if (px <= -38 && pz <= -28) {
-        return Math.max(0, ((-38 - px) / 18.0) * 2.3);
+      // Western & Northern Horizon Sand Dunes climbing physics (smooth cone slope matching visual meshes)
+      const dunes = [
+        { cx: -62, cz: -78, rx: 22, rz: 16, h: 5.5 },
+        { cx: -67, cz: -46, rx: 16, rz: 24, h: 5.0 },
+        { cx: -38, cz: -84, rx: 18, rz: 14, h: 4.6 },
+        { cx: -66, cz: -18, rx: 15, rz: 20, h: 4.2 },
+        { cx: -72, cz: -88, rx: 20, rz: 20, h: 6.2 },
+      ];
+      for (let i = 0; i < dunes.length; i++) {
+        const d = dunes[i];
+        const nx = (px - d.cx) / d.rx;
+        const nz = (pz - d.cz) / d.rz;
+        const distSq = nx * nx + nz * nz;
+        if (distSq < 1.0) {
+          const duneH = (1 - Math.sqrt(distSq)) * d.h;
+          if (duneH > 0.05) return duneH;
+        }
       }
       return 0;
     };
@@ -1060,7 +1171,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       { cx: 40,  cz:  25, r: 5.8 }, // Burj Al Arab Tower & Spinnaker Sail
       { cx: -35, cz:  15, r: 8.0 }, // Museum of the Future Torus Ring
       { cx: 55,  cz:  50, r: 5.2 }, // Ain Dubai Base & Support Legs
-      { cx: -52, cz: -58, r: 4.8 }, // Bedouin Desert Camp Majlis Tent
+      { cx: -48, cz: -51.8, r: 1.1 }, // Bedouin Desert Camp Campfire Stone Ring
       { cx: 50,  cz: -35, r: 5.0 }, // Miracle Oasis Fountain Basin
     ];
 
@@ -1086,6 +1197,10 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
 
       // Al Qasba Moorish Cultural Pavilion
       { minX: -37.0, maxX: -23.0, minZ:  78.0, maxZ:  85.0 },
+
+      // Bedouin Desert Camp Tent Walls (rear & west windbreak — front majlis entrance open!)
+      { minX: -51.5, maxX: -44.5, minZ: -59.8, maxZ: -58.8 }, // Rear wall
+      { minX: -51.6, maxX: -50.6, minZ: -59.5, maxZ: -54.0 }, // West wall
     ];
 
     const animate = () => {
@@ -1334,7 +1449,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       creekMat.opacity = 0.86 + Math.sin(time * 2) * 0.05;
       abra1.position.y = Math.sin(time * 2) * 0.08;     abra1.rotation.z = Math.sin(time * 1.5) * 0.04;
       abra2.position.y = Math.sin(time * 2 + 1) * 0.08; abra2.rotation.z = Math.sin(time * 1.5 + 1) * 0.04;
-      flameMesh.position.y = 2.85 + Math.sin(time * 12) * 0.08; // campfire flicker grounded on coals
+      flameMesh.position.y = 0.58 + Math.sin(time * 12) * 0.06; // campfire flicker grounded on coals
 
       // Star twinkling at night
       if (starMat.opacity > 0) {

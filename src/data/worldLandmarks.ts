@@ -127,7 +127,7 @@ export const WORLD_LANDMARKS: WorldLandmark[] = [
     district: 'Western Desert Dunes',
     emoji: '⛺',
     description: 'Traditional nomadic desert camp nestled in red sand dunes with woven tent, campfire glow, and camel hitch.',
-    coords: { x: -52, y: 2.3, z: -58 },
+    coords: { x: -48, y: 0.6, z: -55 },
     color: '#D97706',
     badge: 'OASIS CAMP',
     tags: ['desert', 'dune', 'camp', 'bedouin', 'oasis', 'tent', 'fire', 'sand']
