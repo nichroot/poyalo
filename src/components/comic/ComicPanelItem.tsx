@@ -1,31 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ComicPanel } from '../../types/comic';
 import { SpeechBubble } from './SpeechBubble';
 
 interface ComicPanelItemProps {
   panel: ComicPanel;
-  isActive?: boolean;
+  onPlaySound?: (soundText?: string) => void;
 }
 
-export const ComicPanelItem: React.FC<ComicPanelItemProps> = ({ panel, isActive = false }) => {
+export const ComicPanelItem: React.FC<ComicPanelItemProps> = ({ panel, onPlaySound }) => {
+  const [isWiggling, setIsWiggling] = useState(false);
+
+  const handleDecalClick = () => {
+    setIsWiggling(true);
+    if (onPlaySound && panel.soundEffect) {
+      onPlaySound(panel.soundEffect.text);
+    }
+    setTimeout(() => setIsWiggling(false), 500);
+  };
+
   return (
-    <div className={`relative flex flex-col justify-between bg-white border-[2.5px] border-[#111827] rounded-2xl overflow-hidden shadow-[4px_4px_0px_#111827] transition-all duration-300 ${
-      isActive ? 'ring-4 ring-[#FF5722] scale-[1.01]' : ''
-    }`}>
+    <div className="relative flex flex-col justify-between bg-white border-[2.5px] border-[#111827] rounded-2xl overflow-hidden shadow-[4px_4px_0px_#111827] transition-transform hover:-translate-y-0.5">
       
-      {/* Top Header: Panel Number & Narrative Caption ("MEANWHILE...") */}
+      {/* Top Header: Panel Number & Golden-Age Narrative Caption ("MEANWHILE...") */}
       <div className="p-3 bg-[#FDFBF7] border-b-2 border-[#111827]">
         <div className="flex items-center justify-between mb-2">
           <span className="bg-[#111827] text-white font-mono font-black text-[10px] px-2 py-0.5 rounded tracking-widest uppercase">
-            PANEL 0{panel.panelNumber}
+            PANEL #0{panel.panelNumber}
           </span>
-          <span className="text-[10px] font-mono text-gray-500 font-bold">
-            HISTORIC STRIP
+          <span className="text-[10px] font-mono text-gray-500 font-bold uppercase">
+            HISTORIC LORE
           </span>
         </div>
 
         {panel.narrativeCaption && (
-          <div className="bg-[#FBBF24] border-2 border-[#111827] shadow-[2px_2px_0px_#111827] px-2.5 py-1 text-[11px] font-mono font-black text-[#111827] tracking-wider uppercase rounded">
+          <div className="bg-[#FDE047] border-2 border-[#111827] shadow-[2px_2px_0px_#111827] px-2.5 py-1 text-[11px] font-mono font-black text-[#111827] tracking-wider uppercase rounded">
             {panel.narrativeCaption}
           </div>
         )}
@@ -33,40 +41,45 @@ export const ComicPanelItem: React.FC<ComicPanelItemProps> = ({ panel, isActive 
 
       {/* Main Panel Illustration / Halftone Area */}
       <div 
-        className="relative flex-1 min-h-[160px] p-4 flex flex-col items-center justify-center border-b-2 border-[#111827] overflow-hidden"
+        className="relative min-h-[170px] p-4 flex flex-col items-center justify-center border-b-2 border-[#111827] overflow-hidden select-none"
         style={{ backgroundColor: panel.illustrationBgColor }}
       >
         {/* Halftone Ben-Day pattern overlay */}
         <div className="absolute inset-0 comic-halftone opacity-10 pointer-events-none" />
 
-        {/* Scene Mascot / Glyph */}
-        <div className="relative z-10 text-6xl drop-shadow-md select-none transform hover:scale-110 transition-transform">
+        {/* Scene Mascot Glyph */}
+        <div className="relative z-10 text-6xl drop-shadow-sm select-none transform hover:scale-110 active:scale-95 transition-transform duration-200">
           {panel.illustrationEmoji}
         </div>
 
         {/* Scene description subtitle */}
-        <p className="relative z-10 mt-2 text-[11px] font-mono text-center text-gray-700 bg-white/80 px-2 py-0.5 rounded border border-[#111827] max-w-[90%]">
+        <p className="relative z-10 mt-2.5 text-[11px] font-mono font-bold text-center text-[#111827] bg-white/90 px-2.5 py-0.5 rounded-full border border-[#111827] max-w-[90%] shadow-[1px_1px_0px_#111827]">
           {panel.panelScene}
         </p>
 
-        {/* Skewed Action Sound Decal (e.g. "SWOOSH!", "YALLA!") */}
+        {/* Interactive Action Sound Decal (e.g. "SPLASH!", "YALLA!", "KAPOW!") */}
         {panel.soundEffect && (
-          <div 
-            className="absolute top-3 right-3 z-20 font-comic text-2xl tracking-wider text-white px-3 py-1 rounded-lg border-2 border-[#111827] shadow-[3px_3px_0px_#111827] select-none"
+          <button 
+            type="button"
+            onClick={handleDecalClick}
+            title="Tap sound decal to play sound!"
+            className={`absolute top-3 right-3 z-20 font-comic text-xl sm:text-2xl tracking-wider text-white px-3 py-1 rounded-xl border-2 border-[#111827] shadow-[3px_3px_0px_#111827] select-none cursor-pointer active:scale-125 transition-transform ${
+              isWiggling ? 'animate-bounce scale-110' : 'hover:scale-105'
+            }`}
             style={{
               backgroundColor: panel.soundEffect.color,
               transform: `rotate(${panel.soundEffect.rotationDeg}deg)`
             }}
           >
-            <span className="drop-shadow-[1px_1px_0px_#111827]">
+            <span className="drop-shadow-[1.5px_1.5px_0px_#111827]">
               {panel.soundEffect.text}
             </span>
-          </div>
+          </button>
         )}
       </div>
 
       {/* Speech & Thought Bubbles Container */}
-      <div className="p-3 bg-white space-y-2 flex-1 flex flex-col justify-end">
+      <div className="p-3 bg-[#FDFBF7]/50 space-y-2 flex-1 flex flex-col justify-end">
         {panel.speechBubbles.map((bubble, i) => (
           <SpeechBubble key={i} bubble={bubble} />
         ))}
