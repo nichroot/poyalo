@@ -5,7 +5,7 @@ interface VirtualJoystickProps {
   maxRadius?: number; // default 56px
 }
 
-export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
+const VirtualJoystickComponent: React.FC<VirtualJoystickProps> = ({
   onMove,
   maxRadius = 56
 }) => {
@@ -140,3 +140,5 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
     </div>
   );
 };
+
+export const VirtualJoystick = React.memo(VirtualJoystickComponent);

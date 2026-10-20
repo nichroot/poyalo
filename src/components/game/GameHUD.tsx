@@ -34,7 +34,7 @@ interface GameHUDProps {
   playerCoords?: { x: number; z: number };
 }
 
-export const GameHUD: React.FC<GameHUDProps> = ({
+const GameHUDComponent: React.FC<GameHUDProps> = ({
   score,
   pearlsCollected,
   totalPearls,
@@ -394,3 +394,5 @@ export const GameHUD: React.FC<GameHUDProps> = ({
     </>
   );
 };
+
+export const GameHUD = React.memo(GameHUDComponent);

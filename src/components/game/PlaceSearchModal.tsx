@@ -11,7 +11,7 @@ interface PlaceSearchModalProps {
   onTeleportTo: (landmark: WorldLandmark) => void;
 }
 
-export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
+const PlaceSearchModalComponent: React.FC<PlaceSearchModalProps> = ({
   isOpen,
   onClose,
   playerCoords,
@@ -246,3 +246,5 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
     </div>
   );
 };
+
+export const PlaceSearchModal = React.memo(PlaceSearchModalComponent);

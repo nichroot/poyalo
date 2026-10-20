@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import * as THREE from 'three';
 import { INITIAL_VG_WORLD_COLLECTIBLES } from '../../data/gameAssets';
 import { WORLD_LANDMARKS, WorldLandmark } from '../../data/worldLandmarks';
@@ -142,12 +142,12 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
 
   // NPC remote players — stable ref
   const remotePlayersRef = useRef([
-    { id: 'usr_rohan',  displayName: 'Rohan (Tourist)',         avatarColor: '#1B3FFF', x:   4.5, y: 0.0, z:  -4.0, rotationY:  0.5, currentEmote: 'Hello! Enjoying the sights! 👋' },
-    { id: 'usr_fatima', displayName: 'Fatima (Souk Explorer)',  avatarColor: '#FF5722', x:  -6.0, y: 0.0, z:  26.0, rotationY:  1.2, currentEmote: 'The fragrant spices smell amazing! 🧄' },
-    { id: 'usr_alex',   displayName: 'Alex (Bridge Explorer)',  avatarColor: '#10B981', x:  26.0, y: 3.6, z:   2.0, rotationY: -1.5, currentEmote: 'Crossing the Creek! 🌉' },
-    { id: 'usr_zayn',   displayName: 'Zayn (Oasis Wanderer)',   avatarColor: '#EC4899', x:  48.0, y: 0.0, z: -34.0, rotationY: -0.8, currentEmote: 'So peaceful by the fountain ⛲' },
-    { id: 'usr_aadhu',  displayName: 'Aadhu (Little Boy)',      avatarColor: '#F59E0B', x: -38.5, y: 0.2, z:  56.5, rotationY:  0.3, scale: 0.72, currentEmote: 'Race you across the bridge, Momo! 🏃' },
-    { id: 'usr_momo',   displayName: 'Momo (Elder Teenager)',   avatarColor: '#8B5CF6', x: -36.2, y: 0.2, z:  54.8, rotationY: -0.7, scale: 1.05, currentEmote: 'Careful near the water, Aadhu! 😄' },
+    { id: 'usr_rohan',  displayName: 'Rohan',   avatarColor: '#1B3FFF', x:   4.5, y: 0.0, z:  -4.0, rotationY:  0.5, currentEmote: 'Hello! Enjoying the sights! 👋' },
+    { id: 'usr_fatima', displayName: 'Fatima',  avatarColor: '#FF5722', x:  -6.0, y: 0.0, z:  26.0, rotationY:  1.2, currentEmote: 'The fragrant spices smell amazing! 🧄' },
+    { id: 'usr_alex',   displayName: 'Alex',    avatarColor: '#10B981', x:  26.0, y: 3.6, z:   2.0, rotationY: -1.5, currentEmote: 'Crossing the Creek! 🌉' },
+    { id: 'usr_zayn',   displayName: 'Zayn',    avatarColor: '#EC4899', x:  48.0, y: 0.0, z: -34.0, rotationY: -0.8, currentEmote: 'So peaceful by the fountain ⛲' },
+    { id: 'usr_aadhu',  displayName: 'Aadhu',   avatarColor: '#F59E0B', x: -38.5, y: 0.2, z:  56.5, rotationY:  0.3, scale: 0.72, currentEmote: 'Race you across the bridge, Momo! 🏃' },
+    { id: 'usr_momo',   displayName: 'Momo',    avatarColor: '#8B5CF6', x: -36.2, y: 0.2, z:  54.8, rotationY: -0.7, scale: 1.05, currentEmote: 'Careful near the water, Aadhu! 😄' },
   ]);
 
   // ---------------------------------------------------------------------------
@@ -202,17 +202,19 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 750);
     const targetCameraPos = new THREE.Vector3();
 
-    // 3. RENDERER
+    // 3. RENDERER (Optimized for 60fps buttery-smooth mobile & desktop gameplay)
     const isMobile = width < 768;
     const renderer = new THREE.WebGLRenderer({
       antialias: !isMobile,
       powerPreference: 'high-performance',
-      precision: isMobile ? 'mediump' : 'highp'
+      precision: isMobile ? 'mediump' : 'highp',
+      stencil: false,
+      depth: true
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.25 : 1.5));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFShadowMap; // Clean, high-performance neo-brutalist shadows (zero soft blur lag)
+    renderer.shadowMap.type = THREE.PCFShadowMap; // Ultra-fast hardware shadow map filtering
     container.appendChild(renderer.domElement);
 
     // 4. LIGHTING
@@ -227,11 +229,11 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     sunLight.shadow.mapSize.set(isMobile ? 512 : 1024, isMobile ? 512 : 1024);
     sunLight.shadow.camera.near   =  10;
     sunLight.shadow.camera.far    =  190;
-    sunLight.shadow.camera.left   = -100;
-    sunLight.shadow.camera.right  =  100;
-    sunLight.shadow.camera.top    =  100;
-    sunLight.shadow.camera.bottom = -100;
-    sunLight.shadow.bias = -0.0005;
+    sunLight.shadow.camera.left   = -75;
+    sunLight.shadow.camera.right  =  75;
+    sunLight.shadow.camera.top    =  75;
+    sunLight.shadow.camera.bottom = -75;
+    sunLight.shadow.bias = -0.001;
     scene.add(sunLight);
 
     // Night point lights
@@ -923,16 +925,16 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       chestMeshes[ch.id] = { group: cg, lid };
     });
 
-    // 17. PALM TREES
+    // 17. PALM TREES (Optimized — zero shadow overhead)
     const trunkGeo = new THREE.CylinderGeometry(0.2, 0.35, 4.5, 6);
     const leafGeo  = new THREE.ConeGeometry(0.9, 2.2, 4);
     const createPalm = (x: number, z: number) => {
       const g = new THREE.Group();
-      const trunk = new THREE.Mesh(trunkGeo, sharedWoodMat); trunk.position.y = 2.25; trunk.castShadow = true; g.add(trunk);
+      const trunk = new THREE.Mesh(trunkGeo, sharedWoodMat); trunk.position.y = 2.25; g.add(trunk);
       for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 3) {
         const leaf = new THREE.Mesh(leafGeo, sharedFoliageMat);
         leaf.position.set(Math.cos(angle) * 0.9, 4.3, Math.sin(angle) * 0.9);
-        leaf.rotation.x = Math.PI / 3; leaf.rotation.y = angle; leaf.castShadow = true;
+        leaf.rotation.x = Math.PI / 3; leaf.rotation.y = angle;
         g.add(leaf);
       }
       g.position.set(x, 0, z);
@@ -1119,7 +1121,14 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     };
     window.addEventListener('resize', onResize);
 
-    // 22. HEIGHT COLLISION MAP
+    // 22. HEIGHT COLLISION MAP (Static data outside loop to eliminate GC allocations)
+    const WORLD_DUNES = [
+      { cx: -62, cz: -78, rx: 22, rz: 16, h: 5.5 },
+      { cx: -67, cz: -46, rx: 16, rz: 24, h: 5.0 },
+      { cx: -38, cz: -84, rx: 18, rz: 14, h: 4.6 },
+      { cx: -66, cz: -18, rx: 15, rz: 20, h: 4.2 },
+      { cx: -72, cz: -88, rx: 20, rz: 20, h: 6.2 },
+    ];
     const getGroundHeight = (px: number, pz: number): number => {
       // Downtown Spire Promenade Plaza
       if (px >= 5 && px <= 51 && pz >= -77 && pz <= -36) {
@@ -1152,15 +1161,8 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         return Math.max(0, Math.min(5.65, prog * 5.65));
       }
       // Western & Northern Horizon Sand Dunes climbing physics (smooth cone slope matching visual meshes)
-      const dunes = [
-        { cx: -62, cz: -78, rx: 22, rz: 16, h: 5.5 },
-        { cx: -67, cz: -46, rx: 16, rz: 24, h: 5.0 },
-        { cx: -38, cz: -84, rx: 18, rz: 14, h: 4.6 },
-        { cx: -66, cz: -18, rx: 15, rz: 20, h: 4.2 },
-        { cx: -72, cz: -88, rx: 20, rz: 20, h: 6.2 },
-      ];
-      for (let i = 0; i < dunes.length; i++) {
-        const d = dunes[i];
+      for (let i = 0; i < WORLD_DUNES.length; i++) {
+        const d = WORLD_DUNES[i];
         const nx = (px - d.cx) / d.rx;
         const nz = (pz - d.cz) / d.rz;
         const distSq = nx * nx + nz * nz;
@@ -1196,6 +1198,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     // Track discovered landmarks locally to avoid stale closure issues
     const discoveredSet = new Set<string>();
     let lastCoordsUpdate = 0;
+    let lastWpUpdate = 0;
 
     const targetVel = new THREE.Vector3();
     const velDiff   = new THREE.Vector3();
@@ -1440,7 +1443,10 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         // Spawn comic dust puffs when running or turbo sprinting
         if (spd > 2.0 && isGrounded && (now - lastPuffSpawn > (isBoosting ? 85 : 150))) {
           lastPuffSpawn = now;
-          const puff = dustPool.find(p => p.life <= 0);
+          let puff: typeof dustPool[0] | undefined;
+          for (let i = 0; i < maxPuffs; i++) {
+            if (dustPool[i].life <= 0) { puff = dustPool[i]; break; }
+          }
           if (puff) {
             puff.mesh.position.set(
               playerGroup.position.x - velocity.x * 0.08 + (Math.random() - 0.5) * 0.25,
@@ -1460,8 +1466,9 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         pChar.lLegG.rotation.x = 0; pChar.rLegG.rotation.x = 0;
       }
 
-      // Update dust puff particle physics
-      dustPool.forEach(p => {
+      // Update dust puff particle physics (indexed loop — zero garbage collection)
+      for (let i = 0; i < maxPuffs; i++) {
+        const p = dustPool[i];
         if (p.life > 0) {
           p.life -= delta;
           p.scale += delta * 2.6;
@@ -1469,7 +1476,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
           (p.mesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, (p.life / p.maxLife) * 0.65);
           if (p.life <= 0) p.mesh.visible = false;
         }
-      });
+      }
 
       // SMOOTH CAMERA
       targetCameraPos.x = playerGroup.position.x + Math.sin(cameraAngle) * Math.cos(cameraPitch) * camDist;
@@ -1500,7 +1507,8 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         diamondMesh.position.y = 12 + Math.sin(time * 3) * 1.5;
         beamMat.opacity = 0.35 + Math.sin(time * 4) * 0.15;
         const distToWp = Math.round(Math.hypot(playerGroup.position.x - wp.coords.x, playerGroup.position.z - wp.coords.z));
-        if (distToWp !== lastWaypointDistRef.current) {
+        if (Math.abs(distToWp - lastWaypointDistRef.current) >= 2 && (now - lastWpUpdate > 350)) {
+          lastWpUpdate = now;
           lastWaypointDistRef.current = distToWp;
           setWaypointDistance(distToWp);
         }
@@ -1526,8 +1534,9 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         }
       }
 
-      // SPEED BOOST PADS — per-pad 3s cooldown so they don't fire every frame
-      boostPadDefs.forEach(pad => {
+      // SPEED BOOST PADS — indexed loop with per-pad cooldown (zero GC)
+      for (let i = 0; i < boostPadDefs.length; i++) {
+        const pad = boostPadDefs[i];
         const d = Math.hypot(playerGroup.position.x - pad.x, playerGroup.position.z - pad.z);
         if (d <= 2.2 && !isBoosting && (now - (boostPadCooldownRef.current[pad.id] || 0)) > 3000) {
           boostPadCooldownRef.current[pad.id] = now;
@@ -1535,20 +1544,22 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
           playSoundEffect('boost');
           showBadge('⚡ SPEED SURGE!', '⚡');
         }
-      });
+      }
 
-      // BOUNCE PADS
-      bouncePadDefs.forEach(pad => {
+      // BOUNCE PADS (zero GC)
+      for (let i = 0; i < bouncePadDefs.length; i++) {
+        const pad = bouncePadDefs[i];
         const d = Math.hypot(playerGroup.position.x - pad.x, playerGroup.position.z - pad.z);
         if (d <= 2.0 && isGrounded) {
           playerVelY = 17.5; isGrounded = false;
           playSoundEffect('bounce');
           showBadge('SUPER BOUNCE!', '🦘');
         }
-      });
+      }
 
-      // MYSTERY CHESTS
-      chestDefs.forEach(ch => {
+      // MYSTERY CHESTS (zero GC)
+      for (let i = 0; i < chestDefs.length; i++) {
+        const ch = chestDefs[i];
         if (!ch.opened) {
           const d = Math.hypot(playerGroup.position.x - ch.x, playerGroup.position.z - ch.z);
           if (d <= 2.2) {
@@ -1562,7 +1573,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
             if (onScoreUpdateRef.current) onScoreUpdateRef.current(scoreRef.current, collectedIdsRef.current.size);
           }
         }
-      });
+      }
 
       // RESPOND TO 45s SECRET LOOT RESPAWN (keeps open world alive)
       for (let i = 0; i < INITIAL_VG_WORLD_COLLECTIBLES.length; i++) {
@@ -1634,12 +1645,12 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         setNearbyPlayerEmote(nearbyEmote);
       }
 
-      // COORDINATE UPDATE (throttled 200ms & only on integer changes)
-      if (now - lastCoordsUpdate > 200) {
+      // COORDINATE UPDATE (throttled 350ms & 2m delta to eliminate micro-jitter and rerender lag)
+      if (now - lastCoordsUpdate > 350) {
         lastCoordsUpdate = now;
         const rx = Math.round(playerGroup.position.x);
         const rz = Math.round(playerGroup.position.z);
-        if (rx !== lastCoordsRef.current.x || rz !== lastCoordsRef.current.z) {
+        if (Math.abs(rx - lastCoordsRef.current.x) >= 2 || Math.abs(rz - lastCoordsRef.current.z) >= 2) {
           lastCoordsRef.current.x = rx;
           lastCoordsRef.current.z = rz;
           setPlayerCoords({ x: rx, z: rz });
@@ -1683,8 +1694,8 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const pearlsCollected = collectibles.filter(c => c.type === 'pearl' && c.collected).length;
-  const totalPearls     = collectibles.filter(c => c.type === 'pearl').length;
+  const pearlsCollected = useMemo(() => collectibles.filter(c => c.type === 'pearl' && c.collected).length, [collectibles]);
+  const totalPearls     = useMemo(() => collectibles.filter(c => c.type === 'pearl').length, [collectibles]);
 
   return (
     <div className={`relative w-full h-[calc(100vh-140px)] min-h-[480px] overflow-hidden rounded-2xl border-[2.5px] border-[#111827] shadow-[4px_4px_0px_#111827] transition-colors duration-500 ${
