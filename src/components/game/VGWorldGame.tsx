@@ -92,6 +92,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
   const [score, setScore] = useState<number>(0);
   const [unlockedItem, setUnlockedItem] = useState<CollectibleItem | null>(null);
   const [nearbyPlayerName, setNearbyPlayerName] = useState<string | undefined>(undefined);
+  const [nearbyPlayerEmote, setNearbyPlayerEmote] = useState<string | undefined>(undefined);
   const [playerEmote, setPlayerEmote] = useState<{ text: string; expires: number } | null>(null);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('day');
   const [speedBoostActive, setSpeedBoostActive] = useState<boolean>(false);
@@ -141,10 +142,12 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
 
   // NPC remote players — stable ref
   const remotePlayersRef = useRef([
-    { id: 'usr_rohan',  displayName: 'Rohan (Tourist)',         avatarColor: '#1B3FFF', x:  4.5, y: 0.8, z:  -4.0, rotationY:  0.5, currentEmote: 'Hello! 👋' },
-    { id: 'usr_fatima', displayName: 'Fatima (Souk Explorer)',  avatarColor: '#FF5722', x: -6.0, y: 0.8, z:  26.0, rotationY:  1.2 },
-    { id: 'usr_alex',   displayName: 'Alex (Bridge Explorer)',  avatarColor: '#10B981', x: 26.0, y: 3.6, z:   2.0, rotationY: -1.5, currentEmote: 'Crossing the Creek! 🌉' },
-    { id: 'usr_zayn',   displayName: 'Zayn (Oasis Wanderer)',   avatarColor: '#EC4899', x: 48.0, y: 0.8, z: -34.0, rotationY: -0.8 },
+    { id: 'usr_rohan',  displayName: 'Rohan (Tourist)',         avatarColor: '#1B3FFF', x:   4.5, y: 0.0, z:  -4.0, rotationY:  0.5, currentEmote: 'Hello! Enjoying the sights! 👋' },
+    { id: 'usr_fatima', displayName: 'Fatima (Souk Explorer)',  avatarColor: '#FF5722', x:  -6.0, y: 0.0, z:  26.0, rotationY:  1.2, currentEmote: 'The fragrant spices smell amazing! 🧄' },
+    { id: 'usr_alex',   displayName: 'Alex (Bridge Explorer)',  avatarColor: '#10B981', x:  26.0, y: 3.6, z:   2.0, rotationY: -1.5, currentEmote: 'Crossing the Creek! 🌉' },
+    { id: 'usr_zayn',   displayName: 'Zayn (Oasis Wanderer)',   avatarColor: '#EC4899', x:  48.0, y: 0.0, z: -34.0, rotationY: -0.8, currentEmote: 'So peaceful by the fountain ⛲' },
+    { id: 'usr_aadhu',  displayName: 'Aadhu (Little Boy)',      avatarColor: '#F59E0B', x: -38.5, y: 0.2, z:  56.5, rotationY:  0.3, scale: 0.72, currentEmote: 'Race you across the bridge, Momo! 🏃' },
+    { id: 'usr_momo',   displayName: 'Momo (Elder Teenager)',   avatarColor: '#8B5CF6', x: -36.2, y: 0.2, z:  54.8, rotationY: -0.7, scale: 1.05, currentEmote: 'Careful near the water, Aadhu! 😄' },
   ]);
 
   // ---------------------------------------------------------------------------
@@ -981,8 +984,40 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       const rg = new THREE.Group();
       const ch = createCharacterRig(rp.avatarColor, false);
       rg.add(ch.rg);
+      const s = (rp as any).scale || 1.0;
+      rg.scale.set(s, s, s);
       rg.position.set(rp.x, rp.y || 0, rp.z);
       rg.rotation.y = rp.rotationY || 0;
+
+      // Overhead Comic Name Badge (Canvas Sprite Billboard)
+      const tagCanvas = document.createElement('canvas');
+      tagCanvas.width = 256;
+      tagCanvas.height = 64;
+      const ctx = tagCanvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#111827';
+        if (ctx.roundRect) {
+          ctx.roundRect(8, 8, 240, 48, 12);
+        } else {
+          ctx.fillRect(8, 8, 240, 48);
+        }
+        ctx.fill();
+        ctx.strokeStyle = '#FDE047';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.font = 'bold 20px monospace';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(rp.displayName, 128, 32);
+      }
+      const tagTex = new THREE.CanvasTexture(tagCanvas);
+      const tagMat = new THREE.SpriteMaterial({ map: tagTex, transparent: true });
+      const tagSprite = new THREE.Sprite(tagMat);
+      tagSprite.position.y = 2.45;
+      tagSprite.scale.set(2.2, 0.55, 1);
+      rg.add(tagSprite);
+
       scene.add(rg);
     });
 
@@ -1581,19 +1616,22 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         }
       }
 
-      // NEARBY PLAYER NAME — only triggers React state when changed
-      let nearby: string | undefined;
+      // NEARBY PLAYER NAME & EMOTE DIALOG — only triggers React state when changed
+      let nearbyName: string | undefined;
+      let nearbyEmote: string | undefined;
       const rPlayers = remotePlayersRef.current;
       for (let i = 0; i < rPlayers.length; i++) {
         const rp = rPlayers[i];
-        if (Math.hypot(playerGroup.position.x - rp.x, playerGroup.position.z - rp.z) <= 3.5) {
-          nearby = rp.displayName;
+        if (Math.hypot(playerGroup.position.x - rp.x, playerGroup.position.z - rp.z) <= 3.8) {
+          nearbyName = rp.displayName;
+          nearbyEmote = rp.currentEmote;
           break;
         }
       }
-      if (nearby !== lastNearbyRef.current) {
-        lastNearbyRef.current = nearby;
-        setNearbyPlayerName(nearby);
+      if (nearbyName !== lastNearbyRef.current) {
+        lastNearbyRef.current = nearbyName;
+        setNearbyPlayerName(nearbyName);
+        setNearbyPlayerEmote(nearbyEmote);
       }
 
       // COORDINATE UPDATE (throttled 200ms & only on integer changes)
@@ -1685,10 +1723,17 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         </div>
       )}
 
-      {/* Nearby player name tag */}
+      {/* Nearby player name tag & comic speech bubble */}
       {nearbyPlayerName && (
-        <div className="absolute bottom-36 left-1/2 -translate-x-1/2 z-30 px-3 py-1 bg-[#111827] text-white text-[10px] font-mono rounded-full border border-white/30 pointer-events-none">
-          👤 {nearbyPlayerName} is nearby
+        <div className="absolute bottom-36 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1 pointer-events-none">
+          {nearbyPlayerEmote && (
+            <div className="px-3 py-1.5 bg-white border-2 border-[#111827] rounded-xl shadow-[3px_3px_0px_#111827] font-comic text-xs sm:text-sm text-[#111827] animate-bounce max-w-[280px] text-center">
+              "{nearbyPlayerEmote}"
+            </div>
+          )}
+          <div className="px-3 py-1 bg-[#111827] text-white text-[10px] font-mono rounded-full border border-white/30 shadow-[2px_2px_0px_#111827]">
+            👤 {nearbyPlayerName} is nearby
+          </div>
         </div>
       )}
 

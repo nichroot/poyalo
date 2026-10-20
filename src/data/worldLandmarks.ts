@@ -138,11 +138,11 @@ export const WORLD_LANDMARKS: WorldLandmark[] = [
     category: 'leisure',
     district: 'Al Qasba Cultural District',
     emoji: '🛶',
-    description: 'Venetian-style turquoise canal spanned by twin pedestrian footbridges, waterfront café terraces, and Moorish pavilion.',
+    description: 'Venetian-style turquoise canal spanned by twin pedestrian footbridges, waterfront café terraces, and Moorish pavilion. Meet Aadhu & Momo strolling by the canal!',
     coords: { x: -30, y: 0.6, z: 65 },
     color: '#06B6D4',
     badge: 'CANAL PROMENADE',
-    tags: ['qasba', 'canal', 'venetian', 'bridges', 'sharjah', 'waterfront', 'cafe', 'promenade']
+    tags: ['qasba', 'canal', 'venetian', 'bridges', 'sharjah', 'waterfront', 'cafe', 'promenade', 'aadhu', 'momo']
   },
   {
     id: 'miracle-oasis',
