@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  Sparkles, 
   X, 
-  Check, 
-  BookOpen, 
   Sun, 
   Sunset, 
   Moon, 
@@ -11,10 +8,11 @@ import {
   ArrowUp, 
   Search, 
   Compass, 
-  Smile
+  Smile,
+  MapPin
 } from 'lucide-react';
 import { CollectibleItem, TravelEmote } from '../../types/game';
-import { WorldLandmark } from '../../data/worldLandmarks';
+import { WorldLandmark, WORLD_LANDMARKS } from '../../data/worldLandmarks';
 
 interface GameHUDProps {
   score: number;
@@ -34,6 +32,7 @@ interface GameHUDProps {
   activeWaypoint?: WorldLandmark | null;
   waypointDistance?: number;
   onClearWaypoint?: () => void;
+  playerCoords?: { x: number; z: number };
 }
 
 export const GameHUD: React.FC<GameHUDProps> = ({
@@ -53,16 +52,17 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   onOpenPlaceSearch,
   activeWaypoint,
   waypointDistance,
-  onClearWaypoint
+  onClearWaypoint,
+  playerCoords = { x: 0, z: 0 }
 }) => {
   const [showEmotePicker, setShowEmotePicker] = useState(false);
 
-  // Auto-dismiss unlocked item fact notification after 3.2s
+  // Auto-dismiss unlocked item fact notification after 2.8s
   React.useEffect(() => {
     if (unlockedItem) {
       const timer = setTimeout(() => {
         onDismissUnlock();
-      }, 3200);
+      }, 2800);
       return () => clearTimeout(timer);
     }
   }, [unlockedItem, onDismissUnlock]);
@@ -74,13 +74,23 @@ export const GameHUD: React.FC<GameHUDProps> = ({
     'Follow Me! 🗺️'
   ];
 
+  // Radar mini-map coordinates projection:
+  // Map bounds: x in [-70, 75] (range 145), z in [-95, 95] (range 190)
+  const getRadarX = (x: number) => Math.max(6, Math.min(94, ((x - (-70)) / 145) * 100));
+  const getRadarY = (z: number) => Math.max(6, Math.min(94, ((z - (-95)) / 190) * 100));
+
+  const playerRadarX = getRadarX(playerCoords.x);
+  const playerRadarY = getRadarY(playerCoords.z);
+
+  const itemTopOffset = activeWaypoint ? 'top-24' : 'top-14';
+
   return (
     <>
-      {/* Top Left: Clean Consolidated Status Bar (Zero Clutter) */}
+      {/* Top Left: Clean Consolidated Status Bar */}
       <div className="absolute top-3 left-3 z-30 flex items-center space-x-1.5 pointer-events-auto">
         <div className="bg-white border-2 border-[#111827] px-2.5 sm:px-3 py-1.5 rounded-xl shadow-[3px_3px_0px_#111827] flex items-center space-x-2">
           {/* Score */}
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1" title="Adventure Points">
             <span className="text-xs sm:text-sm">🪙</span>
             <span className="font-mono font-black text-xs text-[#111827]">{score}</span>
           </div>
@@ -88,7 +98,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           <div className="w-[1.5px] h-3.5 bg-gray-300" />
 
           {/* Pearls */}
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1" title="Pearls Collected">
             <span className="text-xs sm:text-sm">🦪</span>
             <span className="font-mono font-black text-xs text-[#1B3FFF]">
               {pearlsCollected}/{totalPearls}
@@ -97,7 +107,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
           {/* Discovered Landmarks */}
           <div className="w-[1.5px] h-3.5 bg-gray-300" />
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1" title="Landmarks Discovered">
             <span className="text-xs sm:text-sm">📍</span>
             <span className="font-mono font-black text-xs text-[#10B981]">
               {discoveredLandmarksCount}/9
@@ -179,14 +189,85 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         )}
       </div>
 
+      {/* Top Right: Compact Radar Mini-Map */}
+      <div 
+        onClick={onOpenPlaceSearch}
+        title="Tactical Radar (Click to open Place Search)"
+        className="absolute top-14 right-3 z-30 w-[74px] h-[74px] bg-[#FDFBF7]/95 border-2 border-[#111827] rounded-2xl shadow-[3px_3px_0px_#111827] overflow-hidden backdrop-blur-sm cursor-pointer pointer-events-auto hover:scale-105 active:scale-95 transition-transform"
+      >
+        {/* North Indicator */}
+        <div className="absolute top-1 left-1.5 text-[7px] font-mono font-black text-[#111827]/70 select-none pointer-events-none">
+          N ▲
+        </div>
+
+        {/* Creek Waterway strip */}
+        <div 
+          className="absolute top-0 bottom-0 bg-[#38BDF8]/40 border-x border-[#38BDF8]/60 pointer-events-none"
+          style={{
+            left: `${getRadarX(8.5)}%`,
+            width: `${getRadarX(43.5) - getRadarX(8.5)}%`
+          }}
+        />
+
+        {/* Grand Bridge indicator */}
+        <div 
+          className="absolute h-[3px] bg-[#78350F] rounded-full pointer-events-none"
+          style={{
+            left: `${getRadarX(7.5)}%`,
+            width: `${getRadarX(44.5) - getRadarX(7.5)}%`,
+            top: `${getRadarY(0)}%`
+          }}
+        />
+
+        {/* Landmarks dots */}
+        {WORLD_LANDMARKS.slice(0, 8).map(lm => {
+          const lx = getRadarX(lm.coords.x);
+          const ly = getRadarY(lm.coords.z);
+          return (
+            <div 
+              key={lm.id}
+              className="absolute w-1.5 h-1.5 rounded-full border-[0.5px] border-[#111827] pointer-events-none"
+              style={{
+                left: `${lx}%`,
+                top: `${ly}%`,
+                backgroundColor: lm.color,
+                transform: 'translate(-50%, -50%)'
+              }}
+            />
+          );
+        })}
+
+        {/* Active Waypoint Target */}
+        {activeWaypoint && (
+          <div 
+            className="absolute w-2.5 h-2.5 bg-[#FBBF24] border border-[#111827] rotate-45 animate-ping pointer-events-none"
+            style={{
+              left: `${getRadarX(activeWaypoint.coords.x)}%`,
+              top: `${getRadarY(activeWaypoint.coords.z)}%`,
+              transform: 'translate(-50%, -50%) rotate(45deg)'
+            }}
+          />
+        )}
+
+        {/* Player Position Dot */}
+        <div 
+          className="absolute w-2.5 h-2.5 bg-[#1B3FFF] rounded-full border border-white shadow-sm ring-2 ring-[#1B3FFF]/40 pointer-events-none"
+          style={{
+            left: `${playerRadarX}%`,
+            top: `${playerRadarY}%`,
+            transform: 'translate(-50%, -50%)'
+          }}
+        />
+      </div>
+
       {/* Active GPS Waypoint Banner */}
       {activeWaypoint && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-white border-2 border-[#111827] rounded-full shadow-[3px_3px_0px_#111827] font-mono font-black text-xs flex items-center space-x-2 text-[#111827] pointer-events-auto">
+        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-white border-2 border-[#111827] rounded-full shadow-[3px_3px_0px_#111827] font-mono font-black text-xs flex items-center space-x-2 text-[#111827] pointer-events-auto max-w-[85vw]">
           <Compass className="w-3.5 h-3.5 text-[#1B3FFF] animate-spin flex-shrink-0" />
-          <span className="truncate max-w-[140px] sm:max-w-xs text-[11px]">
+          <span className="truncate max-w-[130px] sm:max-w-xs text-[11px]">
             {activeWaypoint.emoji} {activeWaypoint.name.toUpperCase()}
           </span>
-          <span className="bg-[#10B981] text-white text-[10px] px-1.5 py-0.2 rounded-full border border-[#111827]">
+          <span className="bg-[#10B981] text-white text-[10px] px-1.5 py-0.2 rounded-full border border-[#111827] flex-shrink-0">
             {waypointDistance ?? 0}M
           </span>
           {onClearWaypoint && (
@@ -201,9 +282,39 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         </div>
       )}
 
-      {/* Active Boost / Event Alert Banner */}
+      {/* Non-intrusive Collection Fact Notification (Stacked below waypoint, never overlapping!) */}
+      {unlockedItem && (
+        <div className={`absolute ${itemTopOffset} left-1/2 -translate-x-1/2 z-40 max-w-sm w-[90%] bg-[#FEF3C7] border-2 border-[#111827] rounded-xl p-2 shadow-[3px_3px_0px_#111827] flex items-center space-x-2.5 pointer-events-auto animate-bounce transition-all`}>
+          <div className="w-8 h-8 rounded-lg bg-white border-2 border-[#111827] flex items-center justify-center text-base flex-shrink-0">
+            {unlockedItem.emoji}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-1.5">
+              <span className="bg-[#10B981] text-white text-[9px] font-mono font-black px-1.5 py-0.2 rounded border border-[#111827]">
+                +{unlockedItem.points} PTS
+              </span>
+              <h4 className="font-display font-black text-xs text-[#111827] truncate">
+                {unlockedItem.name}
+              </h4>
+            </div>
+            <p className="text-[10px] font-mono text-gray-800 line-clamp-1 mt-0.5">
+              {unlockedItem.culturalFact}
+            </p>
+          </div>
+          <button 
+            type="button"
+            onClick={onDismissUnlock}
+            className="text-gray-500 hover:text-black p-1"
+            title="Dismiss fact"
+          >
+            <X className="w-3.5 h-3.5 stroke-[2.5]" />
+          </button>
+        </div>
+      )}
+
+      {/* Active Boost Alert Banner */}
       {speedBoostActive && (
-        <div className="absolute top-22 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-[#FBBF24] text-[#111827] border-2 border-[#111827] rounded-full shadow-[3px_3px_0px_#111827] font-mono font-black text-xs flex items-center space-x-1.5 animate-pulse pointer-events-none">
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-[#FBBF24] text-[#111827] border-2 border-[#111827] rounded-full shadow-[3px_3px_0px_#111827] font-mono font-black text-xs flex items-center space-x-1.5 animate-pulse pointer-events-none">
           <Zap className="w-3.5 h-3.5 text-[#1B3FFF] fill-[#1B3FFF]" />
           <span>⚡ TURBO SPRINT ACTIVATED!</span>
         </div>
@@ -211,7 +322,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
       {/* Comic Badge Popups (e.g. "DISCOVERED: BURJ KHALIFA (+150 PTS)!") */}
       {activeBadge && (
-        <div className="absolute top-26 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-[#FF5722] text-white border-2 border-[#111827] rounded-2xl shadow-[4px_4px_0px_#111827] font-comic text-base flex items-center space-x-2 animate-bounce pointer-events-none whitespace-nowrap">
+        <div className="absolute top-28 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1 bg-[#FF5722] text-white border-2 border-[#111827] rounded-2xl shadow-[4px_4px_0px_#111827] font-comic text-base flex items-center space-x-2 animate-bounce pointer-events-none whitespace-nowrap">
           <span>{activeBadge.icon}</span>
           <span className="tracking-wide">{activeBadge.text}</span>
         </div>
@@ -222,11 +333,6 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         <button
           type="button"
           onPointerDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onSprint();
-          }}
-          onTouchStart={(e) => {
             e.preventDefault();
             e.stopPropagation();
             onSprint();
@@ -252,39 +358,12 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             e.stopPropagation();
             onJump();
           }}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onJump();
-          }}
           title="Jump / Leap (Spacebar)"
           className="absolute bottom-6 right-5 z-30 w-16 h-16 bg-[#FBBF24] hover:bg-amber-300 active:bg-amber-400 active:scale-95 text-[#111827] rounded-full border-[2.5px] border-[#111827] shadow-[4px_4px_0px_#111827] flex flex-col items-center justify-center font-display font-black text-xs uppercase transition-transform pointer-events-auto select-none touch-none"
         >
           <ArrowUp className="w-6 h-6 stroke-[3]" />
           <span className="text-[9px] -mt-0.5 tracking-tight font-black">JUMP</span>
         </button>
-      )}
-
-      {/* Non-intrusive Collection Fact Notification (Never blocks controls or freezes gameplay!) */}
-      {unlockedItem && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 max-w-sm w-[92%] bg-white border-2 border-[#111827] rounded-2xl p-2.5 shadow-[4px_4px_0px_#111827] flex items-center space-x-3 pointer-events-none animate-bounce">
-          <div className="w-10 h-10 rounded-xl bg-[#FEF3C7] border-2 border-[#111827] flex items-center justify-center text-xl flex-shrink-0">
-            {unlockedItem.emoji}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center space-x-1.5">
-              <span className="bg-[#10B981] text-white text-[9px] font-mono font-black px-1.5 py-0.2 rounded border border-[#111827]">
-                +{unlockedItem.points} PTS
-              </span>
-              <h4 className="font-display font-black text-xs text-[#111827] truncate">
-                {unlockedItem.name}
-              </h4>
-            </div>
-            <p className="text-[10px] font-mono text-gray-700 line-clamp-1 mt-0.5">
-              {unlockedItem.culturalFact}
-            </p>
-          </div>
-        </div>
       )}
     </>
   );

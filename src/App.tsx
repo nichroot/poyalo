@@ -146,8 +146,8 @@ export const App: React.FC = () => {
         deferredPrompt={deferredInstallPrompt}
       />
 
-      {/* Supersonic Comic Airplane Easter Egg (Phone Shake & Header Trigger) */}
-      <AirplaneEasterEgg />
+      {/* Supersonic Comic Airplane Easter Egg (Phone Shake & Header Trigger, disabled during game) */}
+      <AirplaneEasterEgg disabled={activeTab === 'game'} />
 
       {/* AI Key & Deterministic Mode Configuration Modal */}
       <ApiKeyModal

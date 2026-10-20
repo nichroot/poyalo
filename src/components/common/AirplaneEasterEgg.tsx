@@ -60,12 +60,21 @@ function playJetSound() {
   }
 }
 
-export const AirplaneEasterEgg: React.FC = () => {
+interface AirplaneEasterEggProps {
+  disabled?: boolean;
+}
+
+export const AirplaneEasterEgg: React.FC<AirplaneEasterEggProps> = ({ disabled = false }) => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const isTriggeringRef = useRef<boolean>(false);
+  const disabledRef = useRef<boolean>(disabled);
+
+  useEffect(() => {
+    disabledRef.current = disabled;
+  }, [disabled]);
 
   const triggerFlyby = () => {
-    if (isTriggeringRef.current) return;
+    if (isTriggeringRef.current || disabledRef.current) return;
     isTriggeringRef.current = true;
     setIsActive(true);
 
@@ -87,7 +96,7 @@ export const AirplaneEasterEgg: React.FC = () => {
   };
 
   useEffect(() => {
-    // 1. Phone accelerometer shake detection (High-pass gravity filter + 6 vigorous reversals)
+    // 1. Phone accelerometer shake detection (High-pass gravity filter + 7 deliberate reversals)
     let gravityX = 0;
     let gravityY = 0;
     let gravityZ = 0;
@@ -95,11 +104,12 @@ export const AirplaneEasterEgg: React.FC = () => {
     let lastReversalTime = 0;
     let sequenceStartTime = 0;
     let lastAxisSign = 0;
-    const REQUIRED_SHAKES = 6; // Requires 6 vigorous back-and-forth shakes
-    const SHAKE_COOLDOWN = 5000; // 5s cooldown between flights
+    const REQUIRED_SHAKES = 7; // Requires 7 vigorous deliberate back-and-forth shakes
+    const SHAKE_COOLDOWN = 6000; // 6s cooldown between flights
     let lastTriggerTime = 0;
 
     const handleMotion = (event: DeviceMotionEvent) => {
+      if (disabledRef.current) return;
       const now = Date.now();
       if (now - lastTriggerTime < SHAKE_COOLDOWN || isTriggeringRef.current) return;
 
@@ -134,8 +144,8 @@ export const AirplaneEasterEgg: React.FC = () => {
       // Net dynamic acceleration magnitude (without gravity)
       const magnitude = Math.hypot(linearX, linearY, linearZ);
 
-      // High threshold: gentle movement is 1-5 m/s²; picking up is 6-10; deliberate shake is > 24
-      if (magnitude > 24) {
+      // High threshold: gentle movement is 1-5 m/s²; picking up is 6-10; deliberate shake is > 34
+      if (magnitude > 34) {
         const dominantAcc = Math.abs(linearX) > Math.abs(linearY) ? linearX : linearY;
         const currentSign = Math.sign(dominantAcc);
 
