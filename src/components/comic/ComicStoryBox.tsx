@@ -76,6 +76,15 @@ function playComicSynth(type: 'pop' | 'chime' | 'whoosh' | 'splash' | 'kapow' = 
   }
 }
 
+const COMIC_INSPIRATION_CHIPS = [
+  { label: '⛩️ Kyoto Samurai', prompt: 'Feudal Samurai in Kyoto Japan' },
+  { label: '🏛️ Roman Gladiators', prompt: 'Gladiators in Ancient Rome Colosseum' },
+  { label: '🎨 Renaissance Florence', prompt: 'Leonardo vs Michelangelo in Florence Italy' },
+  { label: '🗽 1920s Harlem Jazz', prompt: 'Jazz Age in 1920s Harlem New York' },
+  { label: '🌴 Dubai Pearl Divers', prompt: 'Historic Pearl Diving on Dubai Creek 1800s' },
+  { label: '🏮 Old Shanghai 1930s', prompt: 'Art Deco Bund and teahouses in 1930s Shanghai' }
+];
+
 interface ComicStoryBoxProps {
   initialCity?: string;
 }
@@ -88,7 +97,6 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
   const [tone, setTone] = useState<ComicTone>('roast');
   const [era, setEra] = useState<EraLayer>('1800s');
   const [toastMessage, setToastMessage] = useState<string>('');
-  const [showAiCreator, setShowAiCreator] = useState<boolean>(false);
   const [customStoryPrompt, setCustomStoryPrompt] = useState<string>('');
   const [isGeneratingStory, setIsGeneratingStory] = useState<boolean>(false);
   const [aiCustomStory, setAiCustomStory] = useState<ComicStory | null>(null);
@@ -205,75 +213,119 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
   ];
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-6 pb-24 max-w-4xl mx-auto">
       
-      {/* Golden-Age Comic Book Issue Cover Plaque */}
-      <div className="bg-[#FFFDF8] border-[2.5px] border-[#111827] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_#111827] relative overflow-hidden">
-        
-        {/* Halftone Ben-Day dot pattern accent */}
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-[#FF5722]/10 rounded-full comic-halftone pointer-events-none" />
-
-        {/* Vintage Comic Header Strip */}
-        <div className="flex items-center justify-between gap-2 flex-wrap pb-3 mb-3 border-b-2 border-dashed border-[#111827]/30">
-          
-          {/* Issue Badge & Barcode */}
-          <div className="flex items-center space-x-2">
-            <div className="bg-[#111827] text-white px-2 py-0.5 rounded font-mono font-black text-[10px] tracking-widest uppercase flex items-center space-x-1">
-              <span>VOL. 1</span>
-              <span>•</span>
-              <span>NO. 01</span>
+      {/* 1. Search & AI Comic Generator Hero Card (Open Bar Design matching Planner & Myth) */}
+      <div className="bg-[#FFFFFF] border-[2.5px] border-[#111827] rounded-2xl p-4 sm:p-6 shadow-[4px_4px_0px_#111827] relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bg-[#FF5722] text-white px-2.5 py-0.5 rounded font-mono font-black text-xs uppercase border border-[#111827]">
+                POYALO • COMIC LORE STUDIO
+              </span>
+              <span className="bg-[#FEF08A] text-[#111827] px-2 py-0.5 rounded font-mono font-bold text-[11px] border border-[#111827]">
+                3-PANEL GRAPHIC NOVELS
+              </span>
+              <span className="text-xs font-mono font-bold text-gray-500 hidden sm:inline">
+                Powered by POYALO AI & Verified Lore
+              </span>
             </div>
-            <span className="hidden sm:inline-block font-mono font-bold text-[9px] text-gray-500 tracking-tighter select-none">
-              ||| | ||||| |||
-            </span>
-            <span className="bg-[#FEF08A] text-[#111827] px-2 py-0.5 rounded font-mono font-black text-[10px] border border-[#111827] uppercase hidden xs:inline-block">
-              ★ 100% VERIFIED LORE ★
-            </span>
+            
+            <h1 className="text-2xl sm:text-3xl font-display font-black text-[#111827] mt-2 tracking-tight">
+              Worldwide Comic Book Lore & Story Studio
+            </h1>
+            <p className="text-xs sm:text-sm font-mono text-gray-700 mt-1 max-w-2xl">
+              Ask for ANY destination, legendary era, or character worldwide (e.g. "Kyoto Samurai", "Colosseum Gladiators", "Dubai Pearl Divers"). We script a 3-panel graphic novel with authentic dialogue and historical context.
+            </p>
           </div>
 
-          {/* Quick Action Tools */}
-          <div className="flex items-center space-x-1.5">
+          {/* Quick Action Tools: Surprise Me & Share */}
+          <div className="flex items-center space-x-2 self-start sm:self-center flex-shrink-0">
             <button
               onClick={handleSurpriseMe}
               title="Pick a surprise random story from archives"
-              className="px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 active:translate-y-0.5 transition-all text-[#111827]"
+              className="px-3 py-2 bg-white hover:bg-amber-100 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1.5 active:translate-x-0.5 active:translate-y-0.5 transition-all text-[#111827]"
             >
               <Dices className="w-3.5 h-3.5 text-[#FF5722]" />
-              <span className="hidden sm:inline">SURPRISE</span>
+              <span>SURPRISE</span>
             </button>
 
             <button
               onClick={handleShareComic}
               title="Copy / Share comic strip transcript"
-              className="px-2.5 py-1 bg-white hover:bg-sky-50 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 active:translate-y-0.5 transition-all text-[#111827]"
+              className="px-3 py-2 bg-white hover:bg-sky-50 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1.5 active:translate-x-0.5 active:translate-y-0.5 transition-all text-[#111827]"
             >
               <Share2 className="w-3.5 h-3.5 text-[#1B3FFF]" />
-              <span className="hidden sm:inline">SHARE</span>
-            </button>
-
-            <button
-              onClick={() => setShowAiCreator(!showAiCreator)}
-              title="Toggle AI custom comic generator"
-              className={`px-3 py-1 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 active:translate-y-0.5 transition-all ${
-                showAiCreator 
-                  ? 'bg-[#111827] text-white' 
-                  : 'bg-[#FEF08A] hover:bg-amber-300 text-[#111827]'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
-              <span>{showAiCreator ? 'CLOSE' : 'AI DRAW'}</span>
+              <span>SHARE</span>
             </button>
           </div>
         </div>
 
-        {/* Story Title & Newsprint Tagline Ribbon */}
-        <div className="space-y-1.5">
-          <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-            <span className="bg-[#FF5722] text-white px-2 py-0.5 rounded font-mono font-black text-[10px] uppercase border border-[#111827] tracking-wider">
-              {activeStory.cityName}
-            </span>
-            <span className="text-xs font-mono font-bold text-gray-500 uppercase">
-              {activeStory.placeName}
+        {/* Smart Comic Prompt Input Bar (Open & Prominent!) */}
+        <form onSubmit={handleGenerateCustomStory} className="mt-4 flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Sparkles className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#FF5722]" />
+            <input
+              type="text"
+              value={customStoryPrompt}
+              onChange={(e) => setCustomStoryPrompt(e.target.value)}
+              placeholder="Ask for ANY place or story (e.g. 'Kyoto Samurai', 'Roman Gladiators', '1920s Harlem Jazz')..."
+              className="w-full pl-10 pr-3.5 py-3 bg-[#FDFBF7] border-2 border-[#111827] rounded-xl font-mono text-xs font-bold text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#FF5722] shadow-inner"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isGeneratingStory || !customStoryPrompt.trim()}
+            className="px-5 py-3 bg-[#FF5722] hover:bg-[#E64A19] text-white border-2 border-[#111827] rounded-xl font-display font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5 flex items-center justify-center space-x-2 disabled:opacity-50 min-h-[46px] whitespace-nowrap"
+          >
+            {isGeneratingStory ? (
+              <>
+                <Sparkles className="w-4 h-4 animate-spin text-amber-300" />
+                <span>DRAWING COMIC...</span>
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                <span>CREATE COMIC</span>
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Popular Inspiration Chips */}
+        <div className="mt-3 flex items-center gap-1.5 flex-wrap">
+          <span className="text-[10px] font-mono font-black text-gray-500 uppercase mr-1">
+            POPULAR INSPIRATION:
+          </span>
+          {COMIC_INSPIRATION_CHIPS.map((chip) => (
+            <button
+              key={chip.label}
+              type="button"
+              onClick={(e) => handleGenerateCustomStory(e, chip.prompt)}
+              disabled={isGeneratingStory}
+              className="px-2.5 py-1 bg-[#FDFBF7] hover:bg-[#FEF3C7] border-2 border-[#111827] rounded-xl text-[11px] font-mono font-bold text-gray-800 shadow-[1.5px_1.5px_0px_#111827] active:translate-x-0.5 transition-colors disabled:opacity-50"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Suggestion / Status Toast */}
+        {toastMessage && (
+          <div className="mt-4 p-2.5 bg-amber-50 border-2 border-[#111827] rounded-xl text-[#111827] text-xs font-mono font-bold flex items-center space-x-2 shadow-[2px_2px_0px_#111827] animate-in fade-in">
+            <Check className="w-4 h-4 text-[#10B981] flex-shrink-0" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+      </div>
+
+      {/* 2. City & Filter Director Strip: Verified Lore Archives + Tone + Era */}
+      <div className="bg-white border-2 border-[#111827] rounded-2xl p-3.5 sm:p-4 shadow-[3px_3px_0px_#111827] space-y-3">
+        {/* City Archives Carousel Row */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-mono font-black text-gray-500 uppercase tracking-wider">
+              SELECT DESTINATION (OFFLINE ARCHIVES):
             </span>
             {aiCustomStory && (
               <button
@@ -281,91 +333,16 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
                   setAiCustomStory(null);
                   playComicSynth('pop');
                 }}
-                className="px-2 py-0.5 bg-gray-100 hover:bg-gray-200 border border-[#111827] rounded text-[10px] font-mono font-bold text-gray-700 flex items-center space-x-1 shadow-[1.5px_1.5px_0px_#111827] active:translate-x-0.5"
-                title="Reset to verified sample lore"
+                className="px-2 py-0.5 bg-[#FEF08A] hover:bg-amber-200 border border-[#111827] rounded text-[10px] font-mono font-black text-[#111827] flex items-center space-x-1 shadow-[1.5px_1.5px_0px_#111827] active:translate-x-0.5"
+                title="Switch back to verified historical lore"
               >
                 <RotateCcw className="w-2.5 h-2.5" />
-                <span>SAMPLE</span>
+                <span>BACK TO VERIFIED LORE</span>
               </button>
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-display font-black text-[#111827] tracking-tight leading-tight">
-            {activeStory.title}
-          </h1>
-
-          <div className="pt-0.5">
-            <span className="inline-block bg-[#FEF9C3] border border-[#111827] px-2.5 py-1 rounded text-xs sm:text-[13px] font-mono font-bold text-[#111827] shadow-[1px_1px_0px_#111827]">
-              "{activeStory.tagline}"
-            </span>
-          </div>
-        </div>
-
-        {/* Expandable AI Prompt Studio Drawer */}
-        {showAiCreator && (
-          <div className="mt-4 pt-3.5 border-t-2 border-[#111827] animate-in fade-in slide-in-from-top-2 duration-200">
-            <form onSubmit={handleGenerateCustomStory} className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  value={customStoryPrompt}
-                  onChange={(e) => setCustomStoryPrompt(e.target.value)}
-                  placeholder="Ask for ANY place worldwide (e.g. Kyoto Samurai, Colosseum, 1920s Harlem)..."
-                  className="w-full pl-8 pr-3.5 py-2 bg-white border-2 border-[#111827] rounded-xl font-mono text-xs text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#FF5722] font-bold"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isGeneratingStory}
-                className="px-4 py-2 bg-[#FF5722] hover:bg-[#E64A19] text-white border-2 border-[#111827] rounded-xl font-mono font-black text-xs uppercase shadow-[2px_2px_0px_#111827] active:translate-x-0.5 active:translate-y-0.5 flex items-center space-x-1.5 disabled:opacity-50 whitespace-nowrap"
-              >
-                {isGeneratingStory ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                <span>{isGeneratingStory ? 'DRAWING...' : 'DRAW'}</span>
-              </button>
-            </form>
-
-            {/* Quick Inspiration suggestions */}
-            <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-              <span className="text-[10px] font-mono font-bold text-gray-400 uppercase">Try:</span>
-              {[
-                { label: '⛩️ Kyoto Samurai', prompt: 'Feudal Samurai in Kyoto Japan' },
-                { label: '🏛️ Colosseum Gladiators', prompt: 'Gladiators in Ancient Rome' },
-                { label: '🎨 Renaissance Florence', prompt: 'Leonardo vs Michelangelo in Florence' },
-                { label: '🗽 1920s Harlem Jazz', prompt: 'Jazz Age in 1920s Harlem New York' }
-              ].map((pill) => (
-                <button
-                  key={pill.label}
-                  type="button"
-                  onClick={(e) => handleGenerateCustomStory(e, pill.prompt)}
-                  disabled={isGeneratingStory}
-                  className="px-2 py-0.5 bg-white hover:bg-[#FEF3C7] border border-[#111827] rounded text-[10px] font-mono font-bold text-gray-800 shadow-[1px_1px_0px_#111827] active:translate-x-0.5 transition-colors disabled:opacity-50"
-                >
-                  {pill.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Clean Auto-dismissing Toast Message */}
-        {toastMessage && (
-          <div className="mt-3 p-2 bg-amber-50 border-2 border-[#111827] rounded-xl text-[#111827] text-xs font-mono font-bold flex items-center space-x-2 shadow-[2px_2px_0px_#111827] animate-in fade-in">
-            <Check className="w-4 h-4 text-[#10B981] flex-shrink-0" />
-            <span>{toastMessage}</span>
-          </div>
-        )}
-      </div>
-
-      {/* The Unified Comic Director Toolbar: Cities + Tone + Era */}
-      <div className="bg-white border-2 border-[#111827] rounded-2xl p-3 shadow-[3px_3px_0px_#111827] space-y-2.5">
-        
-        {/* City Archives Carousel Row */}
-        <div className="flex items-center space-x-2">
-          <span className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-wider flex-shrink-0">
-            CITY:
-          </span>
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none flex-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             {COMIC_CITIES.map((c) => {
               const isSelected = selectedCity.toLowerCase() === c.name.toLowerCase() && !aiCustomStory;
               return (
@@ -373,10 +350,10 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
                   key={c.id}
                   type="button"
                   onClick={() => handleSelectCity(c.name)}
-                  className={`px-2.5 py-1 rounded-xl border-2 border-[#111827] text-xs font-mono font-black flex items-center space-x-1 whitespace-nowrap transition-all flex-shrink-0 ${
+                  className={`px-3 py-1.5 rounded-xl border-2 border-[#111827] text-xs font-mono font-black flex items-center space-x-1.5 whitespace-nowrap transition-all flex-shrink-0 ${
                     isSelected
-                      ? 'bg-[#1B3FFF] text-white shadow-[2px_2px_0px_#111827] -translate-y-0.5'
-                      : 'bg-[#FDFBF7] text-gray-800 hover:bg-gray-100 shadow-[1px_1px_0px_#111827]'
+                      ? 'bg-[#1B3FFF] text-white shadow-[2.5px_2.5px_0px_#111827] -translate-y-0.5'
+                      : 'bg-[#FDFBF7] text-gray-800 hover:bg-gray-100 shadow-[1.5px_1.5px_0px_#111827]'
                   }`}
                 >
                   <span>{c.flag}</span>
@@ -386,21 +363,22 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
             })}
 
             {aiCustomStory && (
-              <span className="px-2.5 py-1 rounded-xl border-2 border-[#111827] text-xs font-mono font-black bg-[#FEF08A] text-[#111827] shadow-[2px_2px_0px_#111827] whitespace-nowrap">
-                ✨ {activeStory.cityName} (AI)
+              <span className="px-3 py-1.5 rounded-xl border-2 border-[#111827] text-xs font-mono font-black bg-[#FEF08A] text-[#111827] shadow-[2.5px_2.5px_0px_#111827] whitespace-nowrap flex items-center space-x-1">
+                <span>✨</span>
+                <span>{activeStory.cityName} (AI Custom)</span>
               </span>
             )}
           </div>
         </div>
 
         {/* Divider */}
-        <div className="w-full h-[1px] bg-gray-200" />
+        <div className="w-full h-[1.5px] bg-gray-200" />
 
         {/* Tone & Era Controls in a Clean Horizontal Flow */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Tone Filter */}
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            <span className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-wider flex-shrink-0">
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
+            <span className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-wider flex-shrink-0 mr-1">
               TONE:
             </span>
             {tones.map((t) => (
@@ -423,8 +401,8 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
           </div>
 
           {/* Era Filter */}
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            <span className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-wider flex-shrink-0">
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
+            <span className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-wider flex-shrink-0 mr-1">
               ERA:
             </span>
             {eras.map((e) => (
@@ -446,7 +424,62 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
             ))}
           </div>
         </div>
+      </div>
 
+      {/* 3. Golden-Age Comic Book Issue Cover Plaque */}
+      <div className="bg-[#FFFDF8] border-[2.5px] border-[#111827] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_#111827] relative overflow-hidden">
+        {/* Halftone Ben-Day dot pattern accent */}
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-[#FF5722]/10 rounded-full comic-halftone pointer-events-none" />
+
+        {/* Vintage Issue Header */}
+        <div className="flex items-center justify-between gap-2 flex-wrap pb-2.5 mb-2.5 border-b-2 border-dashed border-[#111827]/30">
+          <div className="flex items-center space-x-2">
+            <div className="bg-[#111827] text-white px-2 py-0.5 rounded font-mono font-black text-[10px] tracking-widest uppercase flex items-center space-x-1">
+              <span>VOL. 1</span>
+              <span>•</span>
+              <span>NO. 01</span>
+            </div>
+            <span className="hidden sm:inline-block font-mono font-bold text-[9px] text-gray-500 tracking-tighter select-none">
+              ||| | ||||| |||
+            </span>
+            <span className={`px-2 py-0.5 rounded font-mono font-black text-[10px] border border-[#111827] uppercase ${
+              aiCustomStory ? 'bg-[#FEF08A] text-[#111827]' : 'bg-[#DCFCE7] text-[#166534]'
+            }`}>
+              {aiCustomStory ? '★ POYALO AI ORIGINAL ★' : '★ 100% VERIFIED LORE ★'}
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-1.5 text-xs font-mono font-bold text-gray-600">
+            <span className="bg-gray-100 border border-[#111827] px-2 py-0.5 rounded uppercase">
+              {tone.toUpperCase()}
+            </span>
+            <span className="bg-gray-100 border border-[#111827] px-2 py-0.5 rounded uppercase">
+              {era.toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        {/* Story Title & Newsprint Tagline Ribbon */}
+        <div className="space-y-1.5">
+          <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+            <span className="bg-[#FF5722] text-white px-2 py-0.5 rounded font-mono font-black text-[10px] uppercase border border-[#111827] tracking-wider">
+              {activeStory.cityName}
+            </span>
+            <span className="text-xs font-mono font-bold text-gray-500 uppercase">
+              {activeStory.placeName}
+            </span>
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl font-display font-black text-[#111827] tracking-tight leading-tight">
+            {activeStory.title}
+          </h2>
+
+          <div className="pt-0.5">
+            <span className="inline-block bg-[#FEF9C3] border border-[#111827] px-2.5 py-1 rounded text-xs sm:text-[13px] font-mono font-bold text-[#111827] shadow-[1px_1px_0px_#111827]">
+              "{activeStory.tagline}"
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* The 3-Panel Comic Strip — Equal heights with generous gutters & spacing */}
