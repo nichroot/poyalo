@@ -84,7 +84,7 @@ const GameHUDComponent: React.FC<GameHUDProps> = ({
   return (
     <>
       {/* Top Left: Clean Consolidated Status Bar (Zero Clutter on Mobile) */}
-      <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-30 flex items-center space-x-1 sm:space-x-1.5 pointer-events-auto">
+      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-30 flex items-center space-x-1 sm:space-x-1.5 pointer-events-auto">
         <div className="bg-white border-2 border-[#111827] px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl shadow-[2.5px_2.5px_0px_#111827] flex items-center space-x-1.5 sm:space-x-2">
           {/* Score */}
           <div className="flex items-center space-x-1" title="Adventure Points">
@@ -144,7 +144,7 @@ const GameHUDComponent: React.FC<GameHUDProps> = ({
       </div>
 
       {/* Top Right: Places Search & Atmosphere Switcher */}
-      <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-30 flex items-center space-x-1 sm:space-x-1.5 pointer-events-auto">
+      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-30 flex items-center space-x-1 sm:space-x-1.5 pointer-events-auto">
         {/* Search Places Button */}
         {onOpenPlaceSearch && (
           <button
@@ -186,11 +186,11 @@ const GameHUDComponent: React.FC<GameHUDProps> = ({
         )}
       </div>
 
-      {/* Top Right: Compact Radar Mini-Map (Scaled neatly for mobile & desktop) */}
+      {/* Top Right: Compact Radar Mini-Map (Stacked cleanly below top buttons) */}
       <div 
         onClick={onOpenPlaceSearch}
         title="Tactical Radar (Click to open Place Search)"
-        className="absolute top-12 right-2.5 sm:top-14 sm:right-3 z-20 w-14 h-14 sm:w-[72px] sm:h-[72px] bg-[#FDFBF7]/95 border-2 border-[#111827] rounded-xl sm:rounded-2xl shadow-[2.5px_2.5px_0px_#111827] overflow-hidden backdrop-blur-sm cursor-pointer pointer-events-auto hover:scale-105 active:scale-95 transition-transform"
+        className="absolute top-11 right-2 sm:top-14 sm:right-3 z-20 w-14 h-14 sm:w-[72px] sm:h-[72px] bg-[#FDFBF7]/95 border-2 border-[#111827] rounded-xl sm:rounded-2xl shadow-[2.5px_2.5px_0px_#111827] overflow-hidden backdrop-blur-sm cursor-pointer pointer-events-auto hover:scale-105 active:scale-95 transition-transform"
       >
         {/* North Indicator */}
         <div className="absolute top-0.5 left-1 text-[6px] sm:text-[7px] font-mono font-black text-[#111827]/70 select-none pointer-events-none">

@@ -199,22 +199,24 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     // 2. CAMERA
     const width  = container.clientWidth  || window.innerWidth;
     const height = container.clientHeight || (window.innerHeight - 130);
-    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 750);
+    const isMobile = width < 768;
+    const aspect = width / height;
+    const fov = aspect < 1.0 ? 66 : 50;
+    const camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 750);
     const targetCameraPos = new THREE.Vector3();
 
-    // 3. RENDERER (Optimized for 60fps buttery-smooth mobile & desktop gameplay)
-    const isMobile = width < 768;
+    // 3. RENDERER (Crisp anti-aliased rendering with soft shadows)
     const renderer = new THREE.WebGLRenderer({
-      antialias: !isMobile,
+      antialias: true,
       powerPreference: 'high-performance',
-      precision: isMobile ? 'mediump' : 'highp',
+      precision: 'highp',
       stencil: false,
       depth: true
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.25 : 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFShadowMap; // Ultra-fast hardware shadow map filtering
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Ultra-crisp soft shadows
     container.appendChild(renderer.domElement);
 
     // 4. LIGHTING
@@ -226,15 +228,17 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const sunLight = new THREE.DirectionalLight('#F59E0B', 2.0);
     sunLight.position.set(45, 55, 30);
     sunLight.castShadow = true;
-    sunLight.shadow.mapSize.set(isMobile ? 512 : 1024, isMobile ? 512 : 1024);
+    sunLight.shadow.mapSize.set(1024, 1024);
     sunLight.shadow.camera.near   =  10;
-    sunLight.shadow.camera.far    =  190;
-    sunLight.shadow.camera.left   = -75;
-    sunLight.shadow.camera.right  =  75;
-    sunLight.shadow.camera.top    =  75;
-    sunLight.shadow.camera.bottom = -75;
-    sunLight.shadow.bias = -0.001;
+    sunLight.shadow.camera.far    =  160;
+    sunLight.shadow.camera.left   = -32;
+    sunLight.shadow.camera.right  =  32;
+    sunLight.shadow.camera.top    =  32;
+    sunLight.shadow.camera.bottom = -32;
+    sunLight.shadow.bias = -0.0012;
+    sunLight.shadow.radius = 1.6;
     scene.add(sunLight);
+    scene.add(sunLight.target);
 
     // Night point lights
     const lanternBridge = new THREE.PointLight('#FBBF24', 0, 20);
@@ -261,6 +265,32 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const starField = new THREE.Points(starGeo, starMat);
     scene.add(starField);
 
+    // Procedural Low-Poly 3D Clouds
+    const cloudsGroup = new THREE.Group();
+    const cloudMat = new THREE.MeshLambertMaterial({ color: '#FFFFFF', transparent: true, opacity: 0.92 });
+    const cloudPositions: [number, number, number, number][] = [
+      [-65, 42, -50, 1.2], [-25, 48, -70, 1.0], [30, 40, -45, 1.4], [75, 52, -20, 0.9],
+      [-50, 45,  10, 1.1], [ 10, 44,  25, 1.3], [60, 48,  40, 1.0], [-35, 42,  60, 1.2],
+      [ 25, 50,  75, 1.1], [-70, 46,  80, 1.3], [-10, 40, -20, 0.9], [ 50, 44, -75, 1.2]
+    ];
+    cloudPositions.forEach(([cx, cy, cz, scale]) => {
+      const cg = new THREE.Group();
+      const m1 = new THREE.Mesh(new THREE.BoxGeometry(7.0, 2.2, 4.2), cloudMat);
+      const m2 = new THREE.Mesh(new THREE.BoxGeometry(4.2, 2.8, 3.4), cloudMat);
+      m2.position.set(1.4, 0.35, 0);
+      cg.add(m1, m2);
+      cg.scale.set(scale, scale, scale);
+      cg.position.set(cx, cy, cz);
+      cloudsGroup.add(cg);
+    });
+    scene.add(cloudsGroup);
+
+    // Stylized glowing sun orb
+    const sunOrbMat = new THREE.MeshBasicMaterial({ color: '#FDE047' });
+    const sunOrb = new THREE.Mesh(new THREE.SphereGeometry(6.5, 16, 16), sunOrbMat);
+    sunOrb.position.set(90, 85, 60);
+    scene.add(sunOrb);
+
     // Atmosphere switcher — updated by React state changes via ref
     const updateAtmosphere = (mode: TimeOfDay) => {
       if (mode === 'sunset') {
@@ -271,6 +301,10 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         lanternBridge.intensity = 1.2; lanternBurj.intensity = 0.8;
         lanternSouk.intensity   = 1.0; lanternCamp.intensity = 1.5;
         starMat.opacity = 0;
+        cloudMat.color.set('#FDBA74');
+        sunOrbMat.color.set('#EF4444');
+        sunOrb.position.set(90, 35, 60);
+        cloudsGroup.visible = true; sunOrb.visible = true;
       } else if (mode === 'night') {
         scene.background = new THREE.Color('#0F172A');
         scene.fog = new THREE.FogExp2('#0F172A', 0.011);
@@ -279,6 +313,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         lanternBridge.intensity = 2.8; lanternBurj.intensity = 3.5;
         lanternSouk.intensity   = 3.0; lanternCamp.intensity = 3.2;
         starMat.opacity = 1;
+        cloudsGroup.visible = false; sunOrb.visible = false;
       } else {
         scene.background = new THREE.Color('#87CEEB');
         scene.fog = new THREE.FogExp2('#87CEEB', 0.007);
@@ -287,6 +322,10 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         lanternBridge.intensity = 0; lanternBurj.intensity = 0;
         lanternSouk.intensity   = 0; lanternCamp.intensity = 0;
         starMat.opacity = 0;
+        cloudMat.color.set('#FFFFFF');
+        sunOrbMat.color.set('#FDE047');
+        sunOrb.position.set(90, 85, 60);
+        cloudsGroup.visible = true; sunOrb.visible = true;
       }
     };
     updateAtmosphereRef.current = updateAtmosphere;
@@ -296,6 +335,8 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const sharedSandMat     = new THREE.MeshLambertMaterial({ color: '#E8D2A6' });
     const sharedDuneMat     = new THREE.MeshLambertMaterial({ color: '#D97706' });
     const sharedRoadMat     = new THREE.MeshLambertMaterial({ color: '#374151' });
+    const sharedParkMat     = new THREE.MeshLambertMaterial({ color: '#16A34A' });
+    const sharedWalkwayMat  = new THREE.MeshLambertMaterial({ color: '#F1F5F9' });
     const sharedWoodMat     = new THREE.MeshLambertMaterial({ color: '#78350F' });
     const sharedBuildingMat = new THREE.MeshLambertMaterial({ color: '#D4B996' });
     const sharedFoliageMat  = new THREE.MeshLambertMaterial({ color: '#15803D' });
@@ -372,8 +413,31 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     };
     scene.add(
       createRoad(10, 180, -10, 0), createRoad(110, 10, -15, 20, Math.PI / 2), createRoad(110, 10, -15, -25, Math.PI / 2),
-      createRoad(12, 190,  32, 0), createRoad( 90, 10,  32, -45, Math.PI / 2), createRoad( 80, 10, 32, 45, Math.PI / 2)
+      createRoad(12, 190,  32, 0), createRoad( 90, 10,  32, -45, Math.PI / 2), createRoad( 80, 10, 32, 45, Math.PI / 2),
+      // Al Qasba Seaside Boulevard Connection (linking city grid to Al Qasba Canal District)
+      createRoad(44, 8, -31, 48)
     );
+
+    // Paved Pedestrian Walkway along Al Qasba Avenue
+    const qasbaSidewalk = new THREE.Mesh(new THREE.PlaneGeometry(44, 2.5), sharedWalkwayMat);
+    qasbaSidewalk.rotation.x = -Math.PI / 2;
+    qasbaSidewalk.position.set(-31, 0.04, 52.5);
+    qasbaSidewalk.receiveShadow = true;
+    scene.add(qasbaSidewalk);
+
+    // Lush Manicured Green Oasis Parks
+    // Downtown Spire Park Lawn (Surrounding Burj Khalifa)
+    const dtPark = new THREE.Mesh(new THREE.BoxGeometry(52, 0.1, 50), sharedParkMat);
+    dtPark.position.set(28, 0.04, -55);
+    dtPark.receiveShadow = true;
+    // Khor Dubai Waterfront Park Lawns (West & East banks)
+    const creekParkW = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.08, 76), sharedParkMat);
+    creekParkW.position.set(5.0, 0.04, 2.5);
+    creekParkW.receiveShadow = true;
+    const creekParkE = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.08, 76), sharedParkMat);
+    creekParkE.position.set(47.0, 0.04, 2.5);
+    creekParkE.receiveShadow = true;
+    scene.add(dtPark, creekParkW, creekParkE);
 
     // 9. KHOR DUBAI WATERWAY (Confined to canal channel from z = -35 to +40)
     const creekMat = new THREE.MeshLambertMaterial({ color: '#38BDF8', transparent: true, opacity: 0.88 });
@@ -795,9 +859,24 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     promSouth.receiveShadow = true;
     qasbaGroup.add(promNorth, promSouth);
 
+    // Canal Waterfront Park Greenery Lawns
+    const qParkN = new THREE.Mesh(new THREE.BoxGeometry(44, 0.08, 4.5), sharedParkMat);
+    qParkN.position.set(-30, 0.04, 49.5);
+    qParkN.receiveShadow = true;
+    const qParkS = new THREE.Mesh(new THREE.BoxGeometry(44, 0.08, 4.5), sharedParkMat);
+    qParkS.position.set(-30, 0.04, 80.5);
+    qParkS.receiveShadow = true;
+    qasbaGroup.add(qParkN, qParkS);
+
     // 3. Twin Venetian Arch Footbridges (West at x: -40, East at x: -20)
     const createQasbaBridge = (bx: number) => {
       const bg = new THREE.Group();
+      // Solid arch bridge vault base underneath the timber steps
+      const bridgeVault = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.6, 14.0), sharedBuildingMat);
+      bridgeVault.position.set(bx, 0.9, 65);
+      bridgeVault.castShadow = true; bridgeVault.receiveShadow = true;
+      bg.add(bridgeVault);
+
       const bSegs = 14;
       for (let s = 0; s <= bSegs; s++) {
         const prog = s / bSegs;
@@ -942,7 +1021,10 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     };
     const palmPositions = [
       [6, -8], [5, 12], [-8, -10], [-10, 16], [2, -2],
-      [45, -15], [45, 10], [38, -35], [38, 30], [48, -45], [54, -42], [-54, -48], [-44, -62]
+      [45, -15], [45, 10], [38, -35], [38, 30], [48, -45], [54, -42], [-54, -48], [-44, -62],
+      // Al Qasba Seaside Boulevard & Promenade Greenery
+      [-20, 48], [-32, 48], [-44, 48], [-14, 34], [-15, 24],
+      [-24, 53], [-36, 53], [-46, 53], [-24, 77], [-36, 77], [-46, 77]
     ];
     palmPositions.forEach(([px, pz]) => scene.add(createPalm(px, pz)));
 
@@ -956,23 +1038,167 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     wpGroup.visible = false;
     scene.add(wpGroup);
 
-    // 19. PLAYER CHARACTER
+    // 19. PLAYER CHARACTER RIG (Charming Comic Adventurer with Sneakers, Cargo Pants, Windbreaker & Aviator Shades)
     const createCharacterRig = (primaryColor: string, isMain: boolean) => {
       const rg = new THREE.Group();
-      const bodyMat = new THREE.MeshLambertMaterial({ color: primaryColor });
-      const skinMat = new THREE.MeshLambertMaterial({ color: '#FDE047' });
-      const torso  = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 1.1, 4), bodyMat); torso.rotation.y = Math.PI / 4; torso.position.y = 0.85; torso.castShadow = true; rg.add(torso);
-      const head   = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), skinMat); head.position.y = 1.6; head.castShadow = true; rg.add(head);
-      const hat    = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.1, 12), sharedGoldMat); hat.position.y = 1.95; hat.castShadow = true; rg.add(hat);
+
+      // Stylized Materials
+      const jacketMat   = new THREE.MeshLambertMaterial({ color: primaryColor });
+      const skinMat     = new THREE.MeshLambertMaterial({ color: '#FCD34D' }); // Warm sunny skin
+      const pantsMat    = new THREE.MeshLambertMaterial({ color: '#1E293B' }); // Charcoal dark cargo trousers
+      const shoesMat    = new THREE.MeshLambertMaterial({ color: '#F8FAFC' }); // Crisp white sneakers
+      const soleMat     = new THREE.MeshLambertMaterial({ color: '#EA580C' }); // Orange rubber sneaker sole
+      const beltMat     = new THREE.MeshLambertMaterial({ color: '#0F172A' }); // Black belt & accessories
+      const lensMat     = new THREE.MeshLambertMaterial({ color: '#38BDF8' }); // Reflective blue lenses
+      const packMat     = new THREE.MeshLambertMaterial({ color: '#EA580C' }); // Tangerine rucksack
+      const packRollMat = new THREE.MeshLambertMaterial({ color: '#FBBF24' }); // Rolled travel blanket
+      const flaskMat    = new THREE.MeshLambertMaterial({ color: '#06B6D4' }); // Cyan water canteen
+
+      // 1. LEGS & SNEAKERS (Firmly planted on the ground, distinct colors and animated stride)
+      const createLeg = (xOffset: number) => {
+        const legGroup = new THREE.Group();
+        legGroup.position.set(xOffset, 0.82, 0);
+
+        // Charcoal dark explorer pants
+        const pantsMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.11, 0.58, 8), pantsMat);
+        pantsMesh.position.y = -0.32;
+        pantsMesh.castShadow = true;
+        legGroup.add(pantsMesh);
+
+        // White Sneaker Upper
+        const shoeUpper = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.14, 0.32), shoesMat);
+        shoeUpper.position.set(0, -0.66, 0.05);
+        shoeUpper.castShadow = true;
+        legGroup.add(shoeUpper);
+
+        // Sneaker Toe Cap
+        const toeCap = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.14, 8), shoesMat);
+        toeCap.position.set(0, -0.66, 0.16);
+        legGroup.add(toeCap);
+
+        // Vibrant Orange Sneaker Sole (Resting directly on the ground plane at y = 0.02)
+        const shoeSole = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.36), soleMat);
+        shoeSole.position.set(0, -0.76, 0.06);
+        shoeSole.castShadow = true;
+        shoeSole.receiveShadow = true;
+        legGroup.add(shoeSole);
+
+        return legGroup;
+      };
+
+      const lLegG = createLeg( 0.20);
+      const rLegG = createLeg(-0.20);
+      rg.add(lLegG, rLegG);
+
+      // 2. HIPS & BELT
+      const hips = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.34, 0.16, 10), pantsMat);
+      hips.position.y = 0.84;
+      hips.castShadow = true;
+      const belt = new THREE.Mesh(new THREE.CylinderGeometry(0.37, 0.37, 0.08, 10), beltMat);
+      belt.position.y = 0.90;
+      const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.07, 0.04), sharedGoldMat);
+      buckle.position.set(0, 0.90, 0.37);
+      rg.add(hips, belt, buckle);
+
+      // 3. TORSO / WINDBREAKER JACKET
+      const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.37, 0.36, 0.68, 10), jacketMat);
+      torso.position.y = 1.28;
+      torso.castShadow = true;
+      // Front zipper line
+      const zipper = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.64, 0.03), shoesMat);
+      zipper.position.set(0, 1.28, 0.37);
+      rg.add(torso, zipper);
+
+      // 4. ARMS & HANDS (pivoting at shoulders y = 1.48)
+      const createArm = (xOffset: number) => {
+        const armGroup = new THREE.Group();
+        armGroup.position.set(xOffset, 1.48, 0);
+
+        // Shoulder & upper jacket sleeve
+        const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.10, 0.40, 8), jacketMat);
+        sleeve.position.y = -0.20;
+        sleeve.castShadow = true;
+        armGroup.add(sleeve);
+
+        // Forearm & hand (warm skin tone)
+        const hand = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.32, 8), skinMat);
+        hand.position.y = -0.48;
+        hand.castShadow = true;
+        armGroup.add(hand);
+
+        return armGroup;
+      };
+
+      const lArmG = createArm( 0.48);
+      const rArmG = createArm(-0.48);
+      rg.add(lArmG, rArmG);
+
+      // 5. EXPLORER BACKPACK (Mounted on UPPER back — y = 1.15 to 1.65, so pants & legs are 100% visible from behind!)
       if (isMain) {
-        const pack = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.35), new THREE.MeshLambertMaterial({ color: '#FF5722' })); pack.position.set(0, 0.9, -0.4); pack.castShadow = true; rg.add(pack);
+        const pack = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.50, 0.28), packMat);
+        pack.position.set(0, 1.34, -0.32);
+        pack.castShadow = true;
+        rg.add(pack);
+
+        // Rolled travel blanket on top of backpack
+        const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.54, 10), packRollMat);
+        roll.rotation.z = Math.PI / 2;
+        roll.position.set(0, 1.63, -0.32);
+        roll.castShadow = true;
+        rg.add(roll);
+
+        // Side water flask / canteen
+        const flask = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.26, 8), flaskMat);
+        flask.position.set(0.28, 1.28, -0.32);
+        flask.castShadow = true;
+        rg.add(flask);
       }
-      const armGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.7, 6);
-      const legGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.8, 6);
-      const lArmG  = new THREE.Group(); lArmG.position.set( 0.45, 1.3, 0); const lArmM = new THREE.Mesh(armGeo, skinMat); lArmM.position.y = -0.35; lArmG.add(lArmM); rg.add(lArmG);
-      const rArmG  = new THREE.Group(); rArmG.position.set(-0.45, 1.3, 0); const rArmM = new THREE.Mesh(armGeo, skinMat); rArmM.position.y = -0.35; rArmG.add(rArmM); rg.add(rArmG);
-      const lLegG  = new THREE.Group(); lLegG.position.set( 0.2,  0.8, 0); const lLegM = new THREE.Mesh(legGeo, bodyMat); lLegM.position.y = -0.4; lLegG.add(lLegM); rg.add(lLegG);
-      const rLegG  = new THREE.Group(); rLegG.position.set(-0.2,  0.8, 0); const rLegM = new THREE.Mesh(legGeo, bodyMat); rLegM.position.y = -0.4; rLegG.add(rLegM); rg.add(rLegG);
+
+      // 6. NECK & HEAD
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.14, 0.14, 8), skinMat);
+      neck.position.y = 1.68;
+      rg.add(neck);
+
+      // Traveler headphones around neck
+      const hpBand = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.04, 6, 12), beltMat);
+      hpBand.rotation.x = Math.PI / 2;
+      hpBand.position.set(0, 1.70, 0);
+      const hpLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.05, 8), sharedGoldMat);
+      hpLeft.rotation.z = Math.PI / 2;
+      hpLeft.position.set(-0.25, 1.70, 0);
+      const hpRight = hpLeft.clone();
+      hpRight.position.x = 0.25;
+      rg.add(hpBand, hpLeft, hpRight);
+
+      // Head sphere
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.32, 16, 14), skinMat);
+      head.position.y = 1.94;
+      head.castShadow = true;
+      rg.add(head);
+
+      // Face: Comic Aviator Sunglasses (facing forward +Z)
+      const shadesFrame = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.09, 0.06), beltMat);
+      shadesFrame.position.set(0, 1.96, 0.29);
+      const lensL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.03), lensMat);
+      lensL.position.set(-0.08, 1.96, 0.32);
+      const lensR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.03), lensMat);
+      lensR.position.set( 0.08, 1.96, 0.32);
+      rg.add(shadesFrame, lensL, lensR);
+
+      // Hat: Stylish Explorer Baseball Cap with forward visor
+      const capCrown = new THREE.Mesh(
+        new THREE.SphereGeometry(0.33, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+        sharedGoldMat
+      );
+      capCrown.position.y = 1.98;
+      capCrown.castShadow = true;
+      const capVisor = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.04, 0.20), beltMat);
+      capVisor.position.set(0, 2.02, 0.36);
+      capVisor.castShadow = true;
+      const capButton = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.04, 8), beltMat);
+      capButton.position.y = 2.32;
+      rg.add(capCrown, capVisor, capButton);
+
       return { rg, lArmG, rArmG, lLegG, rLegG };
     };
 
@@ -1016,7 +1242,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       const tagTex = new THREE.CanvasTexture(tagCanvas);
       const tagMat = new THREE.SpriteMaterial({ map: tagTex, transparent: true });
       const tagSprite = new THREE.Sprite(tagMat);
-      tagSprite.position.y = 2.45;
+      tagSprite.position.y = 2.85;
       tagSprite.scale.set(2.2, 0.55, 1);
       rg.add(tagSprite);
 
@@ -1068,7 +1294,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     // 21. CAMERA DRAG — pointer events on canvas only
     //     Exclude bottom-left 200×200 area (joystick zone) on mobile to prevent conflict
     let cameraAngle = Math.PI * 0.75;
-    let cameraPitch = 0.45;
+    let cameraPitch = isMobile ? 0.32 : 0.42;
     let activeCamPointerId: number | null = null;
     let prevPtrX = 0;
     let prevPtrY = 0;
@@ -1116,7 +1342,10 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       if (!container) return;
       const w = container.clientWidth || window.innerWidth;
       const h = container.clientHeight || (window.innerHeight - 130);
-      camera.aspect = w / h; camera.updateProjectionMatrix();
+      const asp = w / h;
+      camera.aspect = asp;
+      camera.fov = asp < 1.0 ? 66 : 50;
+      camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     };
     window.addEventListener('resize', onResize);
@@ -1186,12 +1415,12 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const baseSpeed   = 10.5;
     const accelRate   = baseSpeed / 0.12;
     const decelRate   = baseSpeed / 0.08;
-    const camDist     = 7.5;
+    const camDist     = isMobile ? 8.6 : 7.4;
 
     // Place initial camera
     camera.position.set(
       Math.sin(cameraAngle) * camDist,
-      Math.sin(cameraPitch) * camDist + 1.2,
+      Math.sin(cameraPitch) * camDist + 1.0,
       Math.cos(cameraAngle) * camDist
     );
 
@@ -1478,12 +1707,25 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         }
       }
 
-      // SMOOTH CAMERA
+      // SMOOTH CAMERA (Framed in lower third to showcase panoramic city & skyline)
       targetCameraPos.x = playerGroup.position.x + Math.sin(cameraAngle) * Math.cos(cameraPitch) * camDist;
-      targetCameraPos.y = playerGroup.position.y + Math.sin(cameraPitch) * camDist + 1.2;
+      targetCameraPos.y = playerGroup.position.y + Math.sin(cameraPitch) * camDist + 1.0;
       targetCameraPos.z = playerGroup.position.z + Math.cos(cameraAngle) * Math.cos(cameraPitch) * camDist;
-      camera.position.lerp(targetCameraPos, 0.1);
-      camera.lookAt(playerGroup.position.x, playerGroup.position.y + 1.2, playerGroup.position.z);
+      camera.position.lerp(targetCameraPos, 0.12);
+      camera.lookAt(playerGroup.position.x, playerGroup.position.y + 1.0, playerGroup.position.z);
+
+      // DIRECTIONAL LIGHT SHADOW TRACKING (Crystal-clear shadows anywhere on map)
+      sunLight.position.set(playerGroup.position.x + 35, playerGroup.position.y + 50, playerGroup.position.z + 25);
+      sunLight.target.position.set(playerGroup.position.x, playerGroup.position.y, playerGroup.position.z);
+      sunLight.target.updateMatrixWorld();
+
+      // DRIFT PROCEDURAL SKY CLOUDS
+      if (cloudsGroup.visible) {
+        cloudsGroup.children.forEach(c => {
+          c.position.x += 1.2 * delta;
+          if (c.position.x > 150) c.position.x = -150;
+        });
+      }
 
       // WORLD ANIMATIONS
       wheelGroup.rotation.z += 0.22 * delta;
