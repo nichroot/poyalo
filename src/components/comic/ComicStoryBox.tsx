@@ -7,7 +7,8 @@ import {
   Share2,
   Dices,
   Check,
-  Search
+  Search,
+  Sparkle
 } from 'lucide-react';
 import { ComicStory, ComicTone, EraLayer } from '../../types/comic';
 import { getComicForCityToneEra, COMIC_CITIES } from '../../data/mockComics';
@@ -206,19 +207,73 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
   return (
     <div className="space-y-4 pb-20">
       
-      {/* Golden-Age Comic Book Issue Header */}
-      <div className="bg-white border-[2.5px] border-[#111827] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_#111827] relative overflow-hidden">
-        {/* Halftone subtle background accent */}
-        <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-[#FF5722]/10 rounded-full comic-halftone pointer-events-none" />
+      {/* Golden-Age Comic Book Issue Cover Plaque */}
+      <div className="bg-[#FFFDF8] border-[2.5px] border-[#111827] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_#111827] relative overflow-hidden">
+        
+        {/* Halftone Ben-Day dot pattern accent */}
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-[#FF5722]/10 rounded-full comic-halftone pointer-events-none" />
 
-        {/* Top Control Bar: Brand & Quick Utility Actions */}
-        <div className="flex items-center justify-between gap-2 flex-wrap mb-2.5">
+        {/* Vintage Comic Header Strip */}
+        <div className="flex items-center justify-between gap-2 flex-wrap pb-3 mb-3 border-b-2 border-dashed border-[#111827]/30">
+          
+          {/* Issue Badge & Barcode */}
           <div className="flex items-center space-x-2">
-            <span className="bg-[#FF5722] text-white px-2.5 py-0.5 rounded font-mono font-black text-[11px] uppercase border border-[#111827] tracking-wider">
-              POYALO COMICS • ISSUE #01
+            <div className="bg-[#111827] text-white px-2 py-0.5 rounded font-mono font-black text-[10px] tracking-widest uppercase flex items-center space-x-1">
+              <span>VOL. 1</span>
+              <span>•</span>
+              <span>NO. 01</span>
+            </div>
+            <span className="hidden sm:inline-block font-mono font-bold text-[9px] text-gray-500 tracking-tighter select-none">
+              ||| | ||||| |||
             </span>
-            <span className="text-[11px] font-mono font-bold text-gray-600 uppercase hidden xs:inline">
+            <span className="bg-[#FEF08A] text-[#111827] px-2 py-0.5 rounded font-mono font-black text-[10px] border border-[#111827] uppercase hidden xs:inline-block">
+              ★ 100% VERIFIED LORE ★
+            </span>
+          </div>
+
+          {/* Quick Action Tools */}
+          <div className="flex items-center space-x-1.5">
+            <button
+              onClick={handleSurpriseMe}
+              title="Pick a surprise random story from archives"
+              className="px-2.5 py-1 bg-white hover:bg-amber-100 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 active:translate-y-0.5 transition-all text-[#111827]"
+            >
+              <Dices className="w-3.5 h-3.5 text-[#FF5722]" />
+              <span className="hidden sm:inline">SURPRISE</span>
+            </button>
+
+            <button
+              onClick={handleShareComic}
+              title="Copy / Share comic strip transcript"
+              className="px-2.5 py-1 bg-white hover:bg-sky-50 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 active:translate-y-0.5 transition-all text-[#111827]"
+            >
+              <Share2 className="w-3.5 h-3.5 text-[#1B3FFF]" />
+              <span className="hidden sm:inline">SHARE</span>
+            </button>
+
+            <button
+              onClick={() => setShowAiCreator(!showAiCreator)}
+              title="Toggle AI custom comic generator"
+              className={`px-3 py-1 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                showAiCreator 
+                  ? 'bg-[#111827] text-white' 
+                  : 'bg-[#FEF08A] hover:bg-amber-300 text-[#111827]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+              <span>{showAiCreator ? 'CLOSE' : 'AI DRAW'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Story Title & Newsprint Tagline Ribbon */}
+        <div className="space-y-1.5">
+          <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+            <span className="bg-[#FF5722] text-white px-2 py-0.5 rounded font-mono font-black text-[10px] uppercase border border-[#111827] tracking-wider">
               {activeStory.cityName}
+            </span>
+            <span className="text-xs font-mono font-bold text-gray-500 uppercase">
+              {activeStory.placeName}
             </span>
             {aiCustomStory && (
               <button
@@ -235,52 +290,20 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
             )}
           </div>
 
-          {/* Action Buttons: Surprise Me, Share, and AI Creator Toggle */}
-          <div className="flex items-center space-x-1.5">
-            <button
-              onClick={handleSurpriseMe}
-              title="Pick a surprise random story from archives"
-              className="px-2.5 py-1.5 bg-white hover:bg-amber-100 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 active:translate-y-0.5 transition-all text-[#111827]"
-            >
-              <Dices className="w-3.5 h-3.5 text-[#FF5722]" />
-              <span className="hidden sm:inline">SURPRISE</span>
-            </button>
+          <h1 className="text-2xl sm:text-3xl font-display font-black text-[#111827] tracking-tight leading-tight">
+            {activeStory.title}
+          </h1>
 
-            <button
-              onClick={handleShareComic}
-              title="Copy / Share comic strip transcript"
-              className="px-2.5 py-1.5 bg-white hover:bg-sky-50 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1 active:translate-x-0.5 active:translate-y-0.5 transition-all text-[#111827]"
-            >
-              <Share2 className="w-3.5 h-3.5 text-[#1B3FFF]" />
-              <span className="hidden sm:inline">SHARE</span>
-            </button>
-
-            <button
-              onClick={() => setShowAiCreator(!showAiCreator)}
-              title="Toggle AI custom comic generator"
-              className={`px-3 py-1.5 border-2 border-[#111827] rounded-xl font-mono font-black text-xs shadow-[2px_2px_0px_#111827] flex items-center space-x-1.5 active:translate-x-0.5 active:translate-y-0.5 transition-all ${
-                showAiCreator 
-                  ? 'bg-[#111827] text-white' 
-                  : 'bg-[#FEF08A] hover:bg-amber-300 text-[#111827]'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
-              <span>{showAiCreator ? 'CLOSE' : 'AI DRAW'}</span>
-            </button>
+          <div className="pt-0.5">
+            <span className="inline-block bg-[#FEF9C3] border border-[#111827] px-2.5 py-1 rounded text-xs sm:text-[13px] font-mono font-bold text-[#111827] shadow-[1px_1px_0px_#111827]">
+              "{activeStory.tagline}"
+            </span>
           </div>
         </div>
 
-        {/* Story Title & Tagline */}
-        <h1 className="text-2xl sm:text-3xl font-display font-black text-[#111827] tracking-tight leading-tight">
-          {activeStory.title}
-        </h1>
-        <p className="text-xs sm:text-sm font-mono text-gray-700 mt-1 max-w-2xl font-medium">
-          {activeStory.tagline}
-        </p>
-
-        {/* Expandable AI Prompt Form */}
+        {/* Expandable AI Prompt Studio Drawer */}
         {showAiCreator && (
-          <div className="mt-4 pt-3 border-t-2 border-[#111827] animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="mt-4 pt-3.5 border-t-2 border-[#111827] animate-in fade-in slide-in-from-top-2 duration-200">
             <form onSubmit={handleGenerateCustomStory} className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -289,7 +312,7 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
                   value={customStoryPrompt}
                   onChange={(e) => setCustomStoryPrompt(e.target.value)}
                   placeholder="Ask for ANY place worldwide (e.g. Kyoto Samurai, Colosseum, 1920s Harlem)..."
-                  className="w-full pl-8 pr-3.5 py-2 bg-[#FDFBF7] border-2 border-[#111827] rounded-xl font-mono text-xs text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#FF5722] font-bold"
+                  className="w-full pl-8 pr-3.5 py-2 bg-white border-2 border-[#111827] rounded-xl font-mono text-xs text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#FF5722] font-bold"
                 />
               </div>
               <button
@@ -302,8 +325,8 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
               </button>
             </form>
 
-            {/* Inspiration tags */}
-            <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+            {/* Quick Inspiration suggestions */}
+            <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
               <span className="text-[10px] font-mono font-bold text-gray-400 uppercase">Try:</span>
               {[
                 { label: '⛩️ Kyoto Samurai', prompt: 'Feudal Samurai in Kyoto Japan' },
@@ -316,7 +339,7 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
                   type="button"
                   onClick={(e) => handleGenerateCustomStory(e, pill.prompt)}
                   disabled={isGeneratingStory}
-                  className="px-2 py-0.5 bg-[#FDFBF7] hover:bg-[#FEF3C7] border border-[#111827] rounded text-[10px] font-mono font-bold text-gray-800 shadow-[1px_1px_0px_#111827] active:translate-x-0.5 transition-colors disabled:opacity-50"
+                  className="px-2 py-0.5 bg-white hover:bg-[#FEF3C7] border border-[#111827] rounded text-[10px] font-mono font-bold text-gray-800 shadow-[1px_1px_0px_#111827] active:translate-x-0.5 transition-colors disabled:opacity-50"
                 >
                   {pill.label}
                 </button>
@@ -325,7 +348,7 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
           </div>
         )}
 
-        {/* Toast Notification Bar */}
+        {/* Clean Auto-dismissing Toast Message */}
         {toastMessage && (
           <div className="mt-3 p-2 bg-amber-50 border-2 border-[#111827] rounded-xl text-[#111827] text-xs font-mono font-bold flex items-center space-x-2 shadow-[2px_2px_0px_#111827] animate-in fade-in">
             <Check className="w-4 h-4 text-[#10B981] flex-shrink-0" />
@@ -334,10 +357,10 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
         )}
       </div>
 
-      {/* Unified Comic Director Bar: Cities + Tone + Era */}
+      {/* The Unified Comic Director Toolbar: Cities + Tone + Era */}
       <div className="bg-white border-2 border-[#111827] rounded-2xl p-3 shadow-[3px_3px_0px_#111827] space-y-2.5">
         
-        {/* City Archives Row */}
+        {/* City Archives Carousel Row */}
         <div className="flex items-center space-x-2">
           <span className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-wider flex-shrink-0">
             CITY:
@@ -373,7 +396,7 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
         {/* Divider */}
         <div className="w-full h-[1px] bg-gray-200" />
 
-        {/* Tone & Era Controls in Single Clean Row */}
+        {/* Tone & Era Controls in a Clean Horizontal Flow */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           {/* Tone Filter */}
           <div className="flex items-center space-x-1.5 overflow-x-auto pb-0.5 scrollbar-none">
@@ -426,8 +449,8 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
 
       </div>
 
-      {/* The 3-Panel Comic Strip */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+      {/* The 3-Panel Comic Strip — Equal heights with generous gutters & spacing */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-stretch">
         {activeStory.panels.map((panel) => (
           <ComicPanelItem 
             key={panel.panelNumber} 
@@ -437,8 +460,8 @@ export const ComicStoryBox: React.FC<ComicStoryBoxProps> = ({ initialCity }) => 
         ))}
       </div>
 
-      {/* Sources & Verified Grounding Footer */}
-      <div className="bg-[#FDFBF7] border-2 border-[#111827] rounded-xl p-3 shadow-[2px_2px_0px_#111827] flex flex-wrap items-center justify-between gap-2">
+      {/* Historical Sources Grounding Footer */}
+      <div className="bg-[#FFFDF7] border-2 border-[#111827] rounded-xl p-3 sm:p-3.5 shadow-[2px_2px_0px_#111827] flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
           <BookOpen className="w-4 h-4 text-gray-700" />
           <span className="text-[11px] font-mono font-black text-gray-800 uppercase tracking-wider">
