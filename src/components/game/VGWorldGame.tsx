@@ -325,18 +325,18 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       createRoad(12, 190,  32, 0), createRoad( 90, 10,  32, -45, Math.PI / 2), createRoad( 80, 10, 32, 45, Math.PI / 2)
     );
 
-    // 9. CREEK WATERWAY
+    // 9. KHOR DUBAI WATERWAY (Confined to canal channel from z = -35 to +40)
     const creekMat = new THREE.MeshLambertMaterial({ color: '#38BDF8', transparent: true, opacity: 0.88 });
-    const creekMesh = new THREE.Mesh(new THREE.PlaneGeometry(35, 280), creekMat);
+    const creekMesh = new THREE.Mesh(new THREE.PlaneGeometry(34, 76), creekMat);
     creekMesh.rotation.x = -Math.PI / 2;
-    creekMesh.position.set(26, 0.05, 0);
+    creekMesh.position.set(26, 0.05, 2.5);
     creekMesh.receiveShadow = true;
     scene.add(creekMesh);
 
-    // Creek quay walls
-    const quayGeo = new THREE.BoxGeometry(1.5, 0.8, 280);
-    const quayW = new THREE.Mesh(quayGeo, sharedBuildingMat); quayW.position.set( 8.5, 0.4, 0); scene.add(quayW);
-    const quayE = new THREE.Mesh(quayGeo, sharedBuildingMat); quayE.position.set(43.5, 0.4, 0); scene.add(quayE);
+    // Creek quay walls (aligned with canal channel)
+    const quayGeo = new THREE.BoxGeometry(1.5, 0.8, 76);
+    const quayW = new THREE.Mesh(quayGeo, sharedBuildingMat); quayW.position.set( 8.5, 0.4, 2.5); scene.add(quayW);
+    const quayE = new THREE.Mesh(quayGeo, sharedBuildingMat); quayE.position.set(43.5, 0.4, 2.5); scene.add(quayE);
 
     // 10. GRAND ARCH BRIDGE
     const bridgeGroup = new THREE.Group();
@@ -373,7 +373,23 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
 
     // 12. LANDMARKS
 
-    // a) BURJ KHALIFA
+    // a) BURJ KHALIFA & DOWNTOWN FOUNTAIN PLAZA (100% On Dry Land & Walkable!)
+    const downtownPlaza = new THREE.Mesh(
+      new THREE.BoxGeometry(46, 0.3, 44),
+      new THREE.MeshLambertMaterial({ color: '#1E293B' })
+    );
+    downtownPlaza.position.set(28, 0.15, -55);
+    downtownPlaza.receiveShadow = true;
+    scene.add(downtownPlaza);
+
+    // Downtown Fountain Lake Basin (Reflective lake around the tower base)
+    const fountainLake = new THREE.Mesh(
+      new THREE.CylinderGeometry(14, 14, 0.15, 32),
+      new THREE.MeshLambertMaterial({ color: '#0284C7', emissive: '#0369A1', emissiveIntensity: 0.35 })
+    );
+    fountainLake.position.set(28, 0.25, -55);
+    scene.add(fountainLake);
+
     const bkGroup = new THREE.Group();
     const bkDark    = new THREE.MeshLambertMaterial({ color: '#334155' });
     const bkCyanBand = new THREE.MeshLambertMaterial({ color: '#38BDF8', emissive: '#0284C7', emissiveIntensity: 0.75 });
@@ -390,9 +406,9 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     bkSpire.position.y = 66; bkSpire.castShadow = true; bkGroup.add(bkSpire);
     const bkBeacon = new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 8), new THREE.MeshBasicMaterial({ color: '#EF4444' }));
     bkBeacon.position.y = 75; bkGroup.add(bkBeacon);
-    const bkLobby = new THREE.Mesh(new THREE.BoxGeometry(12, 2.2, 12), new THREE.MeshLambertMaterial({ color: '#1E293B' }));
+    const bkLobby = new THREE.Mesh(new THREE.BoxGeometry(11, 2.2, 11), new THREE.MeshLambertMaterial({ color: '#0F172A' }));
     bkLobby.position.y = 1.1; bkGroup.add(bkLobby);
-    bkGroup.position.set(30, 0, -50);
+    bkGroup.position.set(28, 0.2, -55);
     scene.add(bkGroup);
 
     // b) DUBAI FRAME
@@ -411,19 +427,67 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     dfGroup.position.set(-25, 0, -35);
     scene.add(dfGroup);
 
-    // c) BURJ AL ARAB
+    // c) BURJ AL ARAB (Iconic Curved Dhow Sail, Rear Mast Arch & Cantilevered Helipad)
     const baaGroup = new THREE.Group();
-    const sailMat = new THREE.MeshLambertMaterial({ color: '#F8FAFC' });
-    const sail = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 5.5, 22, 3), sailMat);
-    sail.position.y = 11; sail.rotation.y = -Math.PI / 2; sail.castShadow = true;
-    const helipad  = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.6, 0.35, 18), new THREE.MeshLambertMaterial({ color: '#1E293B' }));
-    helipad.position.set(0, 19.5, 4.2);
-    const helipadH = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.4, 16), new THREE.MeshBasicMaterial({ color: '#FBBF24', side: THREE.DoubleSide }));
-    helipadH.rotation.x = -Math.PI / 2; helipadH.position.set(0, 19.7, 4.2);
-    const island    = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 0.6, 24), new THREE.MeshLambertMaterial({ color: '#CBD5E1' }));
-    island.position.y = 0.3;
-    const baaCause  = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.4, 14), sharedWoodMat); baaCause.position.set(0, 0.3, -11);
-    baaGroup.add(sail, helipad, helipadH, island, baaCause);
+    const sailWhiteMat = new THREE.MeshStandardMaterial({ color: '#FFFFFF', roughness: 0.15, metalness: 0.05 });
+    const steelArchMat = new THREE.MeshStandardMaterial({ color: '#E2E8F0', roughness: 0.3, metalness: 0.6 });
+    const skyviewMat   = new THREE.MeshLambertMaterial({ color: '#38BDF8', transparent: true, opacity: 0.8 });
+
+    // 1. Sweeping Curved Spinnaker Sail (Layered white curved arc structure)
+    for (let s = 0; s < 9; s++) {
+      const prog = s / 8;
+      const tierH = 2.6;
+      const sailWidth = 10.5 * Math.sin(prog * Math.PI * 0.85);
+      const sailZ = Math.cos(prog * Math.PI * 0.7) * 3.5;
+      const sailTier = new THREE.Mesh(
+        new THREE.BoxGeometry(3.6, tierH - 0.2, Math.max(1.5, sailWidth)),
+        sailWhiteMat
+      );
+      sailTier.position.set(0, s * tierH + tierH / 2 + 0.4, sailZ);
+      sailTier.castShadow = true;
+      baaGroup.add(sailTier);
+    }
+
+    // 2. Rear Structural Exoskeleton Mast Truss (Twin Inverted-V Columns)
+    const mastLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 26, 8), steelArchMat);
+    mastLeft.position.set(-2.0, 13.5, -3.2);
+    mastLeft.rotation.z = -0.06;
+    mastLeft.rotation.x = -0.15;
+    const mastRight = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 26, 8), steelArchMat);
+    mastRight.position.set(2.0, 13.5, -3.2);
+    mastRight.rotation.z = 0.06;
+    mastRight.rotation.x = -0.15;
+    baaGroup.add(mastLeft, mastRight);
+
+    // 3. Spire Mast Summit
+    const baaSpire = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.35, 9, 6), sharedSilverMat);
+    baaSpire.position.set(0, 27, 0);
+    baaGroup.add(baaSpire);
+
+    // 4. Cantilevered Circular Helipad (Jutting out forward over ocean)
+    const helipad = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.2, 0.35, 20), new THREE.MeshLambertMaterial({ color: '#1E293B' }));
+    helipad.position.set(0, 21.0, 5.8);
+    const helipadH = new THREE.Mesh(new THREE.RingGeometry(1.2, 1.8, 18), new THREE.MeshBasicMaterial({ color: '#FBBF24', side: THREE.DoubleSide }));
+    helipadH.rotation.x = -Math.PI / 2; helipadH.position.set(0, 21.2, 5.8);
+    const helipadBeam = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.6, 5.5), steelArchMat);
+    helipadBeam.position.set(0, 20.3, 3.2);
+    baaGroup.add(helipad, helipadH, helipadBeam);
+
+    // 5. Skyview Panoramic Restaurant Capsule (Cantilevered under the summit)
+    const skyviewBar = new THREE.Mesh(new THREE.BoxGeometry(8.5, 1.6, 2.6), skyviewMat);
+    skyviewBar.position.set(0, 19.2, -1.8);
+    baaGroup.add(skyviewBar);
+
+    // 6. Artificial Triangular/Circular Island Base with sea breakers
+    const island = new THREE.Mesh(new THREE.CylinderGeometry(14, 15, 0.7, 32), new THREE.MeshLambertMaterial({ color: '#E2E8F0' }));
+    island.position.y = 0.35;
+    const waveBreaker = new THREE.Mesh(new THREE.TorusGeometry(14.8, 0.6, 8, 32), sharedBuildingMat);
+    waveBreaker.rotation.x = Math.PI / 2;
+    waveBreaker.position.y = 0.35;
+    const baaCause = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.4, 16), sharedWoodMat);
+    baaCause.position.set(0, 0.35, -12);
+    baaGroup.add(island, waveBreaker, baaCause);
+
     baaGroup.position.set(40, 0, 25);
     scene.add(baaGroup);
 
@@ -731,6 +795,10 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
 
     // 22. HEIGHT COLLISION MAP
     const getGroundHeight = (px: number, pz: number): number => {
+      // Downtown Spire Promenade Plaza
+      if (px >= 5 && px <= 51 && pz >= -77 && pz <= -36) {
+        return 0.2;
+      }
       // Grand Arch Bridge
       if (px >= 7.5 && px <= 44.5 && Math.abs(pz) <= 4.2) {
         const t = (px - 7.5) / 37.0;
@@ -836,8 +904,8 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       playerGroup.position.x = Math.max(-70, Math.min(75, playerGroup.position.x));
       playerGroup.position.z = Math.max(-95, Math.min(95, playerGroup.position.z));
 
-      // Water boundary — allow bridge crossing and BAA island
-      const inWater    = playerGroup.position.x > 8.8 && playerGroup.position.x < 43.2;
+      // Water boundary — Khor Dubai canal only occupies z in [-35.5, 40.5]
+      const inWater    = playerGroup.position.x > 8.8 && playerGroup.position.x < 43.2 && playerGroup.position.z >= -35.5 && playerGroup.position.z <= 40.5;
       const onBridge   = Math.abs(playerGroup.position.z) <= 4.8;
       const onBaaIsland = playerGroup.position.x >= 28 && playerGroup.position.z >= 12 && playerGroup.position.z <= 38;
       if (inWater && !onBridge && !onBaaIsland) {
@@ -847,6 +915,83 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         } else {
           playerGroup.position.x = 43.4;
           velocity.x = 0;
+        }
+      }
+
+      // SOLID OBSTACLES COLLISION RESOLVER (No more phasing through buildings!)
+      const pRadius = 0.6;
+      const cylinderObstacles = [
+        { cx: 28, cz: -55, r: 6.0 },   // Burj Khalifa Downtown Base
+        { cx: -7, cz: -40, r: 1.8 },   // Dubai Frame West Pillar
+        { cx: 7, cz: -40, r: 1.8 },    // Dubai Frame East Pillar
+        { cx: 38, cz: 25, r: 5.5 },    // Burj Al Arab Tower & Spinnaker Sail
+        { cx: 15, cz: -22, r: 7.0 },   // Museum of the Future Torus Ring
+        { cx: 50, cz: 55, r: 4.2 },    // Ain Dubai Base & Support Legs
+        { cx: -42, cz: -45, r: 4.0 },  // Desert Camp Majlis & Bedouin Tents
+        { cx: -48, cz: 20, r: 3.2 },   // Desert Oasis Fountain Basin
+      ];
+
+      for (let i = 0; i < cylinderObstacles.length; i++) {
+        const obs = cylinderObstacles[i];
+        const dx = playerGroup.position.x - obs.cx;
+        const dz = playerGroup.position.z - obs.cz;
+        const dist = Math.hypot(dx, dz);
+        const minDist = obs.r + pRadius;
+        if (dist < minDist && dist > 0.0001) {
+          const overlap = minDist - dist;
+          const nx = dx / dist;
+          const nz = dz / dist;
+          playerGroup.position.x += nx * overlap;
+          playerGroup.position.z += nz * overlap;
+          const dot = velocity.x * nx + velocity.z * nz;
+          if (dot < 0) {
+            velocity.x -= dot * nx;
+            velocity.z -= dot * nz;
+          }
+        }
+      }
+
+      // Box colliders (Al Fahidi Historic Buildings & Souk stalls)
+      // Only active if player is below rooftop level
+      if (playerY < 4.2) {
+        const boxObstacles = [
+          // Al Fahidi building block (excluding ramp corridor)
+          { minX: -21.5, maxX: -16.5, minZ: -24.5, maxZ: -11.5 },
+          { minX: -16.5, maxX: -10.5, minZ: -24.5, maxZ: -19.5 },
+          { minX: -16.5, maxX: -10.5, minZ: -16.5, maxZ: -11.5 },
+          // Old Souk Spice & Textile Bazaar stalls
+          { minX: -18.0, maxX: -12.0, minZ: 12.0, maxZ: 18.0 }
+        ];
+
+        for (let i = 0; i < boxObstacles.length; i++) {
+          const b = boxObstacles[i];
+          const px = playerGroup.position.x;
+          const pz = playerGroup.position.z;
+          if (
+            px > b.minX - pRadius &&
+            px < b.maxX + pRadius &&
+            pz > b.minZ - pRadius &&
+            pz < b.maxZ + pRadius
+          ) {
+            const dLeft = px - (b.minX - pRadius);
+            const dRight = (b.maxX + pRadius) - px;
+            const dTop = pz - (b.minZ - pRadius);
+            const dBottom = (b.maxZ + pRadius) - pz;
+            const minPen = Math.min(dLeft, dRight, dTop, dBottom);
+            if (minPen === dLeft) {
+              playerGroup.position.x = b.minX - pRadius;
+              if (velocity.x > 0) velocity.x = 0;
+            } else if (minPen === dRight) {
+              playerGroup.position.x = b.maxX + pRadius;
+              if (velocity.x < 0) velocity.x = 0;
+            } else if (minPen === dTop) {
+              playerGroup.position.z = b.minZ - pRadius;
+              if (velocity.z > 0) velocity.z = 0;
+            } else {
+              playerGroup.position.z = b.maxZ + pRadius;
+              if (velocity.z < 0) velocity.z = 0;
+            }
+          }
         }
       }
 

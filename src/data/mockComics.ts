@@ -1,4 +1,5 @@
 import { ComicStory, ComicTone, EraLayer } from '../types/comic';
+import { EXPANDED_COMIC_STORIES } from './mockComicsExpanded';
 
 export interface ComicCityOption {
   id: string;
@@ -13,7 +14,19 @@ export const COMIC_CITIES: ComicCityOption[] = [
   { id: 'Tokyo', name: 'Tokyo', country: 'Japan', flag: '🇯🇵', landmark: 'Asakusa & Tokyo Tower' },
   { id: 'Paris', name: 'Paris', country: 'France', flag: '🇫🇷', landmark: 'Montmartre & Grand Boulevards' },
   { id: 'Rome', name: 'Rome', country: 'Italy', flag: '🇮🇹', landmark: 'Roman Forum & Trevi Fountain' },
-  { id: 'Kozhikode', name: 'Kozhikode', country: 'India (Malabar Coast)', flag: '🇮🇳', landmark: 'Beypore Uru & Spice Port' }
+  { id: 'Kozhikode', name: 'Kozhikode', country: 'India (Malabar Coast)', flag: '🇮🇳', landmark: 'Beypore Uru & Spice Port' },
+  { id: 'Amsterdam', name: 'Amsterdam', country: 'Netherlands', flag: '🇳🇱', landmark: 'Canal Ring & Jordaan' },
+  { id: 'London', name: 'London', country: 'United Kingdom', flag: '🇬🇧', landmark: 'Tower Bridge & Westminster' },
+  { id: 'New York', name: 'New York', country: 'United States', flag: '🇺🇸', landmark: 'Times Square & Lower East Side' },
+  { id: 'Barcelona', name: 'Barcelona', country: 'Spain', flag: '🇪🇸', landmark: 'Sagrada Família & Gothic Quarter' },
+  { id: 'Bangkok', name: 'Bangkok', country: 'Thailand', flag: '🇹🇭', landmark: 'Wat Arun & Chao Phraya River' },
+  { id: 'Singapore', name: 'Singapore', country: 'Singapore', flag: '🇸🇬', landmark: 'Marina Bay & Lau Pa Sat' },
+  { id: 'Istanbul', name: 'Istanbul', country: 'Turkey', flag: '🇹🇷', landmark: 'Hagia Sophia & Grand Bazaar' },
+  { id: 'Cairo', name: 'Cairo', country: 'Egypt', flag: '🇪🇬', landmark: 'Giza Pyramids & Khan el-Khalili' },
+  { id: 'Kyoto', name: 'Kyoto', country: 'Japan', flag: '🇯🇵', landmark: 'Fushimi Inari & Gion Alleys' },
+  { id: 'Venice', name: 'Venice', country: 'Italy', flag: '🇮🇹', landmark: 'Grand Canal & Piazza San Marco' },
+  { id: 'Berlin', name: 'Berlin', country: 'Germany', flag: '🇩🇪', landmark: 'Brandenburg Gate & Kreuzberg' },
+  { id: 'Sydney', name: 'Sydney', country: 'Australia', flag: '🇦🇺', landmark: 'Opera House & The Rocks' }
 ];
 
 // ==========================================
@@ -1423,7 +1436,8 @@ export const ALL_COMIC_STORIES: ComicStory[] = [
   ...TOKYO_COMIC_STORIES,
   ...PARIS_COMIC_STORIES,
   ...ROME_COMIC_STORIES,
-  ...KOZHIKODE_COMIC_STORIES
+  ...KOZHIKODE_COMIC_STORIES,
+  ...EXPANDED_COMIC_STORIES
 ];
 
 /**

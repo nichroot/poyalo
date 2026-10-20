@@ -18,8 +18,8 @@ export const WORLD_LANDMARKS: WorldLandmark[] = [
     category: 'iconic',
     district: 'Downtown Spire District',
     emoji: '🏙️',
-    description: "The world's tallest building at 828m, featuring reflective stepped spires and futuristic summit needle.",
-    coords: { x: 30, y: 0.6, z: -50 },
+    description: "The world's tallest building at 828m, towering over Downtown Dubai with reflective stepped spires and futuristic summit needle.",
+    coords: { x: 28, y: 0.6, z: -55 },
     color: '#38BDF8',
     badge: "WORLD'S TALLEST",
     tags: ['burj', 'khalifa', 'tower', 'skyscraper', 'downtown', 'spire', 'tall']

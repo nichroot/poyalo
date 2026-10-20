@@ -313,6 +313,312 @@ export const CURATED_MYTHS: Record<string, TravelMyth[]> = {
       insiderTip: 'Walk through Sankaran Bakery on SM Street for free tastings of authentic tender coconut and black halwa served on fresh banana leaves.',
       severity: 'fun'
     }
+  ],
+
+  'Amsterdam': [
+    {
+      id: 'ams-1',
+      city: 'Amsterdam',
+      country: 'Netherlands',
+      category: 'safety',
+      categoryLabel: 'Bicycle Hegemony & Traffic',
+      emoji: '🚲',
+      myth: 'Bicycle lanes are just casual scenic paths where pedestrians have the right of way.',
+      reality: 'Bikes rule Amsterdam with unyielding priority. Walking into the red-asphalt fietspad without checking will earn you frantic bell chimes and harsh Dutch scolding. Cyclists do not stop for wandering tourists.',
+      insiderTip: 'Stay firmly on the sidewalk pavement (gray tiles), never walk on the reddish-brown asphalt bike paths, and look both ways twice before crossing.',
+      severity: 'high'
+    },
+    {
+      id: 'ams-2',
+      city: 'Amsterdam',
+      country: 'Netherlands',
+      category: 'traditional',
+      categoryLabel: 'Cannabis & Public Laws',
+      emoji: '🌿',
+      myth: 'Marijuana is completely legal everywhere and you can smoke on any street corner.',
+      reality: 'Cannabis is technically "tolerated" (gedoogbeleid) only within licensed coffeeshops. Smoking weed in public streets—especially throughout the City Center and Red Light District—is strictly illegal and subject to on-the-spot fines.',
+      insiderTip: 'Respect designated consumption zones inside licensed venues and do not consume cannabis openly on public bridges or canal steps.',
+      severity: 'medium'
+    },
+    {
+      id: 'ams-3',
+      city: 'Amsterdam',
+      country: 'Netherlands',
+      category: 'humans',
+      categoryLabel: 'Dutch Directness',
+      emoji: '🗣️',
+      myth: 'Dutch locals are deliberately rude and dismissive.',
+      reality: 'The Dutch practice "bespreekbaarheid"—radical honesty and directness. If your idea is impractical or you are in their way, they will tell you plainly without sugarcoating. It is considered efficient and respectful, not rude.',
+      insiderTip: 'Do not take direct bluntness personally. Feel free to be straightforward and clear in return; they appreciate brevity.',
+      severity: 'fun'
+    }
+  ],
+
+  'New York': [
+    {
+      id: 'nyc-1',
+      city: 'New York',
+      country: 'United States',
+      category: 'food',
+      categoryLabel: 'Municipal Water & Bagels',
+      emoji: '🥯',
+      myth: 'New York City tap water is murky and requires bottled water for everything.',
+      reality: 'NYC has some of the highest-rated municipal drinking water in the nation, piped untreated and pristine directly from the Catskill and Delaware mountain reservoirs. This mineral profile is the secret behind the legendary texture of NYC bagels and pizza dough!',
+      insiderTip: 'Save your money and skip bottled water—carry a reusable flask and refill from any city tap or restaurant.',
+      severity: 'fun'
+    },
+    {
+      id: 'nyc-2',
+      city: 'New York',
+      country: 'United States',
+      category: 'safety',
+      categoryLabel: 'Street Safety & The Subway',
+      emoji: '🚇',
+      myth: 'The NYC subway is an unnavigable danger zone where tourists should never travel at night.',
+      reality: 'Millions of everyday New Yorkers commute on the MTA 24/7. While common-sense street awareness is necessary, key lines in Manhattan and Brooklyn are bustling and equipped with OMNY contactless tap-and-go gates at all stations.',
+      insiderTip: 'Never enter an empty subway car during peak rush hour—there is always a pungent reason it is completely vacant.',
+      severity: 'medium'
+    },
+    {
+      id: 'nyc-3',
+      city: 'New York',
+      country: 'United States',
+      category: 'traditional',
+      categoryLabel: 'Sidewalk Etiquette',
+      emoji: '🚶🏻',
+      myth: 'You can casually stop in the middle of Manhattan sidewalks to gaze up at skyscrapers.',
+      reality: 'New York sidewalks are high-speed commuter highways. Abruptly freezing mid-step to take photos causes immediate pedestrian gridlock and draws intense exasperation from locals.',
+      insiderTip: 'Step to the outer building wall or storefront entrance before pulling out your smartphone or checking maps.',
+      severity: 'fun'
+    }
+  ],
+
+  'Barcelona': [
+    {
+      id: 'bcn-1',
+      city: 'Barcelona',
+      country: 'Spain',
+      category: 'food',
+      categoryLabel: 'Dining Times & Sangria',
+      emoji: '🥘',
+      myth: 'Locals drink Sangria every night and sit down for dinner at 6:00 PM.',
+      reality: 'Pitchers of sangria with fruit slices are almost exclusively sold to tourists. Locals drink Vermut (red vermouth with an olive) for aperitif and Cava or wine with meals. Authentic restaurant kitchens rarely open before 8:30 or 9:00 PM.',
+      insiderTip: 'Have a "merienda" (late afternoon snack) around 5 PM, and book dinner reservations between 9:00 PM and 10:00 PM to eat with the locals.',
+      severity: 'fun'
+    },
+    {
+      id: 'bcn-2',
+      city: 'Barcelona',
+      country: 'Spain',
+      category: 'safety',
+      categoryLabel: 'Pickpocketing & La Rambla',
+      emoji: '⚠️',
+      myth: 'Barcelona has violent street muggings around every corner.',
+      reality: 'Violent crime in Barcelona is extremely low. However, professional distraction pickpocketing around Las Ramblas, Sagrada Família, and metro transfer corridors is among the highest in Europe.',
+      insiderTip: 'Never leave your phone or sunglasses sitting on an outdoor cafe table, and keep your bag zipped and slung across your chest on the metro.',
+      severity: 'high'
+    },
+    {
+      id: 'bcn-3',
+      city: 'Barcelona',
+      country: 'Spain',
+      category: 'traditional',
+      categoryLabel: 'Catalan Culture & Language',
+      emoji: '💛',
+      myth: 'Barcelona is culturally identical to Madrid or Seville.',
+      reality: 'Barcelona is the proud capital of Catalonia, with its own co-official Romance language (Catalan), distinct architectural heritage, and separate cultural traditions (like the human towers of Castells).',
+      insiderTip: 'Greeting shopkeepers with "Bon dia" (Good day) instead of "Buenos días" is warmly appreciated by locals.',
+      severity: 'fun'
+    }
+  ],
+
+  'Singapore': [
+    {
+      id: 'sin-1',
+      city: 'Singapore',
+      country: 'Singapore',
+      category: 'traditional',
+      categoryLabel: 'Chewing Gum Law',
+      emoji: '🍬',
+      myth: 'Chewing a piece of gum will land you in a Singaporean prison cell immediately.',
+      reality: 'The law bans the commercial import and sale of chewing gum to prevent vandalism on MRT train door sensors. Possessing a small personal pack for chewing is not a crime, nor is therapeutic nicotine or dental gum.',
+      insiderTip: 'Never spit gum or litter onto the street—public cleanliness fines are strictly enforced and start at SGD $300.',
+      severity: 'fun'
+    },
+    {
+      id: 'sin-2',
+      city: 'Singapore',
+      country: 'Singapore',
+      category: 'food',
+      categoryLabel: 'Hawker Centers vs Expensive Restaurants',
+      emoji: '🍜',
+      myth: 'Singapore is an ultra-expensive tax haven where food costs a fortune.',
+      reality: 'While luxury hotels are pricey, Singapore\'s UNESCO-listed Hawker Centers (Maxwell, Chinatown Complex, Lau Pa Sat) serve some of the best culinary dishes on the planet for just SGD $4 to $7 per plate.',
+      insiderTip: 'If you see an empty table with a packet of pocket tissues, an umbrella, or an office lanyard on it, it has been "choped" (reserved). Respect the reservation!',
+      severity: 'fun'
+    }
+  ],
+
+  'Istanbul': [
+    {
+      id: 'ist-1',
+      city: 'Istanbul',
+      country: 'Turkey',
+      category: 'traditional',
+      categoryLabel: 'Capital City & Modern Dress',
+      emoji: '🕌',
+      myth: 'Istanbul is the capital of Turkey and women must wear full head coverings everywhere.',
+      reality: 'Ankara has been the political capital of Turkey since 1923. Istanbul is a secular, cosmopolitan metropolis where modern dress (jeans, skirts, t-shirts) is ubiquitous. Headscarves are only required when stepping inside active religious mosques like Hagia Sophia or Blue Mosque.',
+      insiderTip: 'Carry a lightweight scarf in your day bag so you can easily enter imperial mosques without having to borrow public visitor robes.',
+      severity: 'medium'
+    },
+    {
+      id: 'ist-2',
+      city: 'Istanbul',
+      country: 'Turkey',
+      category: 'traditional',
+      categoryLabel: 'Street Animals & Society',
+      emoji: '🐈',
+      myth: 'Stray cats and dogs in Istanbul are pests that the municipality exterminates.',
+      reality: 'Istanbul\'s street cats and dogs are cherished communal citizens. Under Turkish animal protection laws, they are sterilized, vaccinated with ear tags, fed with neighborhood kibble stations, and provided with wooden shelter huts by residents.',
+      insiderTip: 'Petting friendly street cats in cafes or parks is a beloved local pastime. They are remarkably gentle and accustomed to affection.',
+      severity: 'fun'
+    }
+  ],
+
+  'Cairo': [
+    {
+      id: 'cai-1',
+      city: 'Cairo',
+      country: 'Egypt',
+      category: 'monuments',
+      categoryLabel: 'Pyramids of Giza Location',
+      emoji: '🏜️',
+      myth: 'The Great Pyramids are isolated hundreds of miles out in an empty, uninhabited desert.',
+      reality: 'The Giza plateau sits directly adjacent to suburban Cairo. You can view the Sphinx while sitting on the rooftop terrace of a Pizza Hut or local kebab restaurant across the avenue!',
+      insiderTip: 'Arrive at the ticket gate right at 8:00 AM opening to explore the plateau before the midday Cairo sun and tour bus crowds arrive.',
+      severity: 'fun'
+    },
+    {
+      id: 'cai-2',
+      city: 'Cairo',
+      country: 'Egypt',
+      category: 'traditional',
+      categoryLabel: 'Touts & Camel Rides',
+      emoji: '🐫',
+      myth: 'You must pay whatever camel guides or souvenir vendors quote you at the plateau.',
+      reality: 'Official camel ride tariffs are legally fixed by the Ministry of Tourism. Persistent touts will quote 5x the rate or demand exorbitant tips to help you dismount.',
+      insiderTip: 'Book official rides inside the gate through the government ticketing window, or firmly say "La, Shukran" (No, thank you) with polite eye contact and keep walking.',
+      severity: 'medium'
+    }
+  ],
+
+  'Kyoto': [
+    {
+      id: 'kyo-1',
+      city: 'Kyoto',
+      country: 'Japan',
+      category: 'traditional',
+      categoryLabel: 'Geiko & Maiko Etiquette',
+      emoji: '👘',
+      myth: 'You can stop Geishas in Gion for selfies or follow them down residential alleys.',
+      reality: 'Chasing or touching Geiko and Maiko is considered severe harassment ("Geisha paparazzi"). The Gion district has instituted strict bans on photography in private streets, with active fines of ¥10,000.',
+      insiderTip: 'If you spot a Maiko walking to an appointment, admire respectfully from a distance and keep your camera lowered.',
+      severity: 'high'
+    },
+    {
+      id: 'kyo-2',
+      city: 'Kyoto',
+      country: 'Japan',
+      category: 'monuments',
+      categoryLabel: 'Temple Shoes & Tatami',
+      emoji: '👟',
+      myth: 'You can wear your walking shoes throughout Buddhist temple compounds and gardens.',
+      reality: 'Inside temple main halls and wooden verandas, all shoes must be removed and placed in shoe cubbies or carried in plastic bags to preserve centuries-old cedar floors and tatami mats.',
+      insiderTip: 'Wear clean, slip-on shoes with comfortable, intact socks when exploring Kyoto—you will be taking them off a dozen times a day.',
+      severity: 'fun'
+    }
+  ],
+
+  'Venice': [
+    {
+      id: 'vce-1',
+      city: 'Venice',
+      country: 'Italy',
+      category: 'monuments',
+      categoryLabel: 'Canal Odor & Lagoon Tides',
+      emoji: '🌊',
+      myth: 'Venice canals permanently smell like raw open sewers throughout the year.',
+      reality: 'The Adriatic Sea tides naturally flush and cleanse the Venetian lagoon twice every 24 hours. A faint organic marsh scent only occasionally surfaces during sluggish low tides on peak 35°C summer afternoons.',
+      insiderTip: 'Spring and Autumn offer the freshest air, crystalline lagoon reflections, and pleasant strolling temperatures.',
+      severity: 'fun'
+    },
+    {
+      id: 'vce-2',
+      city: 'Venice',
+      country: 'Italy',
+      category: 'traditional',
+      categoryLabel: 'Gondola vs Vaporetto',
+      emoji: '🛶',
+      myth: 'You must pay €100+ for a gondola to get across the Grand Canal.',
+      reality: 'Gondolas are scenic leisure experiences (€90 per 30 mins official rate). For daily crossing, locals use the "Traghetto"—large shared wooden gondolas rowed by two oarsmen that ferry you across the Grand Canal for just €2.00!',
+      insiderTip: 'Stand up balance-style during your €2 Traghetto crossing like a true Venetian commuter.',
+      severity: 'fun'
+    }
+  ],
+
+  'Berlin': [
+    {
+      id: 'ber-1',
+      city: 'Berlin',
+      country: 'Germany',
+      category: 'humans',
+      categoryLabel: 'Berliner Schnauze',
+      emoji: '🐻',
+      myth: 'Berliners are unfriendly and grumpy toward visitors.',
+      reality: 'Locals practice "Berliner Schnauze"—a distinct sharp-witted, sarcastic banter with a heart of gold. What sounds like annoyance is actually affectionate working-class humor.',
+      insiderTip: 'Don\'t be afraid to crack a dry joke back. If you respect the queuing system and cross streets at green pedestrian lights (Ampelmännchen), you will be treated like family.',
+      severity: 'fun'
+    },
+    {
+      id: 'ber-2',
+      city: 'Berlin',
+      country: 'Germany',
+      category: 'traditional',
+      categoryLabel: 'Sunday Shopping & Cash',
+      emoji: '💶',
+      myth: 'You can go shopping at supermarkets and use credit cards everywhere anytime.',
+      reality: 'Under German federal law (Ladenschlussgesetz), virtually all supermarkets, boutiques, and retail stores are legally required to close on Sundays. Furthermore, many beloved Spätis, bakeries, and currywurst stands still accept cash only.',
+      insiderTip: 'Always carry €20 to €40 in physical euro banknotes, and buy your groceries on Saturday before 8 PM.',
+      severity: 'medium'
+    }
+  ],
+
+  'Sydney': [
+    {
+      id: 'syd-1',
+      city: 'Sydney',
+      country: 'Australia',
+      category: 'safety',
+      categoryLabel: 'Deadly Wildlife Reality',
+      emoji: '🕷️',
+      myth: 'You will encounter venomous funnel-web spiders and deadly snakes in your Sydney hotel room.',
+      reality: 'Urban and coastal Sydney is pristine and modern. Anti-venom for funnel-webs has been available since 1981 with zero fatalities since its introduction. Major beaches have shark nets and active drone lifeguards.',
+      insiderTip: 'The real wildlife danger in spring is the Australian Magpie swooping near park trees to protect its nest. Walk calmly and wear sunglasses or a hat.',
+      severity: 'fun'
+    },
+    {
+      id: 'syd-2',
+      city: 'Sydney',
+      country: 'Australia',
+      category: 'traditional',
+      categoryLabel: 'Australia\'s Capital City',
+      emoji: '🏛️',
+      myth: 'Sydney is the capital city of Australia.',
+      reality: 'Canberra is the national capital, chosen in 1908 as a compromise between rival cities Sydney and Melbourne!',
+      insiderTip: 'Catch the public F1 Manly Ferry from Circular Quay for an iconic $8 harbour cruise with postcard views of the Opera House and Harbour Bridge.',
+      severity: 'fun'
+    }
   ]
 };
 
@@ -323,5 +629,15 @@ export const POPULAR_DESTINATIONS = [
   { name: 'Paris', country: 'France', flag: '🇫🇷' },
   { name: 'Bangkok', country: 'Thailand', flag: '🇹🇭' },
   { name: 'London', country: 'United Kingdom', flag: '🇬🇧' },
-  { name: 'Kozhikode', country: 'India (Malabar)', flag: '🇮🇳' }
+  { name: 'Kozhikode', country: 'India (Malabar)', flag: '🇮🇳' },
+  { name: 'Amsterdam', country: 'Netherlands', flag: '🇳🇱' },
+  { name: 'New York', country: 'United States', flag: '🇺🇸' },
+  { name: 'Barcelona', country: 'Spain', flag: '🇪🇸' },
+  { name: 'Singapore', country: 'Singapore', flag: '🇸🇬' },
+  { name: 'Istanbul', country: 'Turkey', flag: '🇹🇷' },
+  { name: 'Cairo', country: 'Egypt', flag: '🇪🇬' },
+  { name: 'Kyoto', country: 'Japan', flag: '🇯🇵' },
+  { name: 'Venice', country: 'Italy', flag: '🇮🇹' },
+  { name: 'Berlin', country: 'Germany', flag: '🇩🇪' },
+  { name: 'Sydney', country: 'Australia', flag: '🇦🇺' }
 ];

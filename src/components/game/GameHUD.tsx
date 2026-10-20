@@ -197,12 +197,25 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           N▲
         </div>
 
-        {/* Creek Waterway strip */}
+        {/* Creek Waterway strip (confined to z: -35.5 to 40.5, leaving Downtown Promenade dry) */}
         <div 
-          className="absolute top-0 bottom-0 bg-[#38BDF8]/40 border-x border-[#38BDF8]/60 pointer-events-none"
+          className="absolute bg-[#38BDF8]/40 border border-[#38BDF8]/60 rounded pointer-events-none"
           style={{
             left: `${getRadarX(8.5)}%`,
-            width: `${getRadarX(43.5) - getRadarX(8.5)}%`
+            width: `${getRadarX(43.5) - getRadarX(8.5)}%`,
+            top: `${getRadarY(-35.5)}%`,
+            height: `${getRadarY(40.5) - getRadarY(-35.5)}%`
+          }}
+        />
+
+        {/* Downtown Burj Khalifa Plaza indicator (Dry land) */}
+        <div
+          className="absolute bg-amber-400/20 border border-dashed border-amber-500/40 rounded pointer-events-none"
+          style={{
+            left: `${getRadarX(5)}%`,
+            width: `${getRadarX(51) - getRadarX(5)}%`,
+            top: `${getRadarY(-77)}%`,
+            height: `${getRadarY(-36) - getRadarY(-77)}%`
           }}
         />
 
