@@ -310,15 +310,19 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     (gridHelper.material as THREE.Material).transparent = true;
     scene.add(gridHelper);
 
-    // 7. SAND DUNES
+    // 7. SAND DUNES (Confined to Western Desert Reserve — Zero congestion around Museum of the Future)
     const createDune = (x: number, z: number, r: number, h: number) => {
       const d = new THREE.Mesh(new THREE.ConeGeometry(r, h, 14), sharedDuneMat);
-      d.position.set(x, h / 2, z); d.scale.set(1.5, 0.45, 1.1);
+      d.position.set(x, h / 2, z); d.scale.set(1.4, 0.45, 1.1);
       d.receiveShadow = true; d.castShadow = true;
       return d;
     };
-    scene.add(createDune(-45, -50, 20, 5.5), createDune(-40, -70, 24, 7.0),
-               createDune(-55,  35, 22, 6.0), createDune(-60, -25, 26, 7.5));
+    scene.add(
+      createDune(-58, -45, 18, 5.0),
+      createDune(-52, -75, 22, 6.5),
+      createDune(-65, -30, 20, 6.0),
+      createDune(-64, -65, 24, 7.0)
+    );
 
     // 8. ROAD NETWORK
     const createRoad = (w: number, d: number, x: number, z: number, rotY = 0) => {
@@ -517,6 +521,12 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     motfGroup.position.set(-35, 0, 15); motfGroup.rotation.y = Math.PI / 4;
     scene.add(motfGroup);
 
+    // Innovation Plaza Promenade around MOTF
+    const motfPlaza = new THREE.Mesh(new THREE.BoxGeometry(26, 0.12, 24), new THREE.MeshLambertMaterial({ color: '#1E293B' }));
+    motfPlaza.position.set(-35, 0.06, 15);
+    motfPlaza.receiveShadow = true;
+    scene.add(motfPlaza);
+
     // e) AIN DUBAI FERRIS WHEEL
     const ainGroup = new THREE.Group();
     const pylonGeo = new THREE.CylinderGeometry(0.4, 0.7, 24, 8);
@@ -560,12 +570,84 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const archTop = new THREE.Mesh(new THREE.BoxGeometry(8, 0.8, 1.2), sharedWoodMat); archTop.position.set(-7, 3.8, 19); soukGroup.add(archTop);
     scene.add(soukGroup);
 
-    // g) BEDOUIN DESERT CAMP
+    // g) BEDOUIN DESERT CAMP (100% Solid Grounded Dune Plateau & Authentic Majlis)
     const campGroup = new THREE.Group();
-    const tentRoof = new THREE.Mesh(new THREE.ConeGeometry(4.5, 2.4, 4), new THREE.MeshLambertMaterial({ color: '#451A03' }));
-    tentRoof.position.set(-50, 4.4, -55); tentRoof.rotation.y = Math.PI / 4; tentRoof.castShadow = true; campGroup.add(tentRoof);
-    const fireBase = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.2, 8), sharedRoadMat); fireBase.position.set(-47, 3.3, -51); campGroup.add(fireBase);
-    const flameMesh = new THREE.Mesh(new THREE.ConeGeometry(0.4, 0.9, 6), new THREE.MeshBasicMaterial({ color: '#F97316' })); flameMesh.position.set(-47, 3.8, -51); campGroup.add(flameMesh);
+    // 1. Solid Dune Plateau Base (elevation y = 2.15)
+    const campPlateau = new THREE.Mesh(
+      new THREE.CylinderGeometry(9.0, 10.5, 0.4, 24),
+      sharedSandMat
+    );
+    campPlateau.position.set(-52, 2.15, -58);
+    campPlateau.receiveShadow = true;
+    campGroup.add(campPlateau);
+
+    // 2. Traditional Goat-Hair Tent (Beit al-Sha'ar)
+    const tentRoofMat = new THREE.MeshLambertMaterial({ color: '#271B12' }); // Rich woven goat hair
+    const tentRoof = new THREE.Mesh(new THREE.BoxGeometry(7.2, 0.22, 5.6), tentRoofMat);
+    tentRoof.position.set(-52, 4.25, -59.5);
+    tentRoof.castShadow = true;
+    campGroup.add(tentRoof);
+
+    // Four solid timber support poles running from ground up to roof
+    const poleGeo = new THREE.CylinderGeometry(0.12, 0.12, 1.95, 6);
+    const poleCoords = [
+      [-55.2, -62.0], [ -48.8, -62.0],
+      [-55.2, -57.0], [ -48.8, -57.0]
+    ];
+    poleCoords.forEach(([px, pz]) => {
+      const pole = new THREE.Mesh(poleGeo, sharedWoodMat);
+      pole.position.set(px, 3.25, pz);
+      pole.castShadow = true;
+      campGroup.add(pole);
+    });
+
+    // Rear windbreak woven fabric wall
+    const tentFabricMat = new THREE.MeshLambertMaterial({ color: '#7F1D1D' }); // Deep Bedouin maroon
+    const rearWall = new THREE.Mesh(new THREE.BoxGeometry(6.6, 1.9, 0.12), tentFabricMat);
+    rearWall.position.set(-52, 3.25, -62.0);
+    rearWall.castShadow = true;
+    const sideWall = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.9, 5.0), tentFabricMat);
+    sideWall.position.set(-55.2, 3.25, -59.5);
+    sideWall.castShadow = true;
+    campGroup.add(rearWall, sideWall);
+
+    // 3. Woven Arabian Floor Carpet & Majlis Cushions
+    const carpetMat = new THREE.MeshLambertMaterial({ color: '#991B1B' });
+    const carpet = new THREE.Mesh(new THREE.BoxGeometry(6.2, 0.06, 4.6), carpetMat);
+    carpet.position.set(-52, 2.38, -59.5);
+    carpet.receiveShadow = true;
+    campGroup.add(carpet);
+
+    const cushionGeo = new THREE.BoxGeometry(1.4, 0.35, 0.65);
+    const cushionMat = new THREE.MeshLambertMaterial({ color: '#DC2626' });
+    const c1 = new THREE.Mesh(cushionGeo, cushionMat); c1.position.set(-54.0, 2.52, -59.5); c1.rotation.y = Math.PI / 2;
+    const c2 = new THREE.Mesh(cushionGeo, cushionMat); c2.position.set(-52.0, 2.52, -61.2);
+    const c3 = new THREE.Mesh(cushionGeo, cushionMat); c3.position.set(-50.0, 2.52, -59.5); c3.rotation.y = Math.PI / 2;
+    campGroup.add(c1, c2, c3);
+
+    // Brass Dallah coffee table
+    const tableMat = new THREE.MeshLambertMaterial({ color: '#D97706' });
+    const coffeeTable = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 0.25, 12), tableMat);
+    coffeeTable.position.set(-52, 2.48, -59.0);
+    const dallah = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.2, 0.55, 8), sharedGoldMat);
+    dallah.position.set(-52, 2.85, -59.0);
+    campGroup.add(coffeeTable, dallah);
+
+    // 4. Stone Campfire Fire-pit (sitting firmly on the ground)
+    const fireBase = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.22, 8, 14), sharedBuildingMat);
+    fireBase.rotation.x = Math.PI / 2;
+    fireBase.position.set(-52, 2.38, -54.5);
+    const coals = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.1, 8), sharedRoadMat);
+    coals.position.set(-52, 2.38, -54.5);
+    const flameMesh = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.0, 6), new THREE.MeshBasicMaterial({ color: '#F97316' }));
+    flameMesh.position.set(-52, 2.85, -54.5);
+    campGroup.add(fireBase, coals, flameMesh);
+
+    // 5. Wooden Camel Hitching Post
+    const hitchPost1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.6, 6), sharedWoodMat); hitchPost1.position.set(-45, 3.1, -55.5);
+    const hitchPost2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.6, 6), sharedWoodMat); hitchPost2.position.set(-45, 3.1, -58.5);
+    const hitchBeam  = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 3.4), sharedWoodMat); hitchBeam.position.set(-45, 3.7, -57.0);
+    campGroup.add(hitchPost1, hitchPost2, hitchBeam);
     scene.add(campGroup);
 
     // h) MIRACLE OASIS & FOUNTAIN
@@ -580,6 +662,104 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const bArch2 = new THREE.Mesh(new THREE.TorusGeometry(3.5, 0.5, 8, 20), new THREE.MeshLambertMaterial({ color: '#FBBF24' })); bArch2.position.set(56, 2.8, -35); bArch2.rotation.y = Math.PI / 2;
     oasisGroup.add(bArch1, bArch2);
     scene.add(oasisGroup);
+
+    // i) AL QASBA WATERFRONT CANAL DISTRICT
+    const qasbaGroup = new THREE.Group();
+
+    // 1. Turquoise Canal Water Channel (running East-West between x: -52 and -8 at z: 65)
+    const qasbaWaterMat = new THREE.MeshLambertMaterial({ color: '#06B6D4', transparent: true, opacity: 0.88 });
+    const qasbaWater = new THREE.Mesh(new THREE.PlaneGeometry(44, 12), qasbaWaterMat);
+    qasbaWater.rotation.x = -Math.PI / 2;
+    qasbaWater.position.set(-30, 0.05, 65);
+    qasbaGroup.add(qasbaWater);
+
+    // Stone quayside coping curbs along the canal edges
+    const qQuayGeo = new THREE.BoxGeometry(44, 0.35, 1.2);
+    const quayNorth = new THREE.Mesh(qQuayGeo, sharedBuildingMat); quayNorth.position.set(-30, 0.18, 58.5);
+    const quaySouth = new THREE.Mesh(qQuayGeo, sharedBuildingMat); quaySouth.position.set(-30, 0.18, 71.5);
+    qasbaGroup.add(quayNorth, quaySouth);
+
+    // 2. North & South Waterfront Promenades (Paved pedestrian walkways)
+    const promenadeMat = new THREE.MeshLambertMaterial({ color: '#F1F5F9' });
+    const promNorth = new THREE.Mesh(new THREE.BoxGeometry(44, 0.25, 7.5), promenadeMat);
+    promNorth.position.set(-30, 0.12, 54.5);
+    promNorth.receiveShadow = true;
+    const promSouth = new THREE.Mesh(new THREE.BoxGeometry(44, 0.25, 7.5), promenadeMat);
+    promSouth.position.set(-30, 0.12, 75.5);
+    promSouth.receiveShadow = true;
+    qasbaGroup.add(promNorth, promSouth);
+
+    // 3. Twin Venetian Arch Footbridges (West at x: -40, East at x: -20)
+    const createQasbaBridge = (bx: number) => {
+      const bg = new THREE.Group();
+      const bSegs = 14;
+      for (let s = 0; s <= bSegs; s++) {
+        const prog = s / bSegs;
+        const bz = 58 + prog * 14.0;
+        const by = 0.25 + Math.sin(prog * Math.PI) * 2.0;
+        const step = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.3, 14.0 / bSegs + 0.1), sharedWoodMat);
+        step.position.set(bx, by, bz);
+        step.castShadow = true; step.receiveShadow = true;
+        bg.add(step);
+
+        // Railings
+        if (s % 2 === 0) {
+          for (const rx of [-1.75, 1.75]) {
+            const rPost = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.1, 6), sharedGoldMat);
+            rPost.position.set(bx + rx, by + 0.6, bz);
+            bg.add(rPost);
+          }
+        }
+      }
+      return bg;
+    };
+    qasbaGroup.add(createQasbaBridge(-40), createQasbaBridge(-20));
+
+    // 4. Canal-side Outdoor Café Bistros (parasols & tables)
+    const parasolColors = ['#DC2626', '#2563EB', '#F59E0B', '#10B981'];
+    const cafePositions: [number, number, number][] = [
+      [-46, 54.5, 0], [-34, 54.5, 1],
+      [-46, 75.5, 2], [-34, 75.5, 3]
+    ];
+    cafePositions.forEach(([cx, cz, colorIdx]) => {
+      const tbl = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.7, 10), sharedWoodMat);
+      tbl.position.set(cx, 0.45, cz);
+      const pPole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.6, 6), sharedGoldMat);
+      pPole.position.set(cx, 1.4, cz);
+      const pTop  = new THREE.Mesh(new THREE.ConeGeometry(1.6, 0.65, 8), new THREE.MeshLambertMaterial({ color: parasolColors[colorIdx] }));
+      pTop.position.set(cx, 2.5, cz);
+      qasbaGroup.add(tbl, pPole, pTop);
+    });
+
+    // 5. Al Qasba Moorish Cultural Pavilion (facing the canal at x: -30, z: 81)
+    const pavBase = new THREE.Mesh(new THREE.BoxGeometry(14, 4.6, 7.5), sharedBuildingMat);
+    pavBase.position.set(-30, 2.3, 81.5);
+    pavBase.castShadow = true; pavBase.receiveShadow = true;
+    for (const ax of [-4.0, 0, 4.0]) {
+      const arch = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.25, 8, 16), sharedGoldMat);
+      arch.position.set(-30 + ax, 3.0, 77.8);
+      qasbaGroup.add(arch);
+    }
+    const pavDome = new THREE.Mesh(
+      new THREE.SphereGeometry(2.4, 16, 12),
+      new THREE.MeshLambertMaterial({ color: '#06B6D4' })
+    );
+    pavDome.position.set(-30, 5.8, 81.5);
+    pavDome.castShadow = true;
+    qasbaGroup.add(pavBase, pavDome);
+
+    // 6. Moored Traditional Abras in Canal Water
+    const createMooredAbra = (mx: number, mz: number, rotY: number) => {
+      const ag = new THREE.Group();
+      const hull = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.45, 5.0), sharedWoodMat); hull.position.y = 0.22; ag.add(hull);
+      const canopy = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.1, 4.0), sharedGoldMat); canopy.position.y = 1.25; ag.add(canopy);
+      ag.position.set(mx, 0, mz);
+      ag.rotation.y = rotY;
+      return ag;
+    };
+    qasbaGroup.add(createMooredAbra(-32, 63.5, 0.1), createMooredAbra(-26, 66.5, -0.15));
+
+    scene.add(qasbaGroup);
 
     // 13. AL FAHIDI HISTORIC DISTRICT
     const obsBase  = new THREE.Mesh(new THREE.BoxGeometry(10, 5.5, 12), sharedBuildingMat); obsBase.position.set(-16, 2.75, -18); obsBase.castShadow = true; obsBase.receiveShadow = true; scene.add(obsBase);
@@ -814,6 +994,20 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         const t = (px - 7.5) / 37.0;
         return 0.4 + Math.sin(t * Math.PI) * 3.2;
       }
+      // Al Qasba West Venetian Arch Footbridge (x: -40, z in [58, 72])
+      if (Math.abs(px - (-40)) <= 2.2 && pz >= 58 && pz <= 72) {
+        const t = (pz - 58) / 14.0;
+        return 0.25 + Math.sin(t * Math.PI) * 2.0;
+      }
+      // Al Qasba East Venetian Arch Footbridge (x: -20, z in [58, 72])
+      if (Math.abs(px - (-20)) <= 2.2 && pz >= 58 && pz <= 72) {
+        const t = (pz - 58) / 14.0;
+        return 0.25 + Math.sin(t * Math.PI) * 2.0;
+      }
+      // Al Qasba Waterfront Promenades (North & South)
+      if (px >= -52 && px <= -8 && ((pz >= 50 && pz <= 58.5) || (pz >= 71.5 && pz <= 84))) {
+        return 0.2;
+      }
       // Wind-Tower Rooftop Observatory deck
       if (px >= -21 && px <= -11 && pz >= -24 && pz <= -12) return 5.65;
       // Observatory ramp
@@ -821,8 +1015,14 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         const prog = (-9 - px) / 7.0;
         return Math.max(0, Math.min(5.65, prog * 5.65));
       }
-      // Western sand dunes
-      if (px <= -30 && pz <= -35) return Math.max(0, ((-30 - px) / 20.0) * 2.8);
+      // Bedouin Desert Camp Dune Plateau (zero floating)
+      if (Math.hypot(px - (-52), pz - (-58)) <= 9.2) {
+        return 2.3;
+      }
+      // Western sand dunes reserve
+      if (px <= -38 && pz <= -28) {
+        return Math.max(0, ((-38 - px) / 18.0) * 2.3);
+      }
       return 0;
     };
 
@@ -860,7 +1060,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       { cx: 40,  cz:  25, r: 5.8 }, // Burj Al Arab Tower & Spinnaker Sail
       { cx: -35, cz:  15, r: 8.0 }, // Museum of the Future Torus Ring
       { cx: 55,  cz:  50, r: 5.2 }, // Ain Dubai Base & Support Legs
-      { cx: -50, cz: -55, r: 4.8 }, // Bedouin Desert Camp Majlis Tent
+      { cx: -52, cz: -58, r: 4.8 }, // Bedouin Desert Camp Majlis Tent
       { cx: 50,  cz: -35, r: 5.0 }, // Miracle Oasis Fountain Basin
     ];
 
@@ -883,6 +1083,9 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       // Spice & Gold Souk Bazaar Stalls
       { minX: -12.5, maxX:  -1.5, minZ:  22.5, maxZ:  25.5 }, // North stall row
       { minX: -12.5, maxX:  -1.5, minZ:  30.5, maxZ:  33.5 }, // South stall row
+
+      // Al Qasba Moorish Cultural Pavilion
+      { minX: -37.0, maxX: -23.0, minZ:  78.0, maxZ:  85.0 },
     ];
 
     const animate = () => {
@@ -950,17 +1153,31 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       playerGroup.position.x = Math.max(-70, Math.min(75, playerGroup.position.x));
       playerGroup.position.z = Math.max(-95, Math.min(95, playerGroup.position.z));
 
-      // Water boundary — Khor Dubai canal only occupies z in [-35.5, 40.5]
-      const inWater    = playerGroup.position.x > 8.8 && playerGroup.position.x < 43.2 && playerGroup.position.z >= -35.5 && playerGroup.position.z <= 40.5;
-      const onBridge   = Math.abs(playerGroup.position.z) <= 4.8;
-      const onBaaIsland = playerGroup.position.x >= 28 && playerGroup.position.z >= 12 && playerGroup.position.z <= 38;
-      if (inWater && !onBridge && !onBaaIsland) {
+      // Water boundaries:
+      // 1. Khor Dubai canal waterway (z: -35.5 to 40.5)
+      const inCreekWater = playerGroup.position.x > 8.8 && playerGroup.position.x < 43.2 && playerGroup.position.z >= -35.5 && playerGroup.position.z <= 40.5;
+      const onBridge     = Math.abs(playerGroup.position.z) <= 4.8;
+      const onBaaIsland  = playerGroup.position.x >= 28 && playerGroup.position.z >= 12 && playerGroup.position.z <= 38;
+      if (inCreekWater && !onBridge && !onBaaIsland) {
         if (playerGroup.position.x < 26) {
           playerGroup.position.x = 8.6;
           velocity.x = 0;
         } else {
           playerGroup.position.x = 43.4;
           velocity.x = 0;
+        }
+      }
+
+      // 2. Al Qasba Waterfront Canal (z: 59.2 to 70.8, x: -52 to -8)
+      const inQasbaWater = playerGroup.position.x >= -52 && playerGroup.position.x <= -8 && playerGroup.position.z > 59.2 && playerGroup.position.z < 70.8;
+      const onQasbaBridge = (Math.abs(playerGroup.position.x - (-40)) <= 2.2 || Math.abs(playerGroup.position.x - (-20)) <= 2.2) && playerGroup.position.z >= 58 && playerGroup.position.z <= 72;
+      if (inQasbaWater && !onQasbaBridge) {
+        if (playerGroup.position.z < 65) {
+          playerGroup.position.z = 58.8;
+          velocity.z = 0;
+        } else {
+          playerGroup.position.z = 71.2;
+          velocity.z = 0;
         }
       }
 
@@ -1117,7 +1334,7 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       creekMat.opacity = 0.86 + Math.sin(time * 2) * 0.05;
       abra1.position.y = Math.sin(time * 2) * 0.08;     abra1.rotation.z = Math.sin(time * 1.5) * 0.04;
       abra2.position.y = Math.sin(time * 2 + 1) * 0.08; abra2.rotation.z = Math.sin(time * 1.5 + 1) * 0.04;
-      flameMesh.position.y = -47 * 0 + 3.8 + Math.sin(time * 12) * 0.08; // campfire flicker
+      flameMesh.position.y = 2.85 + Math.sin(time * 12) * 0.08; // campfire flicker grounded on coals
 
       // Star twinkling at night
       if (starMat.opacity > 0) {

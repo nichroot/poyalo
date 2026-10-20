@@ -127,10 +127,22 @@ export const WORLD_LANDMARKS: WorldLandmark[] = [
     district: 'Western Desert Dunes',
     emoji: '⛺',
     description: 'Traditional nomadic desert camp nestled in red sand dunes with woven tent, campfire glow, and camel hitch.',
-    coords: { x: -50, y: 3.2, z: -55 },
+    coords: { x: -52, y: 2.3, z: -58 },
     color: '#D97706',
     badge: 'OASIS CAMP',
     tags: ['desert', 'dune', 'camp', 'bedouin', 'oasis', 'tent', 'fire', 'sand']
+  },
+  {
+    id: 'qasba-canal',
+    name: 'Al Qasba Waterfront Canal',
+    category: 'leisure',
+    district: 'Al Qasba Cultural District',
+    emoji: '🛶',
+    description: 'Venetian-style turquoise canal spanned by twin pedestrian footbridges, waterfront café terraces, and Moorish pavilion.',
+    coords: { x: -30, y: 0.6, z: 65 },
+    color: '#06B6D4',
+    badge: 'CANAL PROMENADE',
+    tags: ['qasba', 'canal', 'venetian', 'bridges', 'sharjah', 'waterfront', 'cafe', 'promenade']
   },
   {
     id: 'miracle-oasis',

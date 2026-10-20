@@ -107,7 +107,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           <div className="flex items-center space-x-1" title="Landmarks Discovered">
             <span className="text-xs">📍</span>
             <span className="font-mono font-black text-xs text-[#10B981]">
-              {discoveredLandmarksCount}/9
+              {discoveredLandmarksCount}/{WORLD_LANDMARKS.filter(l => l.category !== 'interactive').length}
             </span>
           </div>
         </div>
@@ -208,6 +208,17 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           }}
         />
 
+        {/* Al Qasba Waterfront Canal strip */}
+        <div 
+          className="absolute bg-[#06B6D4]/50 border border-[#0891B2]/70 rounded pointer-events-none"
+          style={{
+            left: `${getRadarX(-52)}%`,
+            width: `${getRadarX(-8) - getRadarX(-52)}%`,
+            top: `${getRadarY(59)}%`,
+            height: `${getRadarY(71) - getRadarY(59)}%`
+          }}
+        />
+
         {/* Downtown Burj Khalifa Plaza indicator (Dry land) */}
         <div
           className="absolute bg-amber-400/20 border border-dashed border-amber-500/40 rounded pointer-events-none"
@@ -230,7 +241,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         />
 
         {/* Landmarks dots */}
-        {WORLD_LANDMARKS.slice(0, 8).map(lm => {
+        {WORLD_LANDMARKS.filter(lm => lm.category !== 'interactive').map(lm => {
           const lx = getRadarX(lm.coords.x);
           const ly = getRadarY(lm.coords.z);
           return (
