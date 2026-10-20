@@ -124,6 +124,9 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
   const collectedIdsRef = useRef<Set<string>>(new Set()); // authoritative source for what's been collected
   const boostPadCooldownRef = useRef<{ [k: string]: number }>({}); // per-pad boost cooldown timestamps
   const respawnTimersRef = useRef<{ [id: string]: number }>({}); // timestamps for 45s secret loot respawns
+  const lastNearbyRef = useRef<string | undefined>(undefined);
+  const lastCoordsRef = useRef<{ x: number; z: number }>({ x: 0, z: 0 });
+  const lastWaypointDistRef = useRef<number>(-1);
 
   // Badge ref — avoid stale closure issue
   const activeBadgeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -198,11 +201,15 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
 
     // 3. RENDERER
     const isMobile = width < 768;
-    const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: !isMobile,
+      powerPreference: 'high-performance',
+      precision: isMobile ? 'mediump' : 'highp'
+    });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.75));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap; // Clean, high-performance neo-brutalist shadows (zero soft blur lag)
     container.appendChild(renderer.domElement);
 
     // 4. LIGHTING
@@ -215,13 +222,13 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     sunLight.position.set(45, 55, 30);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.set(isMobile ? 512 : 1024, isMobile ? 512 : 1024);
-    sunLight.shadow.camera.near   =  0.5;
-    sunLight.shadow.camera.far    =  340;
-    sunLight.shadow.camera.left   = -110;
-    sunLight.shadow.camera.right  =  110;
-    sunLight.shadow.camera.top    =  110;
-    sunLight.shadow.camera.bottom = -110;
-    sunLight.shadow.bias = -0.0004;
+    sunLight.shadow.camera.near   =  10;
+    sunLight.shadow.camera.far    =  190;
+    sunLight.shadow.camera.left   = -100;
+    sunLight.shadow.camera.right  =  100;
+    sunLight.shadow.camera.top    =  100;
+    sunLight.shadow.camera.bottom = -100;
+    sunLight.shadow.bias = -0.0005;
     scene.add(sunLight);
 
     // Night point lights
@@ -714,27 +721,30 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
 
     // 20. COLLECTIBLE 3D MESHES
     const collectibleMeshes: { [id: string]: THREE.Group } = {};
-    const collectibleRingMats: { [id: string]: THREE.MeshLambertMaterial } = {};
+    const sharedRingMat = new THREE.MeshLambertMaterial({
+      color: '#FBBF24',
+      emissive: '#F59E0B',
+      emissiveIntensity: 0.5
+    });
+    const ringGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.05, 12);
 
     INITIAL_VG_WORLD_COLLECTIBLES.forEach(item => {
       const cg = new THREE.Group();
       let mesh: THREE.Mesh;
       if (item.type === 'pearl') {
-        mesh = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 14), new THREE.MeshLambertMaterial({ color: '#E0F2FE', emissive: '#38BDF8', emissiveIntensity: 0.25 }));
+        mesh = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), new THREE.MeshLambertMaterial({ color: '#E0F2FE', emissive: '#38BDF8', emissiveIntensity: 0.25 }));
       } else if (item.type === 'coin') {
-        mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.1, 14), new THREE.MeshLambertMaterial({ color: '#FBBF24', emissive: '#D97706', emissiveIntensity: 0.35 }));
+        mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.1, 12), new THREE.MeshLambertMaterial({ color: '#FBBF24', emissive: '#D97706', emissiveIntensity: 0.35 }));
         mesh.rotation.x = Math.PI / 2;
       } else {
         mesh = new THREE.Mesh(new THREE.DodecahedronGeometry(0.38), new THREE.MeshLambertMaterial({ color: item.color, emissive: item.color, emissiveIntensity: 0.2 }));
       }
       mesh.castShadow = true; cg.add(mesh);
-      const ringMat = new THREE.MeshLambertMaterial({ color: '#FBBF24', emissive: '#F59E0B', emissiveIntensity: 0.5 });
-      const ringMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.05, 14), ringMat);
+      const ringMesh = new THREE.Mesh(ringGeo, sharedRingMat);
       ringMesh.position.y = 0.03; cg.add(ringMesh);
       cg.position.set(item.x, item.y, item.z);
       scene.add(cg);
-      collectibleMeshes[item.id]  = cg;
-      collectibleRingMats[item.id] = ringMat;
+      collectibleMeshes[item.id] = cg;
     });
 
     // 21. CAMERA DRAG — pointer events on canvas only
@@ -841,6 +851,40 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
     const discoveredSet = new Set<string>();
     let lastCoordsUpdate = 0;
 
+    const targetVel = new THREE.Vector3();
+    const velDiff   = new THREE.Vector3();
+
+    // SOLID OBSTACLES (Exact Coordinates for all landmarks, buildings, houses, and market stalls)
+    const SOLID_CYLINDERS = [
+      { cx: 28,  cz: -55, r: 6.2 }, // Burj Khalifa Downtown Base
+      { cx: 40,  cz:  25, r: 5.8 }, // Burj Al Arab Tower & Spinnaker Sail
+      { cx: -35, cz:  15, r: 8.0 }, // Museum of the Future Torus Ring
+      { cx: 55,  cz:  50, r: 5.2 }, // Ain Dubai Base & Support Legs
+      { cx: -50, cz: -55, r: 4.8 }, // Bedouin Desert Camp Majlis Tent
+      { cx: 50,  cz: -35, r: 5.0 }, // Miracle Oasis Fountain Basin
+    ];
+
+    const SOLID_BOXES = [
+      // Dubai Frame: West Pillar & East Pillar (open passage in between!)
+      { minX: -33.5, maxX: -30.5, minZ: -36.5, maxZ: -33.5 },
+      { minX: -19.5, maxX: -16.5, minZ: -36.5, maxZ: -33.5 },
+
+      // Al Fahidi 4 Historic Houses
+      { minX: -24.0, maxX: -12.0, minZ:   0.5, maxZ:  15.5 }, // House 1 (-18, 8)
+      { minX: -10.5, maxX:  -1.5, minZ: -31.0, maxZ: -21.0 }, // House 2 (-6, -26)
+      { minX:  -7.5, maxX:   3.5, minZ:  16.0, maxZ:  28.0 }, // House 3 (-2, 22)
+      { minX: -34.5, maxX: -21.5, minZ: -12.5, maxZ:   0.5 }, // House 4 (-28, -6)
+
+      // Al Fahidi Observatory Base Walls (leaves ramp corridor open at z: -19.5 to -16.5)
+      { minX: -21.5, maxX: -16.0, minZ: -24.5, maxZ: -11.5 }, // West section
+      { minX: -16.0, maxX: -10.5, minZ: -24.5, maxZ: -19.5 }, // North-East wall
+      { minX: -16.0, maxX: -10.5, minZ: -16.5, maxZ: -11.5 }, // South-East wall
+
+      // Spice & Gold Souk Bazaar Stalls
+      { minX: -12.5, maxX:  -1.5, minZ:  22.5, maxZ:  25.5 }, // North stall row
+      { minX: -12.5, maxX:  -1.5, minZ:  30.5, maxZ:  33.5 }, // South stall row
+    ];
+
     const animate = () => {
       animFrameId = requestAnimationFrame(animate);
       const delta = Math.min(clock.getDelta(), 0.033);
@@ -879,7 +923,6 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       let inputY = joyY + keyY;
       const inputLen = Math.hypot(inputX, inputY);
 
-      const targetVel = new THREE.Vector3();
       if (inputLen > 0.05) {
         const normX = inputX / Math.max(1, inputLen);
         const normY = inputY / Math.max(1, inputLen);
@@ -888,15 +931,18 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         const worldX = normX * rgtX + normY * fwdX;
         const worldZ = normX * rgtZ + normY * fwdZ;
         targetVel.set(worldX, 0, worldZ).multiplyScalar(currentMaxSpeed * Math.min(1, inputLen));
+      } else {
+        targetVel.set(0, 0, 0);
       }
 
-      // Smooth horizontal velocity
+      // Smooth horizontal velocity (reusing vectors to avoid GC pressure)
       const rate = targetVel.lengthSq() > 0 ? accelRate : decelRate;
-      const diff = targetVel.clone().sub(velocity);
-      if (diff.length() <= rate * delta) {
+      velDiff.copy(targetVel).sub(velocity);
+      const diffLen = velDiff.length();
+      if (diffLen <= rate * delta) {
         velocity.copy(targetVel);
       } else {
-        velocity.add(diff.normalize().multiplyScalar(rate * delta));
+        velocity.addScaledVector(velDiff.divideScalar(diffLen), rate * delta);
       }
       playerGroup.position.addScaledVector(velocity, delta);
 
@@ -918,78 +964,61 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         }
       }
 
-      // SOLID OBSTACLES COLLISION RESOLVER (No more phasing through buildings!)
+      // SOLID OBSTACLES COLLISION RESOLVER (2-iteration solver guarantees zero building phasing)
       const pRadius = 0.6;
-      const cylinderObstacles = [
-        { cx: 28, cz: -55, r: 6.0 },   // Burj Khalifa Downtown Base
-        { cx: -7, cz: -40, r: 1.8 },   // Dubai Frame West Pillar
-        { cx: 7, cz: -40, r: 1.8 },    // Dubai Frame East Pillar
-        { cx: 38, cz: 25, r: 5.5 },    // Burj Al Arab Tower & Spinnaker Sail
-        { cx: 15, cz: -22, r: 7.0 },   // Museum of the Future Torus Ring
-        { cx: 50, cz: 55, r: 4.2 },    // Ain Dubai Base & Support Legs
-        { cx: -42, cz: -45, r: 4.0 },  // Desert Camp Majlis & Bedouin Tents
-        { cx: -48, cz: 20, r: 3.2 },   // Desert Oasis Fountain Basin
-      ];
-
-      for (let i = 0; i < cylinderObstacles.length; i++) {
-        const obs = cylinderObstacles[i];
-        const dx = playerGroup.position.x - obs.cx;
-        const dz = playerGroup.position.z - obs.cz;
-        const dist = Math.hypot(dx, dz);
-        const minDist = obs.r + pRadius;
-        if (dist < minDist && dist > 0.0001) {
-          const overlap = minDist - dist;
-          const nx = dx / dist;
-          const nz = dz / dist;
-          playerGroup.position.x += nx * overlap;
-          playerGroup.position.z += nz * overlap;
-          const dot = velocity.x * nx + velocity.z * nz;
-          if (dot < 0) {
-            velocity.x -= dot * nx;
-            velocity.z -= dot * nz;
+      for (let iter = 0; iter < 2; iter++) {
+        // Cylinders (Burj Khalifa, Burj Al Arab, MOTF, Ain Dubai, Desert Camp, Oasis)
+        for (let i = 0; i < SOLID_CYLINDERS.length; i++) {
+          const obs = SOLID_CYLINDERS[i];
+          const dx = playerGroup.position.x - obs.cx;
+          const dz = playerGroup.position.z - obs.cz;
+          const distSq = dx * dx + dz * dz;
+          const minDist = obs.r + pRadius;
+          if (distSq < minDist * minDist && distSq > 0.0001) {
+            const dist = Math.sqrt(distSq);
+            const overlap = minDist - dist;
+            const nx = dx / dist;
+            const nz = dz / dist;
+            playerGroup.position.x += nx * overlap;
+            playerGroup.position.z += nz * overlap;
+            const dot = velocity.x * nx + velocity.z * nz;
+            if (dot < 0) {
+              velocity.x -= dot * nx;
+              velocity.z -= dot * nz;
+            }
           }
         }
-      }
 
-      // Box colliders (Al Fahidi Historic Buildings & Souk stalls)
-      // Only active if player is below rooftop level
-      if (playerY < 4.2) {
-        const boxObstacles = [
-          // Al Fahidi building block (excluding ramp corridor)
-          { minX: -21.5, maxX: -16.5, minZ: -24.5, maxZ: -11.5 },
-          { minX: -16.5, maxX: -10.5, minZ: -24.5, maxZ: -19.5 },
-          { minX: -16.5, maxX: -10.5, minZ: -16.5, maxZ: -11.5 },
-          // Old Souk Spice & Textile Bazaar stalls
-          { minX: -18.0, maxX: -12.0, minZ: 12.0, maxZ: 18.0 }
-        ];
-
-        for (let i = 0; i < boxObstacles.length; i++) {
-          const b = boxObstacles[i];
-          const px = playerGroup.position.x;
-          const pz = playerGroup.position.z;
-          if (
-            px > b.minX - pRadius &&
-            px < b.maxX + pRadius &&
-            pz > b.minZ - pRadius &&
-            pz < b.maxZ + pRadius
-          ) {
-            const dLeft = px - (b.minX - pRadius);
-            const dRight = (b.maxX + pRadius) - px;
-            const dTop = pz - (b.minZ - pRadius);
-            const dBottom = (b.maxZ + pRadius) - pz;
-            const minPen = Math.min(dLeft, dRight, dTop, dBottom);
-            if (minPen === dLeft) {
-              playerGroup.position.x = b.minX - pRadius;
-              if (velocity.x > 0) velocity.x = 0;
-            } else if (minPen === dRight) {
-              playerGroup.position.x = b.maxX + pRadius;
-              if (velocity.x < 0) velocity.x = 0;
-            } else if (minPen === dTop) {
-              playerGroup.position.z = b.minZ - pRadius;
-              if (velocity.z > 0) velocity.z = 0;
-            } else {
-              playerGroup.position.z = b.maxZ + pRadius;
-              if (velocity.z < 0) velocity.z = 0;
+        // Box Colliders (Dubai Frame pillars, 4 Al Fahidi houses, Souk stalls, Observatory base)
+        if (playerY < 4.5) {
+          for (let i = 0; i < SOLID_BOXES.length; i++) {
+            const b = SOLID_BOXES[i];
+            const px = playerGroup.position.x;
+            const pz = playerGroup.position.z;
+            if (
+              px > b.minX - pRadius &&
+              px < b.maxX + pRadius &&
+              pz > b.minZ - pRadius &&
+              pz < b.maxZ + pRadius
+            ) {
+              const dLeft   = px - (b.minX - pRadius);
+              const dRight  = (b.maxX + pRadius) - px;
+              const dTop    = pz - (b.minZ - pRadius);
+              const dBottom = (b.maxZ + pRadius) - pz;
+              const minPen = Math.min(dLeft, dRight, dTop, dBottom);
+              if (minPen === dLeft) {
+                playerGroup.position.x = b.minX - pRadius;
+                if (velocity.x > 0) velocity.x = 0;
+              } else if (minPen === dRight) {
+                playerGroup.position.x = b.maxX + pRadius;
+                if (velocity.x < 0) velocity.x = 0;
+              } else if (minPen === dTop) {
+                playerGroup.position.z = b.minZ - pRadius;
+                if (velocity.z > 0) velocity.z = 0;
+              } else {
+                playerGroup.position.z = b.maxZ + pRadius;
+                if (velocity.z < 0) velocity.z = 0;
+              }
             }
           }
         }
@@ -1104,25 +1133,31 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         diamondMesh.position.y = 12 + Math.sin(time * 3) * 1.5;
         beamMat.opacity = 0.35 + Math.sin(time * 4) * 0.15;
         const distToWp = Math.round(Math.hypot(playerGroup.position.x - wp.coords.x, playerGroup.position.z - wp.coords.z));
-        setWaypointDistance(distToWp);
+        if (distToWp !== lastWaypointDistRef.current) {
+          lastWaypointDistRef.current = distToWp;
+          setWaypointDistance(distToWp);
+        }
       } else {
         wpGroup.visible = false;
       }
 
-      // LANDMARK DISCOVERY (+150 XP each, once)
-      WORLD_LANDMARKS.forEach(lm => {
-        if (discoveredSet.has(lm.id)) return;
-        const d = Math.hypot(playerGroup.position.x - lm.coords.x, playerGroup.position.z - lm.coords.z);
-        if (d <= 9.5) {
-          discoveredSet.add(lm.id);
-          playSoundEffect('chest');
-          showBadge(`DISCOVERED: ${lm.name.toUpperCase()}!`, lm.emoji || '📍');
-          scoreRef.current += 150;
-          setScore(scoreRef.current);
-          setDiscoveredLandmarks(prev => [...prev, lm.id]);
-          if (onScoreUpdateRef.current) onScoreUpdateRef.current(scoreRef.current, collectedIdsRef.current.size);
+      // LANDMARK DISCOVERY (+150 XP each, once) — skip loop if all discovered
+      if (discoveredSet.size < WORLD_LANDMARKS.length) {
+        for (let i = 0; i < WORLD_LANDMARKS.length; i++) {
+          const lm = WORLD_LANDMARKS[i];
+          if (discoveredSet.has(lm.id)) continue;
+          const d = Math.hypot(playerGroup.position.x - lm.coords.x, playerGroup.position.z - lm.coords.z);
+          if (d <= 9.5) {
+            discoveredSet.add(lm.id);
+            playSoundEffect('chest');
+            showBadge(`DISCOVERED: ${lm.name.toUpperCase()}!`, lm.emoji || '📍');
+            scoreRef.current += 150;
+            setScore(scoreRef.current);
+            setDiscoveredLandmarks(prev => [...prev, lm.id]);
+            if (onScoreUpdateRef.current) onScoreUpdateRef.current(scoreRef.current, collectedIdsRef.current.size);
+          }
         }
-      });
+      }
 
       // SPEED BOOST PADS — per-pad 3s cooldown so they don't fire every frame
       boostPadDefs.forEach(pad => {
@@ -1163,7 +1198,8 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
       });
 
       // RESPOND TO 45s SECRET LOOT RESPAWN (keeps open world alive)
-      INITIAL_VG_WORLD_COLLECTIBLES.forEach(item => {
+      for (let i = 0; i < INITIAL_VG_WORLD_COLLECTIBLES.length; i++) {
+        const item = INITIAL_VG_WORLD_COLLECTIBLES[i];
         if (item.type !== 'pearl' && collectedIdsRef.current.has(item.id)) {
           const respawnAt = respawnTimersRef.current[item.id];
           if (respawnAt && now >= respawnAt) {
@@ -1176,15 +1212,14 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
             }
           }
         }
-      });
+      }
 
-      // COLLECTIBLES — rotate, float, collect
-      const pulse = 0.5 + Math.sin(time * 3) * 0.3;
-      INITIAL_VG_WORLD_COLLECTIBLES.forEach(item => {
-        const cMesh   = collectibleMeshes[item.id];
-        const ringMat = collectibleRingMats[item.id];
-        if (!cMesh) return;
-        if (ringMat) ringMat.emissiveIntensity = pulse;
+      // COLLECTIBLES — single material uniform pulse and fast loop
+      sharedRingMat.emissiveIntensity = 0.5 + Math.sin(time * 3) * 0.3;
+      for (let i = 0; i < INITIAL_VG_WORLD_COLLECTIBLES.length; i++) {
+        const item = INITIAL_VG_WORLD_COLLECTIBLES[i];
+        const cMesh = collectibleMeshes[item.id];
+        if (!cMesh) continue;
 
         if (!collectedIdsRef.current.has(item.id)) {
           cMesh.visible = true;
@@ -1212,19 +1247,33 @@ export const VGWorldGame: React.FC<VGWorldGameProps> = ({ onScoreUpdate }) => {
         } else {
           cMesh.visible = false;
         }
-      });
+      }
 
-      // NEARBY PLAYER NAME
+      // NEARBY PLAYER NAME — only triggers React state when changed
       let nearby: string | undefined;
-      remotePlayersRef.current.forEach(rp => {
-        if (Math.hypot(playerGroup.position.x - rp.x, playerGroup.position.z - rp.z) <= 3.5) nearby = rp.displayName;
-      });
-      setNearbyPlayerName(nearby);
+      const rPlayers = remotePlayersRef.current;
+      for (let i = 0; i < rPlayers.length; i++) {
+        const rp = rPlayers[i];
+        if (Math.hypot(playerGroup.position.x - rp.x, playerGroup.position.z - rp.z) <= 3.5) {
+          nearby = rp.displayName;
+          break;
+        }
+      }
+      if (nearby !== lastNearbyRef.current) {
+        lastNearbyRef.current = nearby;
+        setNearbyPlayerName(nearby);
+      }
 
-      // COORDINATE UPDATE (throttled 100ms)
-      if (now - lastCoordsUpdate > 100) {
+      // COORDINATE UPDATE (throttled 200ms & only on integer changes)
+      if (now - lastCoordsUpdate > 200) {
         lastCoordsUpdate = now;
-        setPlayerCoords({ x: Math.round(playerGroup.position.x), z: Math.round(playerGroup.position.z) });
+        const rx = Math.round(playerGroup.position.x);
+        const rz = Math.round(playerGroup.position.z);
+        if (rx !== lastCoordsRef.current.x || rz !== lastCoordsRef.current.z) {
+          lastCoordsRef.current.x = rx;
+          lastCoordsRef.current.z = rz;
+          setPlayerCoords({ x: rx, z: rz });
+        }
       }
 
       renderer.render(scene, camera);
