@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Host & Sitemap specification for search indexing
+Host: https://poyaloo.vercel.app
+Sitemap: https://poyaloo.vercel.app/sitemap.xml

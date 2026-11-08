@@ -12,8 +12,43 @@ import { WelcomeOnboardingModal } from './components/onboarding/WelcomeOnboardin
 import { AirplaneEasterEgg } from './components/common/AirplaneEasterEgg';
 import { ApiKeyModal } from './components/common/ApiKeyModal';
 
+const tabToHash: Record<ActiveTab, string> = {
+  planner: 'planner',
+  comic: 'comic',
+  myths: 'myths',
+  game: 'explore',
+  entry: 'entry',
+  pass: 'pass'
+};
+
+const hashToTab = (hash: string): ActiveTab | null => {
+  const clean = hash.replace(/^#/, '').toLowerCase();
+  if (clean === 'explore' || clean === 'game') return 'game';
+  if (clean === 'comic') return 'comic';
+  if (clean === 'myths') return 'myths';
+  if (clean === 'entry') return 'entry';
+  if (clean === 'pass') return 'pass';
+  if (clean === 'planner') return 'planner';
+  return null;
+};
+
+const tabTitles: Record<ActiveTab, string> = {
+  planner: 'POYALO (പോയാലോ?) — AI Travel Itinerary Planner, 3D UAE Exploration & Comic Lore',
+  game: 'POYALO (പോയാലോ?) — 3D UAE Heritage Exploration (Al Qasba, Dubai Creek & Museum of the Future)',
+  comic: 'POYALO (പോയാലോ?) — AI Comic Story Studio & Travel Lore',
+  myths: 'POYALO (പോയാലോ?) — Travel Myth Buster & Etiquette Pointer',
+  entry: 'POYALO (പോയാലോ?) — 180-Day Passport Expiry & UAE Visa Rules Checker',
+  pass: 'POYALO (പോയാലോ?) — Travel Explorer Achievement Pass & Boarding Stub'
+};
+
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('planner');
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
+    if (typeof window !== 'undefined') {
+      const parsed = hashToTab(window.location.hash);
+      if (parsed) return parsed;
+    }
+    return 'planner';
+  });
   const [gameScore, setGameScore] = useState<number>(0);
   const [pearlsCollected, setPearlsCollected] = useState<number>(0);
   const [itineraryScore, setItineraryScore] = useState<number>(() => {
@@ -59,6 +94,29 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  const handleTabChange = React.useCallback((newTab: ActiveTab) => {
+    setActiveTab(newTab);
+    if (typeof window !== 'undefined') {
+      const targetHash = `#${tabToHash[newTab]}`;
+      if (window.location.hash !== targetHash) {
+        window.history.pushState(null, '', targetHash);
+      }
+      document.title = tabTitles[newTab];
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const parsed = hashToTab(window.location.hash);
+      if (parsed) {
+        setActiveTab(parsed);
+        document.title = tabTitles[parsed];
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const handleScoreUpdate = React.useCallback((score: number, pearls: number) => {
     setGameScore(score);
     setPearlsCollected(pearls);
@@ -66,12 +124,12 @@ export const App: React.FC = () => {
 
   const handleOpenMythsForCity = (city: string) => {
     setCurrentCity(city);
-    setActiveTab('myths');
+    handleTabChange('myths');
   };
 
   const handleOpenComicForCity = (city: string) => {
     setCurrentCity(city);
-    setActiveTab('comic');
+    handleTabChange('comic');
   };
 
   const handleCloseWelcome = () => {
@@ -99,8 +157,8 @@ export const App: React.FC = () => {
             activeCity={currentCity}
             onOpenMyths={handleOpenMythsForCity} 
             onOpenComic={handleOpenComicForCity}
-            onNavigateToPass={() => setActiveTab('pass')}
-            onNavigateToEntry={() => setActiveTab('entry')}
+            onNavigateToPass={() => handleTabChange('pass')}
+            onNavigateToEntry={() => handleTabChange('entry')}
             onScoreUpdate={setItineraryScore}
           />
         )}
@@ -120,7 +178,7 @@ export const App: React.FC = () => {
         {activeTab === 'game' && <VGWorldGame onScoreUpdate={handleScoreUpdate} />}
         {activeTab === 'entry' && (
           <EntryCheckView 
-            onNavigateToPass={() => setActiveTab('pass')}
+            onNavigateToPass={() => handleTabChange('pass')}
           />
         )}
         {activeTab === 'pass' && (
@@ -159,7 +217,7 @@ export const App: React.FC = () => {
       {/* Persistent Bottom Mobile Dock */}
       <BottomDock
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         gameScore={gameScore}
       />
 

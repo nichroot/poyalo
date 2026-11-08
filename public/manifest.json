@@ -1,7 +1,7 @@
 {
-  "name": "POYALO (പോയാലോ?) — Comic Lore, 3D & AI Travel Companion",
+  "name": "POYALO (പോയാലോ?) — AI Travel Planner, 3D UAE & Comic Lore",
   "short_name": "POYALO",
-  "description": "Offline-first worldwide travel app pairing comic-book lore, deterministic itinerary validation, and 3D exploration.",
+  "description": "Offline-first worldwide travel app pairing comic-book lore, deterministic itinerary validation, and 3D WebGL exploration.",
   "start_url": "/",
   "id": "/",
   "display": "standalone",
@@ -9,6 +9,8 @@
   "theme_color": "#1B3FFF",
   "orientation": "portrait-primary",
   "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -29,5 +31,44 @@
       "purpose": "any"
     }
   ],
-  "categories": ["travel", "entertainment", "utilities"]
+  "screenshots": [
+    {
+      "src": "/cover.jpg",
+      "sizes": "1280x640",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "POYALO 3D World and Comic Travel Studio"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "3D World Explorer",
+      "short_name": "3D World",
+      "description": "Explore 3D UAE landmarks and Al Qasba canal",
+      "url": "/#explore",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Itinerary Planner",
+      "short_name": "Planner",
+      "description": "Deterministic travel validation and day planner",
+      "url": "/#planner",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Comic Studio",
+      "short_name": "Comics",
+      "description": "Generate AI comic stories and travel lore",
+      "url": "/#comic",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Myth Buster",
+      "short_name": "Myths",
+      "description": "Debunk travel myths and learn local etiquette",
+      "url": "/#myths",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["travel", "entertainment", "utilities", "education", "navigation"]
 }
