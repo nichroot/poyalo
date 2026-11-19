@@ -24,30 +24,35 @@
 
 <br />
 
-[ 🧭 Overview ](#-overview) • [ 💡 About POYALO ](#-about-poyalo) • [ ✈️ Origin Story ](#️-origin-story-born-at-layover-2026) • [ ⚡ The 5 Pillars ](#-the-five-core-pillars) • [ 🛠️ Tech Stack ](#️-architecture--tech-stack) • [ 👥 Creators ](#-meet-the-creators) • [ 🚀 Quickstart ](#-local-development-setup)
+[ ✈️ Origin & Philosophy ](#️-origin--philosophy-born-at-layover-2026) • [ 🧭 Live Demo ](#-live-production--quick-links) • [ ⚡ The 5 Pillars ](#-the-five-core-pillars) • [ 🛠️ Tech Stack ](#️-architecture--tech-stack) • [ 🎨 Design System ](#-design-system--neo-brutalist-guidelines) • [ 👥 Creators ](#-meet-the-creators) • [ 🚀 Quickstart ](#-local-development-setup)
 
 </div>
 
 ---
 
-## 💡 About POYALO
+## ✈️ Origin & Philosophy: Born at LAYOVER 2026
+
+> *"200 students. One overnight build. Zero fixed problem statements. Build something around travel and demo it by sunrise."*
 
 ### 🗣️ What Does *"POYALO"* Mean?
-In Malayalam, **"പോയാലോ?" (*Poyalo?*)** is that irresistible question you whisper to your closest friend when spontaneous wanderlust strikes. It translates loosely to:  
-👉 **"Shall we just go?"**  
-👉 **"Shall we hit the road?"**  
-👉 **"Shall we take the leap?"**
+In Malayalam, **"പോയാലോ?" (*Poyalo?*)** is that irresistible question you whisper to your closest friend when spontaneous wanderlust strikes. It translates to:  
+👉 **"Shall we just go?"** • **"Shall we hit the road?"** • **"Shall we take the leap?"**
 
 It’s the universal spark before every legendary journey — spoken over midnight tea, at airport gates, or when staring at a cheap one-way flight ticket.
 
 <br />
 
+### 🏨 The Overnight Sprint
+**POYALO** was built from scratch in a single sleepless, caffeine-fueled night by **two friends** during **[LAYOVER 2026](https://tinkerhub.github.io/layover/)** — an overnight travel hackathon organized by **[TinkerHub](https://tinkerhub.org)** and **[The Visa Guy](https://tinkerhub.github.io/layover/)** at **TinkerSpace Calicut, Kozhikode** (10–11 October 2026).
+
+The challenge was completely open: *"Make something around travel (useful, weird, or gloriously pointless) and demo it by sunrise."* With a flight route theme running from **CCJ (Kozhikode) to DXB (Dubai)**, we teamed up, locked ourselves in from 6:00 PM to 9:30 AM, and asked each other: **"പോയാലോ?" (*"Shall we go for it?"*)**.
+
+We didn't take first place or win the grand prize Dubai tickets — **we weren't first, but at least we gave it everything we had, and it's the heart, sweat, and effort that counts, right?** What started as an overnight sprint turned into an app we genuinely love and continue to build with care: pairing interactive comic lore, deterministic travel validation, and an in-browser 3D WebGL world.
+
+<br />
+
 ### 💥 The Anti-Spreadsheet Manifesto
-Most travel apps suck because they treat wanderlust like corporate project management:
-- ❌ **40-row Excel spreadsheets** that turn holidays into stressful sprint reviews.
-- ❌ **Dry Wikipedia text walls** that read like an encyclopaedia entry from 1998.
-- ❌ **Hallucinating AI bots** that casually suggest a 15-minute walk across a 300km desert highway.
-- ❌ **Surprise border rejections** when travellers find out their passport needed 180 days of validity *at the boarding gate*.
+Most travel apps suck because they treat wanderlust like corporate project management: 40-row Excel spreadsheets, dry Wikipedia text walls, hallucinating AI travel bots, and surprise border rejections when passports lack the mandatory 180-day validity window.
 
 **POYALO flips the entire paradigm upside down:**
 
@@ -58,30 +63,6 @@ Most travel apps suck because they treat wanderlust like corporate project manag
 | **Static 2D tourist maps** | **Interactive 3D WebGL exploration** — scout landmarks, leap across Al Qasba canals, and collect heritage relics directly in your browser. |
 | **Last-minute passport panic** | **Real-time 180-day passport meter & visa matrix** that stamps compliance directly onto your interactive boarding pass. |
 | **Over-reliance on internet** | **Offline-first PWA** with built-in Web Audio synthesizers that work 35,000 feet in the air with zero cell reception. |
-
-<br />
-
-### 🎨 The Aesthetic: Neo-Brutalist Comic-Book Punk
-POYALO isn't afraid of personality. It features:
-- **Zero blurry drop shadows:** Only crisp, punchy, hard-offset elevation (`box-shadow: 4px 4px 0px #111827`).
-- **Heavy retro ink borders:** Deliberate, bold black framing (`2.5px solid #111827`).
-- **Warm newsprint canvas:** `#FDFBF7` parchment background paired with high-voltage highlighter tones (`#1B3FFF`, `#FBBF24`, `#FF5722`).
-- **Sound Decals & Speech Bubbles:** Cartoon-styled `"YALLA!"`, `"BOING!"`, `"SWOOSH!"`, and `"KAPOW!"` reactions with directional speech bubble tails.
-
----
-
-## ✈️ Origin Story: Born at LAYOVER 2026
-
-> *"200 students. One overnight build. Zero fixed problem statements. Build something around travel and demo it by sunrise."*
-
-**POYALO** was born from scratch in a single sleepless, caffeine-fueled night by **two friends** during **[LAYOVER 2026](https://tinkerhub.github.io/layover/)** — an overnight travel hackathon organized by **[TinkerHub](https://tinkerhub.org)** and **[The Visa Guy](https://tinkerhub.github.io/layover/)** at **TinkerSpace Calicut, Kozhikode** (10–11 October 2026).
-
-The challenge was completely open:  
-> *"Make something around travel (useful, weird, or gloriously pointless) and demo it by sunrise."*
-
-With a flight route theme running from **CCJ (Kozhikode) to DXB (Dubai)**, we teamed up, locked ourselves in from 6:00 PM to 9:30 AM, and asked each other: **"പോയാലോ?" (*"Shall we go for it?"*)**.
-
-We didn't take first place or win the grand prize Dubai tickets — **we weren't first, but at least we gave it everything we had, and it's the heart, sweat, and effort that counts, right?** What started as an overnight sprint turned into an app we genuinely love and continue to build with care: pairing interactive comic lore, deterministic travel validation, and an in-browser 3D WebGL world.
 
 ---
 
